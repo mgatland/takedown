@@ -1,0 +1,771 @@
+0.6
+
+Guarders should not Follow!
+Enemies who know the base is "Breached" should tell their friends, so they abandon their posts and come inside.
+
+!Added e_breach command (UNTESTED) to make enemies abandon guard posts when they see the player inside their base.
+!Added more control to setting Roles in triggers with e_guard-1 and so on.
+!Setting a patrol route won't override other roles already given to the patrollers.
+!When enemy is following (except following during a Check), anyaware gets set so he is aware of his leader's target.
+3 sets of Follow code moved out of CheckEnemyAction and into a new function
+!When an enemy is following, bawareg becomes true and cannot be set to false. this is another hack. Not entirely successful...
+!When an enemy is following a leader who died, his action is set to blank to it can hopefully be replaced by a check action.
+!When an enemy is following, I set his 'checkpos' to where he's going, as well as his finaldest. If he goes into a check action, he should keep going to the same place.
+!Took out the feature where player orders were only given to touching friends, if any friends were touching. Orders now always go to the bigger radius - the touching thing was a pain,one close friend made your orders not work.
+
+!Trip wires added. Tech info: tripnet and tripwire types, game_checkwire function, new triggers. can be set up in a level. can be toggled with trigs. can set off trigs.
+!A tripwire can be told to call a team to it's position when it goes off
+!Experiments with level editing showed me that the object optimizer had a bug - doesn't compress vertically, only horizontally - now fixed
+!Level editor - using the three mouse buttons
+!level editor - drag editing supported. controls: LB - terrain, RB = pathnode. MB (or LB+RB) = rebuild paths.   Shift+ LB\RB changes terrain type. Shift+ MB (or L + R) saves the map to a file
+!Installer - now correctly installs DLL and font!  - NB still has a bug with font?
+! Made "Constants for the WaveMix32.dll library" non-global, trying to improve performance. frame delay is now public in frm_game.
+! made debug (cheatmode) display prettier - shows where enemies are heading more nicely
+! allow disabling of the black background on the options page - option does not save.
+! fixed a bug where trying to load a save with no save selected crashes the game
+! Saving over an old save game keeps the same name by default.
+!played with some sound settings.  http://www.vbexplorer.com/VBExplorer/sound2.asp
+! trip wire sound now unloaded at shut down with the others.
+!mission text now updated in Moveimages (not gameloop) and new subs, engine_mistxt*. Txt now fades after a while
+!BACKUP 5ish made here
+!Made many Types and Consts private to frm_game instead of public in module1. This should improve speed\ram usage\something.
+!began new AI classes - new enums and patrol path type - function ai_getenemyrole, action, etc
+!moved shootai out of gameloop. moved awareness, targeting, out of ai_checkenemystate.
+!tried some Winsock stuff I'll never finish.
+!began on patrol routes
+!Did a big tidy up of the awareness levels. "Check" isn't a response for an entire awareness level now. It's just something you do when you suspect something, no matter your awareness.
+!Patrols can be set in level setup
+!Guarding works now.
+'ATTITUDES' SHOULD BE REMOVED - THEY ARE REDUNDANT NOW
+!Startled is no longer a state- it's a special bool that overrides ai.
+!added triggers e_checkhome, e_guard
+!levels now can use the letters and other characters as terrain types as well as just the digits 0-9. new pathnode character is '*'. Use the level editor to re-save a map in the new format. easy!
+!Bug where an enemy changes from path navagation to straight LOS, moves, blocks his view, moves back to the path, and loops forever. Instead of fixing, i made enemies (even) less likely to go in the reverse direction.
+!Unaware enemies follow enemies who are checking. with dialogue.
+!Awareness level affects dodging skill. The more aware they are, the better they will dodge.
+!When an enemy is still, he clears his 'lastmoved' variable. May cause problems.
+!Basic smooth movement does not look good. I'm not going to put it in. The test looked awful.
+!New walls that link together - map editor automatically uses the right tiles
+!Three different pathnode ranges (now tested).
+!Enemies who are called to help search will respond "Let's go!"
+!increased objtop from 129 to 511
+!optimised ai_pathto function
+!added patches of different ground. These can be offset so they don't line up perfectly.
+!Enemies in a Runto who see their finish and stop using paths will not try using paths again for 4 moves, even if they lose sight.
+!Forgot to make map loader recognise smallest pathnode. Fixed.
+!startled enemies don't count in the 'how many enemies are aware' trigger.
+!Dead bodies last longer (e(victim).counter = 25) up from 15. This is so it's harder to murder patrollers stealthily.
+!Enemies can go and get help when they find the player. They will return to fighting when they get enough friends, or reach their goal.
+!When looking for friends, enemies alert close friends even if they only glimpse them. (cansee)
+!Player can tell friends to (F)ollow or (G) stop. - They will follow during combat, unlike enemies following NPCS.
+
+!Fixed a bug where a startled enemy who had no target caused a crash. But: I don't know why he had no target...
+!Screen goes black when loading instead of showing the previous screen from the last level played.
+!Objects are compressed for LOS regardless of their type. However, this means they aren't compressed for drawing, so we have more objects now.
+! added action_comment to make enemies comment on other enemies. Added more dialogue. Including gathering\checking, and combat comments.
+! Low priority speech is always dropped when offscreen.
+
+file sizes
+Wavs - 579k  (454 k music,  55 k sfx, 70 k voice) 
+bmps - 321k  (55k effects, 41k ground, 95k human, 50k dec, 14k dead, 44k shots, 22k mech)
+
+Base - 506 k
+App     	-  356 k
+readme 	- 14k
+missions 	- 50k + 1k + saves 3k
+font  	- 41k
+wavmix dll  - 42k
+
+total: 506
+        579
+        321
+
+       --1,406kb uncompressed- compress to 850 kb?
+      --    952kb without music  compress to 450 kb?
+
+msvbvm60.dll - 1,400k
+
+Framerate: on first level at starting position. PIII 500 mhz 256 ram
+37.5 fps uncompiled
+77.3 compiled
+
+On level 8
+24.3 / 19.0 uncompiled
+48.7 / 34.7 compiled:
+
+Game should run at 20 fps?
+
+note for music - the longest level in takedown takes 2 minutes. my current midi lasts 30 seconds.
+memory usage according to XP - around 5  megs
+
+=====================================================================
+
+Objectives:
+
+New conversation sounds
+New enemy graphics.
+- 15 frame idle animations. Lean left, Lean right, lower gun  Total 45 frames (x 4)!
+Maybe only 9 x 2 = 18
+- 15 frame shooting animation (only the elite commando Super has a sspeed of less than 15, his is 10) 15 (x 4)
+Maybe only 9
+- Death animations? 
+
+Editor must be able to add patches, keysqs, patrolsquares.
+
+
+Get Help - enemies go to help keysq, look for group (can be 'any'). Enemies in the group will follow. Others will go on alert.
+once [helpnum] have been alerted, enemy can go back to attacking.
+
+Patrollers report in or commanders get jumpy.
+Enemies share there awareness except full awareness.
+Make tripwires use the new awareness - make them turn on a light on a control panel, enemies who see it get suspicous of it's source.
+
+1. More terrain <Mostly done>
+2. New AI awareness - patrols, reporting in, getting help <Mostly done>
+3. New conversations <NOT DONE>
+4. pathnode ranges <done>
+5. new storyline + missions (defend the base! and travel missions!) <NOT DONE>
+6. Editor
+7. Demo recording\playback
+8. What about an isometricy view mode? - half isometric - each square can extend a short distance into the square above.
+Use Nullsoft Install Maker
+
+++++++++++++
+More terrain types - use alphabet in maps intead of numbers, so we can have more. trees. cliff edges a la Red Alert.
+ascii values:
+"a"  97
+"A" 65
+" "   32
+"."   46
+level editor.
+
+Types of wall:
+4 sides x 1
+3 sides  x 4 (reversed)
+2 sides x 6? - up, left, 4 corners.
+1 sides x 4
+0 sides x 1
+Total 16
+
+------------
+tech thoughts
+
+New Trip Wires:
+
+When tripped, the wire activates a beacon.
+Everyone who can see the becon is alerted to AWARE, and gets a checkxy of the tripped position.
+The score of that checkxy decreases over time, so later enemies who see the beacon won't investigate.
+
+patrol route:
+Name =      "Perimeter"
+point,delay  "topleft:10; midleft:10; lowleft:10; firstroom:20; secondroom:commander;"
+         - if the 'delay' is a string, it is the name of who to report to
+
+patroller enemy:
+currentPoint, currentRoute, delayedTime, bHasReported (this cycle)
+
+patroller:
+If you don't know what to do, RUNTO the next point.
+if you are at the next point (non report in), WAITING until Duration
+if you are finished waiting, update the next point
+
+if you are at the report in point and see the commander RUNTO the commander
+if you are beside the commander and haven't reported in, WAITING and REPORTING CONVERSATION
+
+Reporting conversation sets bHasReported to true
+
+if bHasReported = true, update the next point
+
+if you are at report in point and the commander is absent, update the next point (no alert?)
+
+if you hear\see disturbance, GOTO the disturbance
+(when you arrive, you will automatically go back to patrolling)
+
+if you Find the Player, update next point to the report in point and RUNTO there and alert everyone
+
+
+
+
+++++++++++++
+AUTOMATIC SCRIPTING FUNCTIONS - 
+--- Patrol routes must be easy to code - a point has x, y, delay, nextpoint, and bReportIn or ReportInToThisPerson
+--- A slightly suspicious enemy may head towards a noise or explosion
+--- Report-in points must be set and enemies who don't report in raise suspicion: search parties go over their patrol route
+--- Some enemies run for help when they see you
+--- Zoning - zone the level, and enemies can be told to stay in a zone - for example, not following the player out of the base or a certain room (guards)
+
+--- new order: Defend. If the person you are defending is in a zone, go to the defence points defined for that zone. these guard doorways, etc
+
+ENEMY TYPES 2:
+1. aggressive - If you see: attack                   (default)
+2. patrollers - patrol, investigate noise. If you see: report in, then attack
+2b. Additional patroller - like a patroller. Half length delays. looks for the original patroller who didn't report in. If he find him, says "You didn't report in, had us worried!", and goes back to standing inside.
+3. gatherers - if you see: report in, then attack. (gathers could be dasychained to alert an entire base?)
+4. guards - attack on sight, but don't pursue
+4b.guards - Camp On Sight
+5. overseers - if you are told, attack with group - or flee to safety. If you get a high report\no report, send a group member onto the patrol route
+6. off duty - if told, attack. if suspicious, go to duty spot and begin duty orders (should there be an off duty flag that stops any enemy type from working?)
+7. overseers' men - can be sent to patrol. Will attack if the overseer sends them. If the overseer flees, they will bodyguard?
+	- if the overseer hides, they will block the approach to him?
+8. Idle enemies? if a patroller is suspicious, he will make an idle enemy copy his orders: "Something isn't right" - "I'll go with you"
+
+So, specific vars I need
+1. Attitude - Aggressive, patroller, newpatroller, runforhelper, guard, campguard, generalbrave, generalcoward, generalsquad, idle
+
+
+AWARENESS LEVELS 2
+0. unaware			- take no action
+1. suspicious		- Overseers who see a suspicious patroller send an extra patroller on that route (and remember they have). If a patroller doesn't come home, this happens too.
+2. alert - he is here!		- If an Additional Patroller doesn't report in or does but doesn't find the first. If a patroller comes in scared. Off duty soldiers come on duty. Commander may hide.
+3. exact location known	- Everyone attacks except guards and some Overseers, who wait at key points until they see him
+
+++++++++++
+
+++++++++++
+
+NEW CHATS:
+
+--Seen (start seeking) - "There he is!"
+--Taunt - "Got him!"
+
+--Start Check - "What was that?"
+--Get help check Checkf - "Follow me, I saw something"
+--yescheck - "Ok, I will follow you to that movement"
+--
+--Give up checking - "If he was here, he's moved."
+
+-Get help Seek - "Follow me, Now!"
+-yesseek - "I'll cover you!"
+
+Start Gather - "Help! help!"
+
+-Get help Gather - "Assemble, assemble!"
+-yesGather - "Ok"
+
+-End Gather - with a full contingent: "Let's hunt him down"
+-	- with no buddies: "Looks like we're on our own."
+
+Fighting:
+When one hits: "I got him!" - And his friends: "Good shot!" - "Good shooting"
+When one gets hit (and lives) - "Taking fire"
+		- or a friend might say "You OK?" "Maybe"\"No"\"I think so"
+When one dies - and > 1 friend: "Man down!"
+	            only 1 friend: "Oh my god."
+
+Old CHATS - 20 wavs x 11 kb = 220kb
+
+two enemies on 1) different patrol paths and 2) Patrolling	
+"How's it look?"
+"Haven't seen a thing"       				   \          "I think there's something out there"   - boost suspicion of the lower patroller
+"I think there's something out there"     \ "ok"			             "me too"                 \       "Don't get jumpy"
+
+Suspicous
+"What was that?"   \    "Is there someone there?" \ "I'm checking that out"
+
+Reporting
+"Report in!"\ "Report"
+All clear\Haven't seen\I think there's something\ etc
+
+"Someone's forgotten to report" \ "Someone's gone missing"
+"I'll check it out"   "I'll take a look" 
+
+"The search party should be back by now"
+back:
+"I don't know what happened."   "I can't find anything"
+"Keep patrolling"                        "Keep a look out"
+
+"Sir, he's here!"
+"Sir, I've found him!"
+"We're under attack!"
+"The peacekeeper's here!
+
+"Full alert!"
+"Guard this area!"
+
+Idle gets recruted to patrolling
+"Something's not right" \ "I know he's out there"
+"I'll go with you"
+
+
+possibles: combats? or player allies
+
+"Need backup!", "good shot", "thanks"
+
+
+++++++++++++
+OPTIMIZATION
+Seperate display objects and LOS objects so that non-uniform objects can still be compressed together (for LOS checks) but be drawn with different images
+
+
++++++++++++
+MISC - these things aren't wanted any more?
+
+More speech - different voices. Wounded cry. More variants. Commands - 'stick together team', 'Man down!'
+
+
+GADGETS:
+1. Laser tripwires     - Triggers. Can be disabled and enabled.
+2. hackable terminals  - you must stand still to hack. Description screen. Triggers.
+3. Alarm sounder panel - enemy sets off alarm then fights. Enemies go if no-one else is going. Triggers
+
+Large terrain features - mountains, buildings, 3x3 squares - animated?
+
+New .mid music
+
+fleeing ai. Make sure they avoid the player, his shots and his shootable area.
+
+Use 'ModPath' to allow easy modding.
+
+
+
+XXXX
+Notes no. 15 is not yet used - it's a diary entry from one of the guys on mission 2
+XXXX
+
+
+
+
+
+===================================================================================================================
+
+
+story:
+	STORYLINE MUST EMPHISISE TERROR OF WAR AND KILLING!!!!!
+	!More missions!
+Technical:
+	!font included
+	!XP compatibility - include the wavmix.ini file
+
+
+Takedown runs on a Celeron 450 Windows 98 system with 256 megs of ram, but requires 
+msvbvm60.dll, wavmix32.dll, hatten.ttf
+
+In WindowsXP, wavmix must be installed correctly with the _wavmix.ini_ file in windows directory and wavmix32.dll in windows\system32
+
+
+
+Alli says:
+Install: 3 1/2
+grafics: 3 for origionality, 4 for quality, 2 for layout (some of the words are stuffed)
+handling: 3 (needs ability to config alternate keys)
+
+==================
+    ' Make sure the file exists before trying to open it.
+    If Dir(sFileString) = "" Then
+        LoadTips = False
+        Exit Function
+(!)  End If
+    
+
+
+===================
+
+Upgrades: - upgrade at max level should make weapon around twice as powerful
+
+Pistol and rifle:
+	0. rof                         - 10%, 20, 30, 40, 50
+	1. piercing                    + 50, 75, 90, 100, NA 
+	2. heat			       - 15%, 30, 45, 60, 75
+	3. stealth                     - 15%, 30, 45, 60, 75
+	4. NA
+
+
+	recoil	
+
+this stuff is just theory, don't know if I want it yet:
+==Inventory menu:
+Upgrade item - choose upgrade
+Choose inventory (for next mission)
+==Saving
+Save inv and upgrades, current items, material,
+==Game
+Get material for kills (!) - add effect as material flies to you.
+Make upgrades work
+
+Add Action that brings up inventory screen
+
+==main screen
+show current items and material
+
+You can take 3 or 2 items on each mission.
+==================
+
+Items: (Press (gun), Hold (shield) or Always on )
+
+Suit          - A -
+		    health        - 3, 4, 5, 6 health 
+		    heat armour   - 0%, 10%, 25%, 50%
+                    stealth       - 0%, 10%, 25%, 50%
+
+Pistol        - P - 
+		    damage
+		    recoil
+		    heat
+		    Rate of fire
+		    shotaffect
+
+Rifle         - P - damage, recoil, heat, rate of fire, shotspeed 0 or -,
+                    shotaffect, silencer (otherwise firing raises suspicion), selfhurt
+
+scanner       - H - show who's talking, suspicion\aware\cansee, show health, camoflage (harder to see)
+
+==================
+
+
+TRIGGERS:
+!Start of level
+!Victory
+!kills reach 1#
+!Player goes to square 1#, 1#
+!timer check #timer, #value
+!Enemy has engaged (spotted) player
+!Always\flags
+!Player health falls to 1#
+
+
+Failure
+Enemy 1# is killed
+Enemy 1#'s health falls to #2
+Enemy 1# reaches X #2, Y #3
+Any enemy reaches X #1, Y #2
+
+!Time past is #1, loop every #2  - Multiuse
+!Player reaches #1 side of the board (North, south..)
+
+
+ACTIONS:
+!Win mission
+!Set flag #1 to #2
+!heal player (combine with playerxy)
+!toggle decoration
+!text messages
+!Start timer #1 from #2
+!Create\copy enemy #1, X #2, Y #3
+!set the alarm
+
+Lose mission
+Extend timer #1 by #2
+Enter offscreen enemy #1, X #2, Y #3
+
+Increase flag #1 by #2
+Make enemy #1 go to state #2
+Save enemy #1's health as flag
+Load enemy #1's health from flag (so enemies can carry through missions!)
+
+Make enemy #1 move\run\walk to X #2, Y #3
+destroy enemy #1 (because he moved off the board)
+give #1 units of material (reward for secondary objectives)
+Set labMission text to #1
+Set labmission text to timer #1 -maybe other options like enemy health
+Get player x\y\face from flag
+Save player x\y\face as flag
+Same for an enemy x\y\face etc etc
+
+
+
+Thanks to:
+
+Angle tutorial.
+Keyboard tutorial.
+Bitblt tutorial.
+Sound tutorial.
+Pathfinding tutorial.
+
+
+Programs used:
+
+Visual Basic 5    - code
+Bryce 4           - grahics
+Adobe Photoshop 5 -graphics editing
+GoldWave          -Sound effects
+TexSynth          -tiling backgrounds
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+Detecting player -
+If you see him for long enough, includes distance
+If you see a shot for long enough, includes distance
+If you see a dead or seeking teammate
+If you see an explosion
+If you are very close to an explosion (hearing)
+
+Each 10 skill quickens detection by 20
+Each 1 distance slows detection by around 40
+Behind you slows detection by 80%
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+Actual states:
+
+!!Check for player if we are not bEngage
+
+*fighting            - In combat with player, always engaged
+retreating 
+surrounding 
+
+*Seeking             - Looking for player, always engaged
+charging 
+
+
+startled             - Just discovered player
+
+standing             - !! not pursuing player
+waiting 
+
+camping              - Defending a point, !! may be aware of player
+
+runto                - Running to a location
+
+fleeing              - Enemy will avoid player if he is spotted 
+
+
+
+==========================================
+
+enemy attitudes
+
+0. Agressive     - Alarm: chase. Otherwise, camp or chase.
+   (Normal enemies)
+
+1. Cautious      - Attack if we can see, or if alarm goes off
+   (Enemies in a base\strategic location)
+
+2. Defensive     - Attack only if you can see the player, ignore the alarm
+   (Bosses)
+
+3. Cowardly      - If he knows where the player is, avoid him. UNSUPPORTED
+   (wimps)
+
+
+
+=====================================
+
+Gameplay information:        (Must be taught to players)
+
+info      - mission notes and text messaging
+Moving    - 4 directions, strafing, turning
+Shooting  - primary, secondary, heat
+Dodging attacks
+Bottlenecks
+Overheating  - damage, overshooting - Flee when necessary
+Fighting one at a time
+sneaking\ambushing - obsticles, standing behind
+enemy types: seeking, waiting\standing, camping
+
+HUD:
+info
+health
+gun indicator
+heat
+
+Movement:
+walking
+'turning'
+'strafing'
+
+Shooting:
+fire modes
+heat
+
+==========================================
+
+TAKEDOWN story line
+
+In the year 2170, man has finally triumphed. With the combined power of the entire world, the Unity has ended famine, disease and war.
+
+But some will always resist. Hungry for power, factions formed to throw mankind back into conflict.
+
+In defence, the Peacekeepers were formed - the first military group for 45 years. And if successful, the last. Ever.
+
+Now the rebel forces spread each day. They comsume all they reach. If the Unity is to survive, the rebel uprising must be taken down.
+
+month:day:year
+03-03-2170
+Today the four Peacekeepers are being deployed on Foundation Island where they will combat Stall forces and attempt to destroy the uprising. The PeaceKeeper landing was almost delayed as UNITY 
+
+==================
+
+In the far future, supercomputers aid the government in developing laws. New legislation can be virtually mass-produced. However, 15 years of no war has caused serious problems.
+
+"Man write his own laws? you are talking through a microphone made by machine. You are wearing clothes made by a machine. You drive a car made by a machine.
+You cannot make those things, but you think you can produce the law, something a thousand times more delicate, by hand?"
+
+
+
+"It would be nice to control the weather, too. We would have sun all day long. It would always be the perfect temperature. And after a few days or weeks we would die. Sometimes the weather hurts us and sometimes it causes tragedies but in the end it is for our own good."
+
+===============
+
+"^wITEM:^2Notes Cartridge^2Contents: 'My Song'^2We’re all on a little island floating on the big wide sea^1We are small in number but we’re fighting all the Unity^1Men are dying, men are dying, must we die to become free?^1Men are dying, men are dying, I hope the next death is me.^2We’re all on a little island standing up for what is right^1But when all the world opposes all we do is die and fight.^1Men are dying, men are dying, must we die to become free?^1Men are dying, men are dying, I hope the next death is me."
+
+==============================================
+
+Quotes:
+
+1. Sun Tzu said: The art of war is of vital importance to the State. 
+2. It is a matter of life and death, a road either to safety or to ruin. Hence it is a subject of inquiry which can on no account be neglected. 
+3. The art of war, then, is governed by five constant factors, to be taken into account in one's deliberations, when seeking to determine the conditions obtaining in the field. 
+4. These are: (1) The Moral Law; (2) Heaven; (3) Earth; (4) The Commander; (5) Method and discipline. 
+
+
+XXXXX USED
+18. All warfare is based on deception. 
+19. Hence, when able to attack, we must seem unable; when using our forces, we must seem inactive; when we are near, we must make the enemy believe we are far away; when far away, we must make him believe we are near. 
+20. Hold out baits to entice the enemy. Feign disorder, and crush him. 
+XXXXX end used
+21. If he is secure at all points, be prepared for him. If he is in superior strength, evade him. 
+22. If your opponent is of choleric temper, seek to irritate him. Pretend to be weak, that he may grow arrogant. 
+23. If he is taking his ease, give him no rest. If his forces are united, separate them. 
+24. Attack him where he is unprepared, appear where you are not expected. 
+25. These military devices, leading to victory, must not be divulged beforehand. 
+26. Now the general who wins a battle makes many calculations in his temple ere the battle is fought. The general who loses a battle makes but few calculations beforehand. Thus do many calculations lead to victory, and few calculations to defeat: how much more no calculation at all! It is by attention to this point that I can foresee who is likely to win or lose. 
+XXXXX
+
+17. Thus we may know that there are five essentials for victory: (1) He will win who knows when to fight and when not to fight. (2) He will win who knows how to handle both superior and inferior forces. (3) He will win whose army is animated by the same spirit throughout all its ranks. (4) He will win who, prepared himself, waits to take the enemy unprepared. (5) He will win who has military capacity and is not interfered with by the sovereign.
+
+ 18. Hence the saying: If you know the enemy and know yourself, you need not fear the result of a hundred battles. If you know yourself but not the enemy, for every victory gained you will also suffer a defeat. If you know neither the enemy nor yourself, you will succumb in every battle. 
+
+11. What the ancients called a clever fighter is one who not only wins, but excels in winning with ease. 
+12. Hence his victories bring him neither reputation for wisdom nor credit for courage. 
+XXXXX
+13. He wins his battles by making no mistakes. Making no mistakes is what establishes the certainty of victory, for it means conquering an enemy that is already defeated. 
+14. Hence the skillful fighter puts himself into a position which makes defeat impossible, and does not miss the moment for defeating the enemy. 
+XXXXX
+15. Thus it is that in war the victorious strategist only seeks battle after the victory has been won, whereas he who is destined to defeat first fights and afterwards looks for victory. 
+
+XXXXX USED
+12. The onset of troops is like the rush of a torrent which will even roll stones along in its course. 
+13. The quality of decision is like the well-timed swoop of a falcon which enables it to strike and destroy its victim. 
+14. Therefore the good fighter will be terrible in his onset, and prompt in his decision. 
+XXXXX  end used
+
+XXXXX
+1. Sun Tzu said: Whoever is first in the field and awaits the coming of the enemy, will be fresh for the fight; whoever is second in the field and has to hasten to battle will arrive exhausted. 
+XXXXX
+2. Therefore the clever combatant imposes his will on the enemy, but does not allow the enemy's will to be imposed on him. 
+3. By holding out advantages to him, he can cause the enemy to approach of his own accord; or, by inflicting damage, he can make it impossible for the enemy to draw near. 
+4. If the enemy is taking his ease, he can harass him; if well supplied with food, he can starve him out; if quietly encamped, he can force him to move. 
+5. Appear at points which the enemy must hasten to defend; march swiftly to places where you are not expected. 
+
+XXXXX
+17. Let your rapidity be that of the wind, your compactness that of the forest. 
+18. In raiding and plundering be like fire, is immovability like a mountain. 
+19. Let your plans be dark and impenetrable as night, and when you move, fall like a thunderbolt. 
+XXXXX
+
+
+12. There are five dangerous faults which may affect a general: (1) Recklessness, which leads to destruction; (2) cowardice, which leads to capture; (3) a hasty temper, which can be provoked by insults; (4) a delicacy of honor which is sensitive to shame; (5) over-solicitude for his men, which exposes him to worry and trouble. 
+13. These are the five besetting sins of a general, ruinous to the conduct of war. 
+14. When an army is overthrown and its leader slain, the cause will surely be found among these five dangerous faults. Let them be a subject of meditation. 
+
+29. The skillful tactician may be likened to the shuai-jan. Now the shuai-jan is a snake that is found in the ChUng mountains. Strike at its head, and you will be attacked by its tail; strike at its tail, and you will be attacked by its head; strike at its middle, and you will be attacked by head and tail both. 
+30. Asked if an army can be made to imitate the shuai-jan, I should answer, Yes. For the men of Wu and the men of Yueh are enemies; yet if they are crossing a river in the same boat and are caught by a storm, they will come to each other's assistance just as the left hand helps the right. 
+
+
+==========================================================================================================================================
+VERSION HISTORY
+
+0.3 (on my website)
+
+! Now paths are stored to each pathnode as well as the player.
+! New action e_runto
+! Time before being notice changed. Enemies notice player more quickly when he's closer. changes to seeing shots, friends and explosions.
+! Enemies attempt to surround after certain periods of fighting.
+! Enemies become more suspicious as they see things. Over time they become less suspicious.
+! more slots for: triggers, shots, explosions- All done?.
+! 10 count down\up timers with bools for direction 
+! Enemy shooting is more random
+! Increase all health and damage by 20, so there can be more precise damage amounts
+!- removed Set Gun command
+! Conds now have 3 props (not 2)
+! Flags now exist, starting to incorperate them
+! killgoal and countdowntime removed, keeping Healamount
+! added decorations, offonable
+!new text messages
+!Paths only check for other paths closer than 7 units
+!When navagating on the path network, don't let enemies do a Cansee check for other paths. Instead, check if the path that they are standing on is linked.
+!options in briefing
+!Graphics loaded out of files
+!Improved controls - no more annoying ziggy movement!
+!Different types of runto
+!Speed up blue and purple explsion animations
+!FIX THE SCRIPTING SYSTEM - Mutiple conditions! Multiple actions!
+!Halved sound quality, so sound files are smaller
+!all explosions now have 5 frames (before some had 5 and some had 3)
+!each shot type has its own fire sound and wall hit sound
+!Sounds - message beep, overheat warning
+!Saving+loading
+!enemies see things behind them with 25% efficiency, when unaware
+!Make enemies use clearer paths, don't use LOS for pathfinding - TEST THIS!
+!delay after death before message box pops up
+!Improved 'loading screen'
+!AI Movement - weigh up value of all 5 possible moves, then choose the best one.
+!rows of objects compressed into one large object - should speed up LOS checks tenfold...
+!line of site modifications to work with large objects - it's all a hack at the moment.
+!Fatal LOS bug corrected - Got the sucker! - angle values were inverted in each quadrent - I didn't notice because I only checked the middle values, which remained the same.
+!LOS still has small irrationalities, however - some squares visible in large area of non-visible squares - I guess this is because of the centres being so specific. Idealy, the desired angle would be a spread, not a single value.
+!increased enemy limit by 3x to 30 - my computer can handle it - big firefights!
+!Notes implimented! You can view and cycle through them. They're just a label, so they flicker.
+!Bug fix - when the player cannot be seen by a path, we don't waste time trying to draw one to him. This also means enemies will go to the last place he was on the network, instead of trying to force their way to him, which will be better most of the time.
+
+0.4
+
+!scorch marks and correctly positioned explosions!
+!Keysquares are coded but NOT TESTED YET
+!Bug fix - forgot to free all waves on shutdown. Now they're all done.
+!on error goto next
+!visual cue shows which enemy is speaking - NEEDS NEW IMAGE
+!different fighting distances for different enemies
+!triggered sounds must be able to be attached to an enemy and be given a solo flag
+!Scrolling! Now Takedown maps can be as large as you want, and the screen will scroll
+!BUG - SOME KIND OF MEMORY LEAK? IN XP - DOESN'T FIND THE DLL
+!to speed stuff up - put a distance cap on Ph_cansee
+!off-screen things do not play sound - new function game_onscreen(x,y,width,height)
+!AI is about as good as dodging as I want at different skill levels. - no it isn't.
+!Artifacts around screen removed - I was turning Singles into integers
+!shots don't explode on level boundries - they just disappear
+!The game will not let you play episodes that don't exist
+!Bug fix - cloned enemies were not inheriting material or min and max fight distances
+!Playtest - the 8 missions of the TakeDown beta campaign are playable and not overly difficult - some took several attempts - the entire campaign took 30 minutes.
+!Better notes page - it's just a form. Not as cool, but it works.
+!Installer
+!Tester informs me that Version 0.4 works fine - EXCEPT THE MISSING FONT
+
+0.5
+
+!slight changes to mission. Hardest missions made easier.
+!Blank buttons on multichoice briefing fixed?
+!starting screenposition adjusted.
+!'Startled' enemies are not 'aware', so will not trigger aware triggers until they have fulley realised that the player is there.
+!Added support for penetrating crowd-control shots
+!Savegames store upgrades, current weapons and material. These still aren't implimented though
+!upgrading through briefing now possible
+!added gunmod array to player, as well as save
+!added temp weapon upgrade effects - exaggerated
+---must edit upgrade code in PFire and add upgrade code to "refreshgun"
+!shots may have 'stealth' - does not effect explosions
+!better upgrades implimented - more moderate
+!removed a redundant copy of the gunmod array. One that I added a little while ago.
+!Path improvement - each path only has X links, instead of a true\false link for every other path - paths are now far far faster - only 10 checks instead of 100!
+!Path - this has one problem - in outdoors, paths tend to want too many links and must be thinned out - leads to inferior outdoor navigation
+!Enemies now have a Target that can be other enemies or the player - not 100% supported
+!Begun implimenting teams - 0, 1 are baddies (fight each other) - 2 is player allies
+!2 new missions
+!Save interface more friendly
+!Player can't hurt allies
+!MADE BACKUP 2 HERE
+!runto commands now use keysquares - this is so much easier I can hardly believe it!
+!fixed steal (fuel virus?) mission using keysquares
+!added losemission - before I made you 'win' the mission and progress 0 levels, but that saved flags. Fixed.
+!Health and heat display at the start of a level standardised
+!Missions 5 and 6 swapped to give you a break
+!Teammate death menu for missions with a buddy
+!Shot owner now integer, not string
+!suspicion code all redone for multiple awareness
+!a dead enemy 'targets' it's killer so friends can see whodunnit.
+!bAllAware flag added
+!enemies who start with a combat state are set to allaware
+!enemies do the cansee test for friends only on a 1/3 chance - lower priority to speed up game. Checks on opponents are still every frame. (Since the fastest enemy move speed is 4, testing 'every 3 frames' should be fine)
+!----funtion ai_suspect - not used everywhere it should be
+!mission 10 redone.

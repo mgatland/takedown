@@ -1,0 +1,98 @@
+[Setup Wizard Template]
+TemplateDate=1/08/2002 5:05:26 p.m.
+
+[Select Project and Options]
+txtProjFile=C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\shooter.vbp
+chkProjRebuild=0
+optBldSetup=True
+chkIncludeDEP=0
+optInternet=False
+optDEPOnly=False
+
+[Distribution Method]
+optFloppyTarg=False
+optSingleDirTarg=True
+optMultDirTarg=False
+
+[Single Directory]
+cboFloppyDrives=0
+cboFloppyDriveSize=0
+txtDirTarget=C:\DOCUME~1\Matthew\LOCALS~1\Temp\SWSETUP6\
+
+[Internet Package]
+optRemoteSite=True
+optLocalSite=False
+txtLocalSite=
+
+[Data Access]
+chkUseJet=1
+chkUseODBC=0
+Isam0=
+
+[ActiveX Server Components]
+File1=
+
+[Confirm Dependencies]
+File1="C:\WINDOWS\System32\MCIWNDX.OCX",False,32764
+File2="sndrec32.exe",False,32764
+File3="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\WAVMIX32.DLL",True,32762
+File4=
+
+[Shared ActiveX Application]
+optDeployApplication=True
+optDeployShared=False
+optRemoteServer1=True
+optRemoteServer0=False
+
+[File Summary]
+File1="C:\WINDOWS\System32\MSVBVM50.dll",False,"$(WinSysPathSysFile)",$(DLLSelfRegister),False
+File2="C:\Program Files\DevStudio\VB\SETUPKIT\KITFIL32\SYS32\StdOle2.tlb",False,"$(WinSysPathSysFile)",$(TLBRegister),False
+File3="C:\Program Files\DevStudio\VB\SETUPKIT\KITFIL32\SYS32\OleAut32.dll",False,"$(WinSysPathSysFile)",$(DLLSelfRegister),False
+File4="C:\Program Files\DevStudio\VB\SETUPKIT\KITFIL32\SYS32\OlePro32.dll",False,"$(WinSysPathSysFile)",$(DLLSelfRegister),False
+File5="C:\Program Files\DevStudio\VB\SETUPKIT\KITFIL32\SYS32\AsycFilt.dll",False,"$(WinSysPathSysFile)",,False
+File6="C:\Program Files\DevStudio\VB\SETUPKIT\KITFIL32\SYS32\Ctl3d32.dll",False,"$(WinSysPathSysFile)",,False
+File7="C:\Program Files\DevStudio\VB\SETUPKIT\KITFIL32\SYS32\ComCat.dll",False,"$(WinSysPathSysFile)",$(DLLSelfRegister),False
+File8="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\WAVMIX32.DLL",True,"$(WinSysPath)",,True
+File9="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\TakeDown.exe",True,"$(AppPath)",,False
+File10="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\TakeDown.DEP",True,"$(AppPath)",,False
+File11="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\dead0.wav",True,"$(AppPath)\sounds",,False
+File12="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\exp0.wav",True,"$(AppPath)\sounds",,False
+File13="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\exp1.wav",True,"$(AppPath)\sounds",,False
+File14="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\exp2.wav",True,"$(AppPath)\sounds",,False
+File15="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\exp3.wav",True,"$(AppPath)\sounds",,False
+File16="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\mis0.wav",True,"$(AppPath)\sounds",,False
+File17="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\mis1.wav",True,"$(AppPath)\sounds",,False
+File18="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\msg0.wav",True,"$(AppPath)\sounds",,False
+File19="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\music0.wav",True,"$(AppPath)\sounds",,False
+File20="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\music1.wav",True,"$(AppPath)\sounds",,False
+File21="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\music2.wav",True,"$(AppPath)\sounds",,False
+File22="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\music3.wav",True,"$(AppPath)\sounds",,False
+File23="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\music4.wav",True,"$(AppPath)\sounds",,False
+File24="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\overheat0.wav",True,"$(AppPath)\sounds",,False
+File25="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\seen0.wav",True,"$(AppPath)\sounds",,False
+File26="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\seen1.wav",True,"$(AppPath)\sounds",,False
+File27="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\shot0.wav",True,"$(AppPath)\sounds",,False
+File28="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\shot1.wav",True,"$(AppPath)\sounds",,False
+File29="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\shot2.wav",True,"$(AppPath)\sounds",,False
+File30="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\shot3.wav",True,"$(AppPath)\sounds",,False
+File31="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\shot4.wav",True,"$(AppPath)\sounds",,False
+File32="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\taunt0.wav",True,"$(AppPath)\sounds",,False
+File33="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\taunt1.wav",True,"$(AppPath)\sounds",,False
+File34="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\thud0.wav",True,"$(AppPath)\sounds",,False
+File35="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Sounds\thud1.wav",True,"$(AppPath)\sounds",,False
+File36="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\resources\dead.bmp",True,"$(AppPath)\resources",,False
+File37="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\resources\dead_mask.bmp",True,"$(AppPath)\resources",,False
+File38="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\resources\dec.bmp",True,"$(AppPath)\resources",,False
+File39="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\resources\dec_mask.bmp",True,"$(AppPath)\resources",,False
+File40="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\resources\effects.bmp",True,"$(AppPath)\resources",,False
+File41="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\resources\effects_mask.bmp",True,"$(AppPath)\resources",,False
+File42="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\resources\ground.bmp",True,"$(AppPath)\resources",,False
+File43="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\resources\ground_mask.bmp",True,"$(AppPath)\resources",,False
+File44="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\resources\human.bmp",True,"$(AppPath)\resources",,False
+File45="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\resources\human_mask.bmp",True,"$(AppPath)\resources",,False
+File46="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\resources\shots.bmp",True,"$(AppPath)\resources",,False
+File47="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\resources\shots_mask.bmp",True,"$(AppPath)\resources",,False
+File48="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\01.tdm",True,"$(AppPath)",,False
+File49="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\Missions.tdm",True,"$(AppPath)",,False
+File50="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\saves.tds",True,"$(AppPath)",,False
+File51="C:\Documents and Settings\Matthew\My Documents\Matthew's stuff\visual basic\shooter\TakeDown.htm",True,"$(AppPath)",,False

@@ -1,0 +1,50 @@
+wav files
+
+* means it's not used in the main campaign
+
+filename	dialogue		notes
+==============  ======================  =========================
+check0		hmm			saw something suspicious
+check1		"Hey!"			
+
+checkf0		"Let's check that out"	as above, but with a friend
+checkf1		"Did you see that?"	
+yescheck0	"I saw it"		reply to above
+yescheck1	"Let's move"
+checkstop0	"I don't see him anywhere."
+checkstop1	"I wonder where he went."
+
+*gatherf0	"Group, quickly!"	gathering a group to fight
+*gatherf1	"Quick, he's here"
+*gatherfail0	"There's no-one here"	went to find allies but they're all missing
+*gatherfail1	"Where's my backup?"	
+*gatherwork0	"Let's get him"		a gatherer found some friends
+*gatherwork1	"We're ready now"
+*gatheryes0	"OK"
+*gatheryes1	"OK"
+
+goodshot0	"He won't last long now"	I hit the player
+goodshot1	"Target hit"
+goodshotf0	"Good shot!"			My friend hit the player
+goodshotf0	"You hit!"	
+gothurt0	"Help!"				I got shot
+gothurt1	"Ouch!"		
+gothurtf0	"Be careful!"			my friend got shot (and lived)
+gothurtf1	"Look out!"	
+
+mandown0	"Man down!"			friend died
+mandown1	"He's dead!"			
+
+mis0		"I want that peacekeeper dead!"	A commando sees the player and tells everyone to come fight
+mis1		"Alright, we've got him, get in there!" The player has walked into a trap.
+
+seekf0		"Come quickly"			I have seen the player but my friend has not.
+seekf1		"Follow me"		
+seekyes0	"I'll cover you"		reply to above	
+seekyes1	"Let's get him"
+
+seen0		"Hey!"				saw player
+seen1		"You're not supposed to be here!"
+
+taunt0		"He won't last long now"	(use same clips as 'goodshot' 0 and 1)
+taunt1		"Target hit"

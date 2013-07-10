@@ -1,0 +1,639 @@
+[MISSION 1]
+24,33
+"                         "
+" !  ~~   !             ! "
+"  C=  ;F????????F?????B  "
+"  > ~~ >        <     >  "
+"  >    >       * *    >  "
+"  >    <       * *    >  "
+"  >   ~ *   ~  ~:     >  "
+"  >   ~ *    77 >     >  "
+"  >    :    *  ~>  ** >  "
+"  >    A????????H?=  ;E  "
+"  >   !         >     >  "
+"  >             >~  ~ >  "
+" !>             > 57  >  "
+"  >   *     !  *> 57  >  "
+"  G????????B    >~  ~ >  "
+"  >        >    >     >* "
+"  > *   ~  >    >     >  "
+"  >  557   >    >     >  "
+"  >  557   >    A?????E* "
+"  >  557   >   !      <  "
+"  > *   ~  >         * ~ "
+"  >        >         ~ ~ "
+"  >     ** >!*    *~  :  "
+"  A????=  ;@  C??=  ;?E  "
+" !      *~  ~ >   ``  >  "
+" *   ~        >  ~  ~ >* "
+"  C???????????@   C=  >  "
+"  >            *  > ` >  "
+"  >               A=  >  "
+"  >  *    *      ~  ~ >  "
+"  >                   >  "
+"  A???????????????????@  "
+" !          !          ! "
+"                         "
+5
+
+0,0,2
+[enemy]
+0,05,10,3,standing,1,hall
+1,10,12,5,standing,1,hall
+2,13,22,3,standing,1,hall
+3,12,5,5,standing,1,top
+4,18,11,3,standing,1,top
+5,17,24,5,standing,1,low
+6,21,27,3,standing,1,low
+[]
+[trigger]
+0,0,and,true,0,0,0,true,0,0,0,e_gethelp,any,any,room5,e_guard2,group,hall,topgate
+'This should make guarding enemies pursue player when he gets inside.
+'the next clause will make them guard in the first place.
+1,1,and,true,0,0,0,true,0,0,0,e_breach,any,any,0,null,0,0,0
+[]
+[misc]
+keysq,4,5,topgate
+keysq,20,20,rightgate
+keysq,4,24,leftgate
+keysq,11,5,room1
+keysq,19,25,room5
+psq,6,6,upper,0,""
+psq,12,5,upper,1,""
+psq,19,6,upper,2,""
+psq,20,14,upper,3,""
+psq,5,0,hall,0,""
+psq,5,12,hall,1,""
+psq,13,13,hall,2,""
+psq,12,25,hall,3,""
+psq,8,22,hall,4,""
+patch,2,2,21,30,0,0.5
+psq,24,21,lower,0,""
+psq,16,27,lower,1,""
+patrol,low,lower,-1
+patrol,hall,hall,-1
+patrol,top,upper,-1
+[]
+[brief]
+"^wPatrol Test","",""
+100
+[]
+
+[MISSION 1x1]
+24,16
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+5
+
+0,0,2
+[enemy]
+[]
+[trigger]
+[]
+[misc]
+[]
+[brief]
+"^wTemplate 1 screen","",""
+100
+[]
+
+[MISSION 1x2]
+24,33
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+"                         "
+5
+
+0,0,2
+[enemy]
+[]
+[trigger]
+[]
+[misc]
+[]
+[brief]
+"^wTemplate 1x2","",""
+100
+[]
+
+[MISSION 2x1]
+49,16
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+5
+
+0,0,2
+[enemy]
+[]
+[trigger]
+[]
+[misc]
+[]
+[brief]
+"^wTemplate 2 by 1","",""
+100
+[]
+
+[MISSION 2x2]
+49,33
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+"                                                  "
+5
+
+0,0,2
+[enemy]
+[]
+[trigger]
+[]
+[misc]
+[]
+[brief]
+"^wTemplate 2 by 2","",""
+100
+[]
+
+
+[mission test]
+24,16
+"* *              * *     "
+" 1      * *   *   2      "
+"* *      3       * *  *  "
+"        * *              "
+"* * *5       *   *   * * "
+" 2   55555555 555     1  "
+"* *  5       *  5    * * "
+"     5   *      5        "
+"    * *   77    5        "
+" *   5    77   * *       "
+"  4  5      *   5   * *  "
+" * * 5  *       53   4   "
+"     555 55555555   * *  "
+"        *                "
+" * *            * *  *   "
+"  3     * *      1       "
+" * *     2      * *      "
+5
+
+9,9,2
+[enemy]
+0,02,06,5,"standing",1,mrcheese
+1,03,03,1,"standing",1,dudes
+[]
+[trigger]
+' win mission trigger - player must kill 10 (all) enemies
+0,0,and,kills,10,0,0,true,0,0,0,endmission,50,1,0,null,0,0,0
+1,0,and,true,0,0,0,true,0,0,0,e_checkhome,all,0,0,e_guard,group,mrcheese,cheesespot
+2,0,and,true,0,0,0,true,0,0,0,e_patrol2,group,dudes,border,null,0,0,0
+[]
+[misc]
+keysq,6,8,cheesespot
+psq,0,0,border,0,""
+psq,24,0,border,1,""
+psq,24,16,border,2,""
+psq,0,16,border,3,"mrcheese"
+[]
+[brief]
+"^wDefend the base!","",""
+100
+[]
+
+[mission test]
+24,16
+"* *              * *     "
+" 1      * *   *   2      "
+"* *      3       * *  *  "
+"        * *              "
+"* * *        *   *   * * "
+" 2   55555555 555     1  "
+"* *  5       *  5    * * "
+"     5   *      5        "
+"    * *   77    5        "
+" *   5    77   * *       "
+"  4  5      *   5   * *  "
+" * * 5  *       53   4   "
+"     555 55555555   * *  "
+"        *                "
+" * *            * *  *   "
+"  3     * *      1       "
+" * *     2      * *      "
+5
+
+9,9,2
+[enemy]
+0,00,01,1,"seeking",1,mrcheese
+1,00,03,1,"seeking",1,sneakers
+2,00,05,1,"seeking",1,sneakers
+3,00,07,1,"seeking",1,sneakers
+4,00,09,1,"seeking",1,sneakers
+5,00,11,1,"seeking",1,sneakers
+6,24,01,1,"seeking",1,sneakers
+7,24,03,1,"seeking",1,sneakers
+8,24,05,1,"seeking",1,sneakers
+9,24,07,1,"seeking",1,sneakers
+[]
+[trigger]
+' win mission trigger - player must kill 10 (all) enemies
+0,0,and,kills,10,0,0,true,0,0,0,endmission,50,1,0,null,0,0,0
+' lose mission if too many (4) enemies get inside
+1,0,and,enemysq,sneakers,inside,3,true,0,0,0,losemission,50,0,0,briefing,"^wThe base has been compromised. You lose, foo!","",""
+' make sure the enemies are trying to get inside - make them charge in every so often
+2,1,and,delay,40,40,-1,true,0,0,0,e_goto,0,inside,seeking,null,0,0,0
+3,1,and,delay,40,40,-1,true,0,0,0,e_goto,1,inside,seeking,null,0,0,0
+4,1,and,delay,40,40,-1,true,0,0,0,e_goto,2,inside,seeking,null,0,0,0
+5,1,and,delay,40,40,-1,true,0,0,0,e_goto,3,inside,seeking,null,0,0,0
+6,1,and,delay,40,40,-1,true,0,0,0,e_goto,4,inside,seeking,null,0,0,0
+7,1,and,delay,40,40,-1,true,0,0,0,e_goto,5,inside,seeking,null,0,0,0
+8,1,and,delay,40,40,-1,true,0,0,0,e_goto,6,inside,seeking,null,0,0,0
+9,1,and,delay,40,40,-1,true,0,0,0,e_goto,7,inside,seeking,null,0,0,0
+10,1,and,delay,40,40,-1,true,0,0,0,e_goto,8,inside,seeking,null,0,0,0
+11,1,and,delay,40,40,-1,true,0,0,0,e_goto,9,inside,seeking,null,0,0,0
+12,1,and,delay,40,40,-1,true,0,0,0,e_goto,10,inside,seeking,null,0,0,0
+[]
+[misc]
+keysq,06,06,inside
+keysq,07,06,inside
+keysq,08,06,inside
+keysq,09,06,inside
+keysq,10,06,inside
+keysq,11,06,inside
+keysq,12,06,inside
+keysq,13,06,inside
+keysq,14,06,inside
+keysq,15,06,inside
+keysq,06,07,inside
+keysq,07,07,inside
+keysq,08,07,inside
+keysq,09,07,inside
+keysq,10,07,inside
+keysq,11,07,inside
+keysq,12,07,inside
+keysq,13,07,inside
+keysq,14,07,inside
+keysq,15,07,inside
+keysq,06,08,inside
+keysq,07,08,inside
+keysq,08,08,inside
+keysq,09,08,inside
+keysq,10,08,inside
+keysq,11,08,inside
+keysq,12,08,inside
+keysq,13,08,inside
+keysq,14,08,inside
+keysq,15,08,inside
+keysq,06,08,inside
+keysq,07,08,inside
+keysq,08,08,inside
+keysq,09,08,inside
+keysq,10,08,inside
+keysq,11,08,inside
+keysq,12,08,inside
+keysq,13,08,inside
+keysq,14,08,inside
+keysq,15,08,inside
+keysq,06,09,inside
+keysq,07,09,inside
+keysq,08,09,inside
+keysq,09,09,inside
+keysq,10,09,inside
+keysq,11,09,inside
+keysq,12,09,inside
+keysq,13,09,inside
+keysq,14,09,inside
+keysq,15,09,inside
+keysq,06,10,inside
+keysq,07,10,inside
+keysq,08,10,inside
+keysq,09,10,inside
+keysq,10,10,inside
+keysq,11,10,inside
+keysq,12,10,inside
+keysq,13,10,inside
+keysq,14,10,inside
+keysq,15,10,inside
+keysq,06,11,inside
+keysq,07,11,inside
+keysq,08,11,inside
+keysq,09,11,inside
+keysq,10,11,inside
+keysq,11,11,inside
+keysq,12,11,inside
+keysq,13,11,inside
+keysq,14,11,inside
+keysq,15,11,inside
+psq,0,0,border,0,""
+psq,24,0,border,1,""
+psq,24,16,border,2,""
+psq,0,16,border,3,"mrcheese"
+[]
+[brief]
+"^wDefend the base!","",""
+100
+[]
+
+[MISSION 1] 
+28,20
+"      5      155    *        "
+" *    5       55555  55555555"
+"     *  *     55    *        "
+"5555555      *55         *   "
+"   5555555555 55    * *      "
+"  *   *      *   *   2       "
+"   555                *      "
+"   5 * **          1     *   "
+"   5  3           * *        "
+"  *6   *    1                "
+"   5 *   *   *    *    *     "
+"   5    4             2      "
+"   5   * *  132 *      *     "
+"   56555555555555565555555555"
+"  *      * *      *     *    "
+"          3                  "
+"     *   * *    *    *       "
+"                             "
+"                             "
+"  *    *    *     *     *    "
+"                             "
+5
+
+0,2,4
+[enemy]
+0,4,5,1,"standing",1,tripteam
+1,13,14,1,"standing",1,tripteam
+[]
+[trigger]
+0,0,and,newlev,0,0,0,flag,0,0,+?,briefing,"^gMOVEMENT^2Use the W,A,S and D keys to move.^2To 'strafe', hold SHIFT while moving. You will not change the direction you face.^2If you press a direction then quickly tap another direction, you will move then turn and stand in place.","^gPractise moving, strafing, and turning. When you have finished, go East.","",text,"Movement: W, A, S, D","Hold SHIFT and move to strafe","Go East when ready"
+1,0,and,playerxy,7,2,0,flag,0,0,+?,briefing, "^gTAKEDOWN HUD^2From the bottom left of the screen:^1Mission information display^1Damage Bar - Damage you have taken.^1Gun status - Weapon's condition:^1            Ready, reloading, overheated^1Temperature - How hot your systems are.","^gCOMBAT^2M - Fire standard projectile^1N - Fire charged projectile^2Standard shots are most versatile and cause less heat. Charged shots cannot be fired while moving and create more heat. However, they move quickly and cause more damage. They are best used at range.^1You CAN NOT fire while overheated. Firing excessively or taking damage will increase your heat.","",text,"M and N keys to fire","Watch your heat indicator","Go South when ready"
+2,0,and,playerxy,13,3,0,flag,0,0,+?,briefing,"^gThere is an enemy soldier out here. He does not know that you are near. Because he is boxed in, he will not be able to dodge if you fire at him quickly.","^gREVIEW OF CONTROLS^2W, A, S, D - Movement^1SHIFT - Hold while moving to Strafe^2M and N - Fire projectiles","",text,"-Fire at the enemy and kill him","",""
+3,0,and,kills,1,0,0,flag,0,0,+?,briefing,"^gAfter a fight, check your damage (Green\red bar) and heat (Percentage display). If you take too much damage you will die. If you have been hit or have been firing excessively, you will overheat.^2If your heat is high, wait until you cool before continuing. You cannot fire while your heat is above 100%.","^gKill the remaining enemy.","",text,"-Kill the remaining enemy","",""
+4,0,and,playerxy,3,5,0,flag,0,0,+?,briefing,"^gEnemies are easier to kill when they are not aware of you. Try not to let an enemy see you, any projectiles or other enemies who are already aware of you. Keep behind objects if possible. You are also slightly harder to detect by an enemy who is facing away from you.","^gWhen you reach the end of this South-running passageway, face to the East and hold SHIFT to strafe past the end of the wall. As soon as you are around the corner, fire an enhanced projectile (N) at the enemy.^2If you wait until he is facing away from you, he is less likely to see and evade your attack.","",null,0,0,0
+5,0,and,kills,2,0,0,true,0,0,0,endmission,50,1,0,null,0,0,0
+6,0,and,playerxy,21,12,0,true,0,0,0,dec,0,0,0,briefing,"^b-Object Recovered:^2-128GB Storage Disk-^2Contents encrypted","^gYou have found an item! The disk is encrypted, so you can't do anything with it at the moment, but it may come in handy later. Always look out for items to take.",""
+7,0,and,playerxy,21,12,0,true,0,0,0,flag_setval,29,1,0,mistxt,10,0,0
+8,0,and,win,0,0,0,flag,29,0,-+,briefing,"^gMission complete. Remember what you have learnt. Dodging, strafing, and controling your temperature are important skills.","^wYour next stop is a small outpost North of here.","^gOnce the next mission has loaded, you may want to exit to the menu and save your progress",null,0,0,0
+9,0,and,win,0,0,0,flag,29,0,++,briefing,"^gMission complete. Remember what you have learnt. Dodging, strafing, and controling your temperature are important skills.^2It is also important to examine your situation and not rely totally on the instructions given to you. You demonstrated this skill by finding the Storage Disk. Your Supervisor will aid you but you must be able to make decisions on your own.","^wYour next stop is a small outpost North of here.","^gOnce the next mission has loaded, you may want to exit to the menu and save your progress",null,0,0,0
+10,0,and,win,0,0,0,flag,0,0,-?,briefing,"^wMission complete.","","",null,0,0,0
+'
+11,0,and,newlev,0,0,0,true,0,0,0,mistxt,0,0,0,mistxt,1,0,0
+12,0,and,newlev,0,0,0,true,0,0,0,mistxt,2,0,0,mistxt,3,0,0
+[]
+[misc]
+dec,21,12,3,0
+[]
+[brief]
+"^wThis is Andrew Lambed, the new Supervisor that has been assigned to you. I'm here to keep you on track down there and provide a link with UNITY.^2I'm just testing out your communications - Things are a bit jittery with the jamming around here. Check that this text is a white font - a black screen with white font is a message directly from me, and can always be trusted." ,"^wMake sure you fimiliarize yourself with the most recent modificatons to your combat suit before approaching any enemy troopers.^2There are two Stall soldiers in this area for you to dispatch. We'll be watching your vital signs as you fight, making sure you do not experience any nausia while killed the troopers. You should have no trouble.", "^gDo you want to activate the tutorial for this mission to explain how to play TakeDown?^[0Yes - use tutorial^00]^[1No - I know how to do this!^01]"
+100
+[]
+
+
+
+[MISSION 2]
+28,25
+"      5      155    *        "
+" *    5       555       55555"
+"     *  *     55    *        "
+"             *55         *   "
+"            5 55    * *      "
+"  *   *      *   *   2       "
+"                      *      "
+"     * **          1     *   "
+"      3 555       * *        "
+"  *1   *    1                "
+"   2 *   *1  *    *    *     "
+"   3    4 2           2      "
+"   4   * *3            *     "
+"   1 3    4                  "
+"  *      * *      *     *    "
+"          3                  "
+"     *   * *    *    *       "
+"                             "
+"                             "
+"  *    *    *     *     *    "
+"                             "
+"     *   * *    *    *       "
+"                             "
+"                             "
+"  *    *    *     *     *    "
+"                             "
+5
+
+18,0,1
+[enemy]
+0,10,0,9,"waiting",1,none
+1,10,1,7,"waiting",1,none
+2,11,0,5,"waiting",1,none
+3,11,1,7,"waiting",1,none
+4,11,2,9,"waiting",1,none
+5,11,3,7,"waiting",1,none
+6,19,0,13,"waiting",1,friend
+7,20,0,13,"waiting",1,friend
+8,21,0,13,"waiting",1,friend
+9,22,0,13,"waiting",1,friend
+10,23,0,13,"waiting",1,friend
+11,0,0,13,"seeking",1,friend
+[]
+[trigger]
+[]
+[misc]
+[]
+[brief]
+"^wGang wars!","",""
+100
+[]
+
+[MISSION 3]
+72,16
+"                                                                      1 1  "
+"      1 1 1 1 1 1 1 1 1 1                                             1 1  "
+" * * * * * * * * * 1 * 1               1      1     1                 1 1  "
+"1 1 1 1 1 1 1 1 1 1 1 1 111111111111111 111111 11111 111111111111111111 111"
+" * 1 1 1 1 1 1 1 * * * *     **    *   *      *     *      *      *    *   "
+"1 1             1 1 1 1 111111 1111 1111111111111111 111111 111111 1111 111"
+"1 1             111111111     1    1                1      1      1    1   "
+"                                                               *        *  "
+" *     *   *    *     *     *      *       *      *     *                  "
+"         32        *                                     55555             "
+"                          * 4444 *      *      *      *   *    *    *      "
+"                  *   *                                    5               "
+" *    *     *      123                                     5               "
+"                             *      *      *               5               "
+"   *                                                      *                "
+"         *     *      *                                                    "
+"                                                                           "
+5
+
+1,1,1
+[enemy]
+0,0,15,5,"standing",1,none
+1,1,15,9,"standing",1,none
+2,2,15,7,"standing",1,none
+[]
+[trigger]
+0,1,and,flag,0,0,-?,playerxy,0,0,0,upgscreen,0,0,0,flag_setval,0,1,0
+1,1,none,flag,0,0,-?,playerxy,0,0,0,none,0,0,0,flag_setval,0,0,0
+[]
+[misc]
+dec,6,5,5,0
+[]
+[brief]
+"^wGo in and out of the top-left corner to recieve free upgrades","",""
+100
+[]
+
+[MISSION 3]
+72,16
+"                                                                      1 1  "
+"      1 1 1 1 1 1 1 1 1 1                                             1 1  "
+" * * * * * * * * * 1 * 1               1      1     1                 1 1  "
+"1 1 1 1 1 1 1 1 1 1 1 1 111111111111111 111111 11111 111111111111111111 111"
+" * 1 1 1 1 1 1 1 * * * *     **    *   *      *     *      *      *    *   "
+"1 1             1 1 1 1 111111 1111 1111111111111111 111111 111111 1111 111"
+"1 1             111111111     1    1                1      1      1    1   "
+"                                                               *        *  "
+" *     *   *    *     *     *      *       *      *     *                  "
+"         32        *                                     55555             "
+"                          * 4444 *      *      *      *   *    *    *      "
+"                  *   *                                    5               "
+" *    *     *      123                                     5               "
+"                             *      *      *               5               "
+"   *                                                      *                "
+"         *     *      *                                                    "
+"                                                                           "
+5
+
+1,1,1
+[enemy]
+0,0,15,3,"standing",1,none
+1,1,15,1,"standing",1,none
+2,2,15,1,"standing",1,none
+3,3,15,1,"standing",1,none
+4,4,15,1,"standing",1,none
+5,5,15,1,"standing",1,none
+6,6,15,1,"standing",1,none
+7,7,15,3,"standing",1,none
+8,8,15,1,"standing",1,none
+9,9,15,1,"standing",1,none
+10,10,15,5,"standing",1,none
+11,11,15,1,"standing",1,none
+12,12,15,5,"standing",1,none
+13,13,15,1,"standing",1,none
+14,14,15,1,"standing",1,none
+[]
+[trigger]
+[]
+[misc]
+dec,6,5,5,0
+[]
+[brief]
+"^wChoose an upgrade!^[0{01Pistol - Damage increase^00^00]^[1{01Pistol - Piercing power^00^01]^[2{01Pistol - Speed upgrade^00^02]^[3{01Pistol - Rate of fire^00^03]","^wChoose another upgrade!^[0{01Pistol - Damage increase^00^00]^[1{01Pistol - Heat sink^00^04]^[2{01Pistol - Speed upgrade^00^02]^[3{01Pistol - Rate of fire^00^03]","^wChoose another upgrade!^[0{01Pistol - Rate of fire^00^03]^[1{01Pistol - Heat sink^00^04]^[2{01Pistol - Speed upgrade^00^02]^[3{01Pistol - Piercing^00^01]"
+100
+[]
+
+
+
+garbage
+
+3,3,15,1,"standing",1,none
+4,4,15,1,"standing",1,none
+5,5,15,1,"standing",1,none
+6,6,15,1,"standing",1,none
+7,7,15,3,"standing",1,none
+8,8,15,1,"standing",1,none
+9,9,15,1,"standing",1,none
+10,10,15,5,"standing",1,none
+11,11,15,1,"standing",1,none
+12,12,15,5,"standing",1,none
+13,13,15,1,"standing",1,none
+14,14,15,1,"standing",1,none

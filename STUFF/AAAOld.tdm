@@ -1,0 +1,613 @@
+"TakeDown: Episode 1 - The Phantom Menace"
+"This episode introduces the player to TakeDown's basic gameplay."
+
+
+MISSION 1 - Learning
+"0100000100000000000000000"
+"0200000120000000000000000"
+"0100000200000000000200000"
+"0200003000000010000200000"
+"0100000000000000000100000"
+"0000000000000000000320000"
+"0100000000000100000010001"
+"0112100000000000000011000"
+"0200011000000000000002000"
+"0110000200000010000002000"
+"0230000000000000000001000"
+"0310000000000000000000000"
+"0100000000000100000000010"
+"0000000000000010000000000"
+"0000000000000020000000000"
+"0000000000000030000000001"
+"0000000000000020000000000"
+3
+
+0,0,3
+g,1,20,14
+t,"win",0,0,"briefing","^wThe recovery was better than the landing. As I looked up, the hovership fired a steel cable at me. The sharpened end punctured my armoured shoulder but somehow didn't reach the arm inside.^2The cable began drawing me in, and I gently floated into the sky. I eventually was back in my tiny metal room. The suit released the cable and spider-like arms folded from the walls to patch up the hole it made.", "", ""
+"^gUse the W, S, A and D keys to move. Holding the shift key while moving will move without turing. ^2The M key will fire your gun. At the bottom of your map is a display. The green/red bar shows the damage you have taken. The oval light shows your weapon's status - Ready, reloading or overheated. When you weapon's heat is above 100%, it will not fire.^2 When you have completed all mission objectives a timer will appear on the left showing the remaining time before the mission will end."
+"^bThis is Steve, your driver. It's not safe for me to leave the command room, so I'll be communicating with you through this display on your suit. I haven't been allowed to contact you until we entered the Assignment Zone.^2 I'm dropping you here for a few minutes to fimiliarize yourself with your Enforcer battle armour and your SP5 firearm.^2Make sure you're ready, after this you go straight into battle.", "^wThe crampt chamber spat me out, and the group charged towards me. I hit the grass, with the suit protecting me from injury but not from pain. I clambered to my feet."
+0, 200, 5
+
+MISSION 2 - First strike
+"0p00000010p0000000200300p"
+"0000200030000000000p00000"
+"000p000000000100000000320"
+"000003000p000000000055500"
+"0000000000000p00000100000"
+"p00000000000000000000000p"
+"0000400000000000000001000"
+"0000000000300p00000000000"
+"0000010000000000000020000"
+"00p00000p0000000000000000"
+"000100000000002300000p000"
+"0000000000000000p00000000"
+"00p00000000p0000120000000"
+"0000200000000000000000300"
+"p000000000100000000000000"
+"0100000p00000000p00000000"
+"0120000000300000000000003"
+3
+
+0,0,3
+e, 13, 1, 1, "waiting", 1, 0
+e, 20, 14, 1, "standing",1, 0
+t,newlev,0,0,e_runto,0,3,"waiting"
+t,win,0,0,briefing,"^wIt was an easy fight. The pathetic plastic armour became smoke and water under my SP5, along with the flesh that it was supposed to be protecting.^2I felt a jolt as the recovery cable was shot into my metal-encased shoulder and I was lifted into the sky.","^bGood work. Remember, as long as the hovership is working correctly it can repair your armour. The amount that can be repaired depends on how long we have beween missions. At the moment, we have time for a 60% repair.",""
+"^bThe assignment that International Defence has for you involves weakening the grip of an group called Stall. Stall are involved in manipulation and arms dealing.^2We have to clear a path through their defences so that ID can drive in specialists for a special task. This is only a stealth transport - You have to take out the forces from the ground.", "^bI'm dropping you near two troopers who are guarding the outskirts of Stall territory. Sensors indicate only SP2.7 firearms so you shouldn't have a problem.", "^wIt my first battle after months of training. I knew that Steve would be watching like a hawk, recording every move I made for ID to analyse."
+2, 100, 5
+
+MISSION 3 - First area camp
+"00p0000p00000300000003000"
+"0000020000000p000000000p0"
+"0000000002140000000000000"
+"0000000000000000000100000"
+"0p00020300000010000300000"
+"000000000p0000000p0000000"
+"0030000000100200002000000"
+"0000001000000000000000000"
+"0000000000000000000000300"
+"0002000000000000000000000"
+"00000000000000p0000000000"
+"0p00003000000000000000000"
+"0000000000000000000000020"
+"000000000p000000000000000"
+"0001000000200000000000000"
+"0000000000000000000300000"
+"0000000000000010000000000"
+3
+
+10,0, 3
+e, 8, 7, 1, "waiting", 1, 1
+e, 12, 7, 1, "standing", 1, 1
+e, 10, 11, 1, "standing", 1, 1
+e, 11, 9, 1, "standing", 1, 1
+t,newlev,0,0,e_runto,2,8,"standing"
+t,win,0,0,briefing,"^bExcellent. Small groups of Stall troopers like those you just encoutered are scattered all around this area.","",""
+"^bFor the assignment we are working on, you have to eliminate all resistance on ground. We're coming up to a small group.^1They haven't spotted us so you should be able to surprise them.","",""
+4, 100, 3
+
+MISSION 4 - Survival
+"00010000000p000000100000p"
+"0000000010000020000000000"
+"0003000000000000000000100"
+"00p0002000000000300000000"
+"0100000000010000000000030"
+"0000000p00000000200000000"
+"0000030000000000000000000"
+"0000000000000200000000000"
+"0001000000000000001000000"
+"00000000200p000000000000p"
+"00p0000000000000000200000"
+"0000030000000000000000000"
+"0000000p00000000100000000"
+"0000000000000000000000000"
+"00000003000000000000p0000"
+"000p000000000100000000000"
+"0000000000000000000002000"
+0
+
+5,0,1
+e, -1, -1, 1, "seeking", 1, 0
+e, 19, 16, 1, "seeking", 1, 0
+e, 20, 15, 1, "seeking", 1, 0
+t,kills,2,0,briefing,"^wBefore the second trooper's remains had even evaporated, I saw the next group coming over a hill. Steve and the ship were still nowhere in sight.", "", ""
+t,kills,2,0,enemy,0,17,16
+t,kills,2,0,enemy,0,10,16
+t,kills,4,0,briefing,"^b--Hey, I'm just arriving. I can't pick you up with all those troopers around, though. Just hang in there and take them out.", "^wHanging in there would be easier said than done. I was attracting quite a crowd.", ""
+t,kills,4,0,enemy,0,7,16
+t,kills,4,0,enemy,0,8,16
+t,kills,4,0,enemy,0,9,16
+t,kills,4,0,enemy,0,10,16
+t,kills,4,0,enemy,0,11,16
+t,win,0,0,briefing,"^wThe silver hovership flew into view. I felt the now-fimilar jolt of the cable tearing through my metal armour, always carefully stopping short of the flesh inside. I was lifted into the bay and text immediatly begain flashing on my darkening visor.","",""
+"^bI've been called away for another job, which means that you'll have wait here for a few hours. Enemies may approach you. Be careful about taking damage because the hovership won't be here to repair it.", "^wI'd made the assumption that my assignment was important, so I didn't expect ID to go around stealing my transport.^2I had a lot to learn about working in this field.^2The repair arms retraced into the blue metal walls that gave me only enough room to stand. The 'deploying' light flashed on my visor and the floor of my little cell snapped away.", "^wAs the ground sped towards me, a yellow energy bolt sped past. Two unlucky troopers had seen my decent and thought they'd try to take me out. The fools.^2I hit the ground with force, and lifted myself out of the dirt just as the enemies entered sensor range."
+9, 100, 5
+
+MISSION 5 - The gates
+"00000p0000000000110000000"
+"0003000000000001000000000"
+"00000000200000200p0300000"
+"00100p00000p0003000000000"
+"0000000000000000200000p00"
+"0000000031131001000000000"
+"3000p00020002132000000000"
+"0120023130000p000p0000000"
+"0030p000p0000001221311332"
+"0023112003123012000000000"
+"p000001321000p000p0000000"
+"0000000002313221000000000"
+"0020000000000000000000300"
+"p000p000000000000p0000000"
+"0000000000020000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+3
+
+4, 16, 1
+e,4,4,4,"camping",1, 0
+e,14,8,4,"camping",1, 0
+e,5,1,4,"camping",1, 0
+e,17,3,4,"camping",1, 0
+t,newlev,0,0,e_runto,0,8,"camping"
+t,win,0,0,briefing,"^bGreat. You can repair while we bunny-hop to the commando.","",""
+"^bYou've been spotted by a Stall commando. Communication is difficult through the energy field, but he seems to have powerful communication equipment that could send infromation about us. This assignment relies on the fact that we can travel faster than Stall can send info about us, so we must eliminate this commando.^2He's got a blockade set up with rapid fire weapons. As soon as you're fully repaired, I'm sending you in.", "^wWith the ground speeding towards me, I saw the soldiers crouch behind rocks. There was only one way through and they were sitting there ready to pull their triggers the moment I stepped in. The commando himself was well out of sensor range, hiding behind his forces.", ""
+4, 100, 5
+
+MISSION 6 - The Commando
+"00000000010000010000p0000"
+"00p00030000p0023000000300"
+"000000000002001020020000p"
+"0001000p0000000031p0p0050"
+"00000000000003000030000p0"
+"0000000020020000002p00100"
+"300p0000000010p0000p10000"
+"000000000p0010020012000p0"
+"0000030000000000000014000"
+"0000000000000100000000100"
+"0000000p000000000p0000010"
+"0000001000000000000000002"
+"0020000000000020000000300"
+"000003000p000000000000000"
+"001000000002000001000p000"
+"2000100000000000000000000"
+"0000000000000000000000000"
+3
+
+0, 16, 1
+e,16,0,5,"standing",1, 1
+e,8,0,3,"waiting",0, 0
+e,3,2,3,"waiting",0, 0
+t,playerxy,17,6,e_runto,0,0,"standing"
+t,win,0,0,briefing,"^wI entered the ship. Arms extended from the walls of the tiny, green-gray room and began repairing me. Inside the suit, sweat was washed off me and regulators began adjusting the internal temperature for maximum healing.^2As calming colours splashed over my visor, I relaxed and began mentally prepairing myself for the next job.","",""
+"^bThe commando has guards who are wearing armour. Try to avoid them - as soon as you kill the commando I'll take you out of here.^2Your armour will not resist the commando's weapon as well as the weapons of the normal troopers, so be careful.", "^gIn battle, always keep an eye on your weapon's heat. If it is too high, try and find somewhere to hide while it cools down.", "^wIt had been a long time since I'd fought a skilled opponent, and I was looking forward to it."
+1, 100, 5
+
+MISSION 7 - Onwards
+"0000200000000000000000000"
+"0000000000000000003000000"
+"0000000040000000000000000"
+"0010000000000000000000000"
+"0000000000000000200000000"
+"0000005000000000000000000"
+"0000000000002000000000000"
+"0000000000000000000010000"
+"4000000000000000000000000"
+"0000030000000000000000000"
+"0000000001000000300000000"
+"0000000000000000000000200"
+"0000000000000030000000000"
+"0000000040000000000000000"
+"0005000000000000001000000"
+"0005000000000200000000000"
+"0000000000000000000550000"
+3
+
+18, 0, 3
+e,9,9,4,"seeking", 1, 0
+e,10,9,2,"seeking", 1, 0
+e,11,9,3,"seeking", 1, 0
+"^bID seems impressed with your skills. You're working better than they expected.^2We have to continue on towards our main destination. Ahead of us is a group of three troopers with a variety of equipment. We'll just wait until you fully repair.", "", ""
+3, 100, 5
+
+MISSION 8 - Grand Derrik
+"0000021101010001121000000"
+"0000000221021002000000000"
+"0000000000p0p000000000000"
+"0000p0000032000000000p000"
+"000000000200p100000000000"
+"0000000001000310100p00000"
+"0000000002000102020000000"
+"1210000022000200003010000"
+"00021211000p0011000001123"
+"0p00000312000230000000000"
+"0000030003000300000p00000"
+"001000p002000100000000000"
+"0000020001000122000005000"
+"0p00000p00000230000000000"
+"00000003100p00000p4000000"
+"0000534120000010300000000"
+"00p00000000p0011000000555"
+0
+
+10,0, 3
+e,0,11,12,"fleeing",1, 1
+e,9,8,4,"camping",0, 0
+e,13,8,1,"camping",0, 0
+e,8,16,5,"camping",0, 0
+e,16,13,4, "waiting", 0, 0
+t,win,0,0,briefing,"^wAs I was lifted into the ship, I saw troopers clambering out from hidden bunkers. Ani-aircraft guns were being set up.^2It looked like we'd fallen straight into a trap.","",""
+"^bA high ranking Stall member, Grand Derrik, has just been spotted near us. The 'Grand's rarely leave the safety of Stall bases so this is a great chance to take one out.", "^bHe is only wearing basic armour and his skills should be no match for yours, but he is guarded by at least one commando.^2Take him down as quickly as possible and I'll pick you up. The situation looks very dangerous but ID has insisted that we try and attack.", "^wLooking at the scanner I saw troopers guarding the enterace of the base. Either they were as paranoid as rats or they knew we were coming."
+1, 100, 5
+
+MISSION 9 - Break out: Part 1
+"0010000000000000001000000"
+"0000000000000000000000000"
+"0000200000000020000000000"
+"0000000000000000000000100"
+"0000000300000000000000000"
+"0000000000000000000000000"
+"0000000000001000000010000"
+"0000010000000000000000000"
+"0000200000000000000000000"
+"0000000000000000000000000"
+"0001000000000000001000000"
+"0000000000200000000000000"
+"0000000000000000000000300"
+"0000010000000000000000000"
+"0000000000030000010000000"
+"0000000200000000000000000"
+"0000000000000000000030000"
+2
+
+0,8, 4
+e,10,0,1,"seeking",1,0
+e,15,2,1,"seeking",1,0
+e, 21, 13, 2, "seeking",1, 0
+"^bAccording to my files the man you killed wasn't Derrik at all - It must've been a setup. It is possible that someone has comprimised ID's communication network and that they sent us the orders to attack this place.", "^wThey obviously didn't know how fast this ship was - I've managed to avoid the main force. But to get away I need you to clear out a blockade.^2You've only had partial repairs, so be careful.", ""
+3, 100, 3
+
+MISSION 9 - Break out: Part 2
+"0010000000000000001000000"
+"0000000000000000000000000"
+"0000200000000020000000000"
+"0000000000000000000000100"
+"0000000300000000000000000"
+"0000000000000000000000000"
+"0000000000001000000010000"
+"0000010000000000000000000"
+"0000200000000000000000000"
+"0000000000000000000000000"
+"0001000000000000001000000"
+"0000000000200000000000000"
+"0000000000000000000000300"
+"0000010000000000000000000"
+"0000000000030000010000000"
+"0000000200000000000000000"
+"0000000000000000000030000"
+2
+
+-1,-1,-1
+e,0,14,3,"seeking",1, 0
+e,0,4,4,"seeking",0, 0
+e, 4, 16, 2, "seeking",0, 0
+t,win,0,0,briefing,"^wAs soon as the jamming device was safely disintigrated, the hovership flew down. My weapon chirped happy and the light went out - The jamming device must have been stopping something inside it from working.^2Manipulated by remote - I'd never trust the gun again.", "",""
+g,1,30,28
+"^b--My controls are being jammed--^^--Some of the attack force that were #4tn o h& Derrik setup are heading your way--^^--Some must hav¢ jammers, try $Üd g%^^(Incomplete transmission.)", "^wAt least one of the three troopers approaching me would have a jammer. I had to destroy it.^2I raised my gun and then realised that something was wrong - The error light was flashing menacingly. It looked like it would still work, but at a lower efficiency.", ""
+1, 100, 0
+
+MISSION 10 - Blackout
+"0000000000000200000000000"
+"000000p000000100000000000"
+"00000000000p0000000000000"
+"p000003213000000000000p00"
+"0001320000000013230000000"
+"0010000002000000001000000"
+"p002000000000000000200000"
+"0030000000000300000010000"
+"0001000000p00000000003212"
+"0000300000000000003000000"
+"p000020000000000000000000"
+"0000001000000020000p00010"
+"0000000300000000000000000"
+"0000p00000000p00001000000"
+"0000000001200000000000000"
+"0000000000013000000000200"
+"0000000000000100000000000"
+0
+
+12,0,3
+e,8,4,4, "camping", 1, 0
+e,17,5,4, "standing", 1, 0
+e,23,3,3, "standing", 1, 0
+e,24,13,3,"waiting", 1, 0
+e,4,11,4,"waiting",1, 0
+g,1,20,14
+t,win,0,0,briefing,"^wI cleaned the place out. The radio equipment was vaporized." ,"",""
+"^bI think it's clear that some people know we're here. Because of the field here, only powerful transmitters can send distance communications so we should be able to contain the spread of information about us.^2We're heading towards a little group that have a powerful transmitter. Looks like a few troopers. They may be the ones who contacted me posing as ID and got us into that Grand Derrik mess.", "^wMy armour was fully repaired by the time we reached the base.^2It didn't look too strongly fortified.",""
+5, 100, 5
+
+MISSION 11 - Only one
+"0000000000000100000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000300"
+"0000003000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000020"
+"0000000000000000000000000"
+"0002000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0010000000000000000020000"
+"0000000000000000200000000"
+"0020000100010000000000000"
+"0000300000020000000030000"
+1
+
+0,0,4
+e, 12,12, 6, "standing", 1, 0
+t,win,0,0,briefing,"^wThe hovership came diving down to pick me up - then lifted suddenly to avoid a volley of blue energy bolts. There was another one!^2He was a long way away, but some of his cronies were grouping around me.","",""
+"^bWe've got to hurry, it looks like somone is preparing a broadcast. Scanners indicate... only one man. He's moved into the middle of a clearing to avoid radio interference.^2You'll be repaired by the time we get there.", "^wOnly one man, Steve had said. I remembered my enemies saying the same thing about me.^2I had a feeling that this one man would not be easy meat.", ""
+1, 100, 5
+
+MISSION 11 - Only one: part 2
+"0000000000000100000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000300"
+"0000003000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000020"
+"0000000000000000000000000"
+"0002000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0010000000000000000020000"
+"0000000000000000200000000"
+"0020000100010000000000000"
+"0000300000020000000030000"
+1
+
+-1,-1,-1
+e,-1,-1,1, "seeking", 1, 0
+t,delay,110,-1,enemy,0,8,0
+t,delay,30,-1,enemy,0,0,3
+t,win,0,0,briefing,"^wThe hovership swooped down again, this time ready for the blue bolts that shimmered through the air. The cable tore towards me, hit, and I was free from the earth. As I was pulled in the ship darted away.^2The elite commando lowered his weapon as he faded into the distance.", "^bWe never knew that Stall had troopers as powerful as that, and all communication is out so we can't try to warn anyone. We have to continue with the mission - at least you've taken out all the transmitters, so we should remain secret from Stall HQ.^2That trooper will be out of our faces for a while now. We'll get you repaired for the next job. It'll be a long one.",""
+"^b--There's another one!--^2--Take out the troopers close to you, and I'll try and grab you before he gets there!--", "", ""
+2, 100, 0
+
+MISSION 12 - Ground assault: Part 1
+"0100100555003001000100001"
+"0000200555000002000p00100"
+"0000000000000000200000000"
+"00003000000p0000010020000"
+"00p0000000000000000000000"
+"0000000000000000000000000"
+"0000000p00000004000p00000"
+"0002000000000000000000000"
+"0000000000000000000010000"
+"0000000000000p00000000000"
+"0000000100000000000000000"
+"0000000000000000000000000"
+"0000000000000002000000300"
+"000000p000000000000000000"
+"0030000000000000000p00000"
+"0000000000010000000000000"
+"0000000000000000000000000"
+1
+
+10, 16, 1
+e,-1,-1,3,"seeking",1,0
+e,3,6,3,"waiting",1,0
+e,15,5,4,"waiting",1,0
+t,delay,300,-1,enemy,0,10,0
+"^bWe are now coming up to the edge of a network of heavily guarded pathways. This is as close as I can get to the center - you'll have to proceed on foot. Fight your way to the power bank and kill the troopers operating it.^2When I was called away earlier it was to place a team of demolition experts on another part of this island. I'm going to try and find them and make sure they're ok.^2I'm deploying you now - good luck.", "", ""
+0, -1, 5
+
+MISSION 12 - Ground assault: Part 2
+"001030p100023000002003000"
+"55234005001004000100p4200"
+"5500020334000055555000555"
+"0000010240000000000000555"
+"0001230130000000000000000"
+"0004120300000000000p00000"
+"000000020000p000000000000"
+"000000p000000000400000000"
+"0000400p00000000000000000"
+"0000000000001000000030000"
+"0000055500000000p00000000"
+"0300005500000000020000p00"
+"0000100000000000000000000"
+"0000000200001000000030000"
+"0000p0000000000p000000000"
+"0102000555003001000000010"
+"0000100555000000000000001"
+1
+
+-1, 16, -1
+e,-1,-1,1,"seeking",1,0
+t,delay,398,400,enemy,0,24,5
+t,delay,472,700,enemy,0,24,7
+"^wI began heading north. The road ahead divided into two. I had to choose my path.","",""
+0, -1, 0
+
+MISSION 12 - Ground assault: Part 3
+"000000p00001000000p000000"
+"0000000002001000000000555"
+"0001000000000200400000000"
+"0000000200003000000000p00"
+"00000p0000000100000000000"
+"0000000000000400000000100"
+"0000200000000030005p00000"
+"00000000p0005020000000000"
+"0000000000005300000000000"
+"000p00100000500000p040000"
+"0000000000005000000000000"
+"000000000000500p000002000"
+"0040000002005300000000000"
+"000100p00000040003p00000p"
+"0000200000001000000000200"
+"0010300100123000020003010"
+"5233400524122000341002000"
+1
+
+-1, 16, -1
+e,-1,-1,2,"waiting",0,0
+e,4,5,2,"waiting",0,0
+e,6,8,2,"waiting",0,0
+e,15,7,4,"waiting",0,0
+e,16,2,2,"waiting",0,0
+t,delay,484,-1,enemy,0,0,7
+"", "", ""
+0, -1, 0
+
+MISSION 12 - Ground assault: Part 4
+"0000002000000000000020000"
+"00000100000010000p0000000"
+"0020030000000000000000000"
+"0000020000000000300001000"
+"0000001000000000000000000"
+"00p0000300000p00000000000"
+"0003000400000000000000000"
+"0000000555000000000000000"
+"00000003000000020000p0000"
+"0400000040000000000000000"
+"0000p00010000000000000000"
+"0000000002000000000000400"
+"0002000000300000000000000"
+"000000100001000p055000000"
+"0000000000030000000000000"
+"00000p00000100000000p0000"
+"0000000000011000000000000"
+1
+
+-1, 16, -1
+e,-1,-1,1,"seeking",0,0
+e,1,8,3,"waiting",1,0
+e,16,2,2,"waiting",1,0
+t,kills,1,0,enemy,0,24,10
+t,kills,1,0,enemy,0,24,11
+t,kills,1,0,enemy,0,0,9
+"","",""
+0, -1, 0
+
+MISSION 12 - Ground assault: Part 5
+"1324000000000000000000001"
+"0040000000000000550000400"
+"000000p000300000000000000"
+"000030000000000003000p000"
+"0000000000000p00000000000"
+"0000000400000000000005550"
+"00000000000000030p0000000"
+"0000p00000000000000000000"
+"0040000055550000000004000"
+"0000000055040000000000000"
+"00000000560000000300p0000"
+"030000035500000p000000030"
+"0003p00000000000000000000"
+"0000000000000000000120000"
+"00030040000p0100000030p00"
+"0000002000000000010000000"
+"0000001000000000000000000"
+1
+
+10, 10, 2
+e,-1,-1,2,"seeking",1,0
+t,delay,204,-1,enemy,0,7,0
+t,delay,80,-1,enemy,0,13,16
+t,kills,2,0,briefing,"^wI shot the last trooper and he sizzled into the ground. The repair module been deactivated by remote, but I was nearing the end of my walk anyway.","",""
+"^wAhead of me was a repair module. I walked up to it and it began fixing my damaged armour.^2As it completed the repairs it emitted a triumphant beep - which brought a squad of troopers running. A security team, I had to take them out in case they could warn anyone.", "", ""
+2, -1, 5
+
+MISSION 12 - Ground assault: Part 6
+"0000500000p000p0000005001"
+"0000500000055000000005p00"
+"0000500000000000000005001"
+"00p0000p00000000000p00p02"
+"0000000040000000400000001"
+"0000000000000000000000003"
+"0000000000000000005500001"
+"0000000000000000000000002"
+"00p000p000000000000p000p5"
+"0505000040000000400000505"
+"5005000000000000000000505"
+"0505000005000505000000505"
+"0005000p0000000000p000505"
+"0005000000000000000000505"
+"0005555555555555555555505"
+"00p00000000000000000000p4"
+"0000000000000000000000002"
+1
+
+-1, 16, -1
+e,-1,-1,4,"seeking",0,0
+e,8,3,10,"fleeing",1,1
+e,4,13,10,"standing",1,1
+e,16,11,10,"waiting",1,1
+e,13,10,10,"fleeing",1,1
+e,2,1,3,"standing",0,0
+e,1,0,4,"standing",0,0
+e,2,0,4,"standing",0,0
+e,23,1,4,"standing",0,0
+e,23,2,4,"standing",0,0
+t,delay,800,500,enemy,0,24,1
+t,delay,810,573,enemy,0,0,0
+"^wThe power bank was just ahead of me. Several guards were standing around the area where the technicians were working. The technicians themselves were clumsily wielding weapons.", "^wI didn't want to fight all the guards. I would probably have to take down the technicians and run. My sensors told me that once the technicians were out, the East passageway would be my best chance of escaping.", ""
+4, -4, 0
+
+MISSION 12 - Ground assault: Part 7
+"40000p0000p0000000000000p"
+"5000000000000000p00000000"
+"5553201112042115555551000"
+"0000022000100000010300100"
+"00p00000000p0000200220010"
+"0000000000000000101000000"
+"001000000040000003000000p"
+"0000p00000000000000000000"
+"00000000000000000p0002000"
+"00000200000p0001000000000"
+"0000000000000000000000000"
+"000000000030000000001p000"
+"0000p00000000000p00000000"
+"0000000300000000000000000"
+"0000000000005550000020000"
+"00000000p000000p000000000"
+"0000000000000000000000000"
+1
+
+1, 0, 4
+e,24,0,6,"seeking",1,0
+e,4,9,1,"waiting",1,0
+e,7,14,1,"waiting",1,0
+e,24,4,1,"camping",1,0
+"^wI sped down the passage, explosions erupting all around me. Then my pursuers disappeared. With a metallic shriek, a steel pyramid tore out of the ground behind me, blocking the way back.^2I heard the hovership approaching, and something else as well.", "^b--There are several enemies around you. Once you've diabled them I'll try to pick you up--", "^wIf Steve was going to say something else, he didn't, because a fimiliar blast of blue energy sent him and his ship running.^2Ahead of me, someone stepped into sensor range. The second elite commando, seeking vengance for his fallen comrade. This would be interesting."
+4, 100, 0
+
+MISSION 13 - Endgame
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+"0000000000000000000000000"
+1
+
+10,10,3
+"^wWe were away. Explosions bloomed as the unattended power bank began to overheat. Soon a gigantic fireball roared out into the sky.", "^bExcellent. With that power bank destroyed, several defences will be off-line.^2You get repaired while we move on. We're going to visit the demolitions team that I told you about eariler - They're in a bit of trouble, with Stall forces closing in. You're going to bail them out.","^gYou have now completed TakeDown: Episode 1 - The Phantom Menace"
+0,0,5

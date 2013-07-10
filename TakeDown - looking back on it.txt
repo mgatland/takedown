@@ -1,0 +1,41 @@
+2008-02-10
+
+Hi!
+
+I made this game mostly while I was at high school.
+
+I spent a lot of time on it.
+
+It started out as a very simple game where you fought some baddies on a randomly generated map (just rocks lying around), then I added 3 simple scenarios (one, your weapon won't start working for a while, and there are fewer enemies, another, their weapons won't start working for a while, but there are more enemies). The other was no special properties, and a medium number of enemies - probably 3.
+
+From there it grew - more enemies, a sequence of hand made levels, then I wanted level triggers. I wish I still had the first version to show you...
+
+The earliest modifed file in here is a Takedown icon from 2001-03-30. That's the earliest date I know I was working on Takedown. The icon could have been quite early because the graphics of Takedown were used even in the very first primative version. (They were made in Bryce.)
+
+The file AAAOld.tdm, modified 2002-01-04, has an older version of the campaign, when it had first-person writing inspired by Max Payne. Coolies. I'm glad I kept it. It probably isn't runnable any more without modifications, though.
+
+The earliest source backup is from 2002-07-07.
+
+From the file modified dates, it appears that I worked on Takedown soldidly at least until 2003-11-12, and perhaps longer 
+
+- module.bas was last modifed on 2004-04-22. 
+- the logfile +takedown.txt, the options form, and the level data was last modifed on 2005-03-13.
+
+========================================
+edit 2008-10-31: 
+
+How long did development last for?
+
+Latest changes: the main game file frm_game.frm was modified 2005-06-21. That was when I was at uni, and may have been a small one-off change.
+
+The last 'release' I made was the update patch, created on 2005-03-31 (date of the readme file). This could be considered the end of TakeDown. But the release probably came after my work slowed right down.
+
+I know that I was working hard and solidly when I created the new enemy teamwork sound effects - on 2003-12-27. So the real development time was at least until then.
+
+The previous release was 'Takedown10' (TakeDown 1.0) created on 2003-07-05.
+
+
+Main development time:
+Takedown 1.0:	2001-03-30 to 2003-07-05	2 years, 3 months
+hard work period?	2001-03-30 to 2003-12-27	2 years, 9 months (at least)
+To last release	2001-03-30 to 2005-03-13	4 years (3 years, 11.5 months)

@@ -1,0 +1,49 @@
+[MISSION 1]
+24,16
+"                       4 "
+"` `*   *!             !  "
+" 3  C?=  ;F??????????B   "
+"* * >  ** <          <   "
+"    >7                *  "
+"    >7                !  "
+"    >7    : **       :   "
+"    G?????D=  ;??????E   "
+" * *>     ~ ~*       >   "
+"  1 >   *   *        >   "
+" ` `>    ;F=         <   "
+"    >*  ~ > *   *   * !  "
+" ~ *>     >         * *  "
+"  2 >   **>          :   "
+"*```A??=  A??????????@   "
+" 2 *    *!            !  "
+"` *                      "
+5
+
+0,7,2
+[enemy]
+0,-1,-1,13,standing,0,ally
+1,7,3,1,standing,1,dumb
+2,7,4,3,standing,1,dumb
+3,13,2,1,standing,1,dumb
+4,13,3,3,standing,1,dumb
+5,16,10,5,standing,1,dumb
+6,16,11,1,standing,1,dumb
+7,16,12,5,standing,1,dumb
+8,20,11,3,standing,1,dumb
+9,7,11,5,standing,1,dumb
+10,7,12,1,standing,1,dumb
+[]
+[trigger]
+' win mission trigger - player must kill 10 (all) enemies
+0,0,and,kills,10,0,0,true,0,0,0,endmission,50,1,0,null,0,0,0
+' reinforcements have arrived
+1,0,and,delay,50,-1,-1,true,0,0,0,enemy,0,0,0,text,"Reinforcements have arrived","",""
+2,0,and,delay,150,-1,-1,true,0,0,0,enemy,0,1,0,text,"Reinforcements have arrived","",""
+[]
+[misc]
+patch,4,2,20,13,0,0.5
+[]
+[brief]
+"^wWipe them out. All of them.","",""
+100
+[]
