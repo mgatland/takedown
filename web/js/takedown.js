@@ -23,6 +23,19 @@ audio.play = function (sound) {
     console.log(sound);
 };
 
+var Pos = function (x, y) {
+	this.x = x;
+	this.y = y;
+
+	this.equals = function(other) {
+		return (this.x === other.x && this.y === other.y);
+	}
+
+	this.clone = function() {
+		return new Pos(this.x, this.y);
+	}
+}
+
 var Person = function () {
 	this.moved = 0;
 	this.moved = 0;
@@ -31,9 +44,8 @@ var Person = function () {
 	this.shot = 0;
 	this.heat = 0;
 	this.maxHeat = 120;
-	this.pos = {};
-	this.pos.x = 5;
-	this.pos.y = 5;
+	this.pos = new Pos(5,5);
+	this.live = true;
 }
 
 Person.prototype.update = function (world, face, firing, fireMode) {
@@ -104,13 +116,16 @@ var createWorld = function() {
 				this.live = false;
 			}
 		}
+
+		//check for collisions with the player
+
 	}
 
 	world.createShot = function(pos, face, shotType) {
 		console.log("shot!");
 		var shot = {};
 		shot.live = true;
-		shot.pos = { x: pos.x, y:pos.y};
+		shot.pos = pos.clone();
 		shot.face = face;
 		shot.type = shotType;
 		shot.moved = 0;
@@ -118,6 +133,14 @@ var createWorld = function() {
 		world.shots.push(shot);
 		shot.update = shotUpdate;
 	}
+
+	world.createEnemy = function () {
+		var e = new Person();
+		this.enemies.push(e);
+		return e;
+	};
+
+	world.createEnemy();
 
 	return world;
 };
@@ -164,15 +187,13 @@ var update = function (world, keyboard, p) {
 
 //global...
 var tryMove = function (o, face, map) {
-	var x = o.pos.x;
-	var y = o.pos.y;
-	if (face === UP) y--;
-	if (face === RIGHT) x++;
-	if (face === DOWN) y++;
-	if (face === LEFT) x--;
-	if (map.canMove(x,y)) {
-		o.pos.x = x;
-		o.pos.y = y;
+	var movedPos = o.pos.clone();
+	if (face === UP) movedPos.y--;
+	if (face === RIGHT) movedPos.x++;
+	if (face === DOWN) movedPos.y++;
+	if (face === LEFT) movedPos.x--;
+	if (map.canMove(movedPos)) {
+		o.pos = movedPos;
 		o.moved = o.moveSpeed;
 		return true;
 	}
@@ -189,12 +210,11 @@ var render = function (world, p) {
 	drawSquare(p.pos, "blue");
 
 	world.shots.forEach(function (shot) {
-		if (shot.live === true) {
-			drawSquare(shot.pos, "red");
-		} else {
-			drawSquare(shot.pos, "orange");
-		}
-				
+		drawSquare(shot.pos, shot.live === true ? "red" : "orange");
+	});
+
+	world.enemies.forEach(function (e) {
+		drawSquare(e.pos, e.live === true ? "grey" : "black");
 	});
 };
 
@@ -213,39 +233,40 @@ var createGrid = function () {
 	}
 	var grid = {};
 
-	grid.canMove = function (x, y) {
-		if (this.isValid(x,y)) return true;
+	grid.canMove = function (pos) {
+		if (this.isValid(pos)) return true;
 		return false;
 	}
 
-	grid.isValid = function (x, y) {
-		if (x < 0 || x >= width) {
+	grid.isValid = function (pos) {
+		if (pos.x < 0 || pos.x >= width) {
 			return false;
 		}
-		if (y < 0 || y >= height) {
+		if (pos.y < 0 || pos.y >= height) {
 			return false;	
 		}
 		return true;
 	}
 
-	grid.get = function (x, y) {
-		if (!this.isValid(x, y)) {
+	grid.get = function (pos) {
+		if (!this.isValid(pos.x, pos.y)) {
 			return 0;
 		}
-		return terrain[x][y]; 
+		return terrain[pos.x][pos.y]; 
 	}; 
 
-	grid.set = function (x, y, value) {
-		if (!this.isValid(x, y)) {
+	grid.set = function (pos, value) {
+		if (!this.isValid(pos.x, pos.y)) {
 			return;
 		}
-		terrain[x][y] = value;
+		terrain[pos.x][pos.y] = value;
 	}
 
 	grid.forEach = function (func) {
 		for (var i = 0; i < width; i ++) {
 			for (var j = 0; j < height; j++) {
-				func({x:i, y:j}, this.get(i, j));
+				var pos = new Pos(i,j);
+				func(pos, this.get(pos));
 			}
 		}
 	}
