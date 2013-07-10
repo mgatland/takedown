@@ -36,19 +36,21 @@ var Pos = function (x, y) {
 	}
 }
 
-var Person = function () {
+var Person = function (pos) {
 	this.moved = 0;
 	this.moved = 0;
-	this.face = 0;
+	this.face = 2;
 	this.moveSpeed = 4;
 	this.shot = 0;
 	this.heat = 0;
 	this.maxHeat = 120;
-	this.pos = new Pos(5,5);
+	this.pos = pos.clone();
 	this.live = true;
 }
 
 Person.prototype.update = function (world, face, firing, fireMode) {
+	if (this.live === false) return;
+
 	if (this.moved > 0) {
 		this.moved--;
 	} else {
@@ -93,17 +95,12 @@ Person.prototype.fire = function (mode, world) {
 	}
 };
 
-
-var createPlayer = function () {
-	var p = new Person();
-	return p;
-};
-
 var createWorld = function() {
 
 	var world = {};
 	world.shots = [];
 	world.enemies = [];
+	world.p = null;
 
 	var shotUpdate = function(world) {
 		if (this.live === false) return;
@@ -118,7 +115,20 @@ var createWorld = function() {
 		}
 
 		//check for collisions with the player
-
+		if (this.type == 2) { //non-player shot
+			if (world.p.pos.equals(this.pos) && world.p.live === true) {
+				world.p.live = false;
+				this.live = false;
+			}
+		} else {
+			var that = this;
+			world.enemies.forEach(function (e) {
+				if (e.pos.equals(that.pos) && e.live === true) {
+					e.live = false;
+					that.live = false;
+				}
+			});
+		}
 	}
 
 	world.createShot = function(pos, face, shotType) {
@@ -128,18 +138,24 @@ var createWorld = function() {
 		shot.pos = pos.clone();
 		shot.face = face;
 		shot.type = shotType;
-		shot.moved = 0;
+
 		shot.moveSpeed = 1;
-		world.shots.push(shot);
+		shot.moved = 0;
+		this.shots.push(shot);
 		shot.update = shotUpdate;
 	}
 
 	world.createEnemy = function () {
-		var e = new Person();
+		var e = new Person(new Pos(10,10));
 		this.enemies.push(e);
 		return e;
 	};
 
+	world.createPlayer = function () {
+		this.p = new Person(new Pos(5, 5));
+	};
+
+	world.createPlayer();
 	world.createEnemy();
 
 	return world;
@@ -154,15 +170,15 @@ var start = function () {
 
 	var world = createWorld();
 	world.map = createGrid();
-	var p = createPlayer();
-	
+	world.createPlayer();
+
 	window.setInterval(function () {
-		update(world, keyboard, p);
-		render(world, p);
+		update(world, keyboard);
+		render(world);
 	}, 40);
 };
 
-var update = function (world, keyboard, p) {
+var update = function (world, keyboard) {
 	var face = 0;
 	if (keyboard.isKeyDown(KeyEvent.DOM_VK_UP)) face = UP;
 	if (keyboard.isKeyDown(KeyEvent.DOM_VK_RIGHT)) face = RIGHT;
@@ -179,7 +195,12 @@ var update = function (world, keyboard, p) {
 		firing = true;
 	}
 
-	p.update(world, face, firing, fireMode);
+	world.p.update(world, face, firing, fireMode);
+
+	world.enemies.forEach(function(e) {
+		e.update(world, 1, 1, 2);
+	});
+
 	world.shots.forEach(function(shot) {
 		shot.update(world);
 	});
@@ -201,13 +222,13 @@ var tryMove = function (o, face, map) {
 };
 
 // Draw everything
-var render = function (world, p) {
+var render = function (world) {
 
 	world.map.forEach(function (pos, tile) {
 		drawSquare(pos, "green");
 	});
 
-	drawSquare(p.pos, "blue");
+	drawSquare(world.p.pos, world.p.live === true ? "blue": "black");
 
 	world.shots.forEach(function (shot) {
 		drawSquare(shot.pos, shot.live === true ? "red" : "orange");
