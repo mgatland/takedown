@@ -23,64 +23,67 @@ audio.play = function (sound) {
     console.log(sound);
 };
 
-var createPlayer = function () {
-	var p = {};
-	p.moved = 0;
-	p.face = 0;
-	p.moveSpeed = 4;
-	p.shot = 0;
-	p.heat = 0;
-	p.maxHeat = 120;
+var Person = function () {
+	this.moved = 0;
+	this.moved = 0;
+	this.face = 0;
+	this.moveSpeed = 4;
+	this.shot = 0;
+	this.heat = 0;
+	this.maxHeat = 120;
+	this.pos = {};
+	this.pos.x = 5;
+	this.pos.y = 5;
+}
 
-	p.pos = {};
-	p.pos.x = 5;
-	p.pos.y = 5;
-
-	p.update = function (world, face, firing, fireMode) {
-		if (this.moved > 0) {
-			this.moved--;
-		} else {
-			if (face > 0) {
-				tryMove(this, face, world.map);
-			}
-		}
-		if (face > 0) this.face = face;
-
-		if (this.shot > 0) {
-			this.shot--;
-		} else {
-			if (firing) {
-				this.fire(fireMode, world);
-			}
-		}
-
-		if (p.heat > 0) {
-			p.heat -= 0.5; //TODO: double all heat values and make this 1
-			if (p.heat > p.maxHeat) {
-				p.heat = p.maxHeat;
-			}
+Person.prototype.update = function (world, face, firing, fireMode) {
+	if (this.moved > 0) {
+		this.moved--;
+	} else {
+		if (face > 0) {
+			tryMove(this, face, world.map);
 		}
 	}
+	if (face > 0) this.face = face;
+
+	if (this.shot > 0) {
+		this.shot--;
+	} else {
+		if (firing) {
+			this.fire(fireMode, world);
+		}
+	}
+
+	if (this.heat > 0) {
+		this.heat -= 0.5; //TODO: double all heat values and make this 1
+		if (this.heat > this.maxHeat) {
+			this.heat = this.maxHeat;
+		}
+	}
+};
 
 	//refire rate already checked, but heat not checked
-	p.fire = function (mode, world) {
-		if (this.heat >= 100) {
-			p.shot = 10;
-			audio.play("overheat");
-		} else {
-			var shotType = mode; //use player gun
-			var shot = world.createShot(p.pos, p.face, shotType);
-			if (shot !== null) {
-				//set up shot stealth, special
-			}
-			p.heat += heatOnFiring;
-			p.shot = refireRate;
-			if (p.moved < gunKick) {
-				p.moved = gunKick;
-			}
+Person.prototype.fire = function (mode, world) {
+	if (this.heat >= 100) {
+		this.shot = 10;
+		audio.play("overheat");
+	} else {
+		var shotType = mode; //use player gun
+		var shot = world.createShot(this.pos, this.face, shotType);
+		if (shot !== null) {
+			//set up shot stealth, special
+		}
+		this.heat += heatOnFiring;
+		this.shot = refireRate;
+		if (this.moved < gunKick) {
+			this.moved = gunKick;
 		}
 	}
+};
 
+
+var createPlayer = function () {
+	var p = new Person();
 	return p;
 };
 
@@ -88,6 +91,7 @@ var createWorld = function() {
 
 	var world = {};
 	world.shots = [];
+	world.enemies = [];
 
 	var shotUpdate = function(world) {
 		if (this.live === false) return;
@@ -114,6 +118,7 @@ var createWorld = function() {
 		world.shots.push(shot);
 		shot.update = shotUpdate;
 	}
+
 	return world;
 };
 
@@ -177,27 +182,26 @@ var tryMove = function (o, face, map) {
 // Draw everything
 var render = function (world, p) {
 
-	//background fill
-	ctx.fillStyle = "#ff00ff";
-	ctx.fillRect(0,0, width*tileSize, height*tileSize);
-	
-	world.map.forEach(function (x, y, tile) {
-		ctx.fillStyle = "green";
-		ctx.fillRect(x*tileSize, y * tileSize, tileSize, tileSize);
+	world.map.forEach(function (pos, tile) {
+		drawSquare(pos, "green");
 	});
 
-	ctx.fillStyle = "blue";
-	ctx.fillRect(p.pos.x*tileSize, p.pos.y * tileSize, tileSize, tileSize);
+	drawSquare(p.pos, "blue");
 
 	world.shots.forEach(function (shot) {
 		if (shot.live === true) {
-			ctx.fillStyle = "red";
+			drawSquare(shot.pos, "red");
 		} else {
-			ctx.fillStyle = "orange";
+			drawSquare(shot.pos, "orange");
 		}
-		ctx.fillRect(shot.pos.x*tileSize, shot.pos.y * tileSize, tileSize, tileSize);		
+				
 	});
 };
+
+var drawSquare = function (pos, color) {
+	ctx.fillStyle = color;
+	ctx.fillRect(pos.x*tileSize, pos.y*tileSize, tileSize, tileSize);
+}
 
 var createGrid = function () {
 	var terrain = []; //t_type
@@ -241,7 +245,7 @@ var createGrid = function () {
 	grid.forEach = function (func) {
 		for (var i = 0; i < width; i ++) {
 			for (var j = 0; j < height; j++) {
-				func(i, j, this.get(i, j));
+				func({x:i, y:j}, this.get(i, j));
 			}
 		}
 	}
