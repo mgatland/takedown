@@ -36,6 +36,8 @@ var Pos = function (x, y) {
 		return new Pos(this.x, this.y);
 	}
 
+	//TODO: manhatten mode is never used, remove it?
+	//It was used for enemy movement before we had pathfinding
 	this.dirTowards = function(other, manhatten) {
 		if (manhatten !== true) {
 			manhatten = false;
@@ -64,6 +66,52 @@ var Pos = function (x, y) {
 		}
 		return dir;
 	}
+
+	//next step in the walkable path from here to there
+	this.dirOnPathTowards = function(other, world) {
+		//ok, here goes... calculate the cost to walk from every square to the other pos
+		var thisStep = [];
+		var nextStep = [];
+		var closed = [];
+		thisStep.push(other);
+		var cost = 0;
+		while (thisStep.length > 0 || nextStep.length > 0) {
+			if (thisStep.length === 0) {
+				thisStep = nextStep;
+				nextStep = [];
+				cost++;
+			}
+			var next = thisStep.pop();
+			var key = next.x + ":" + next.y;
+			var existingValue = closed[key];
+			if (existingValue === null || existingValue === undefined || existingValue > cost) {
+				if (world.map.canMove(next)) {
+					closed[key] = cost;
+					nextStep.push(new Pos(next.x + 1, next.y));
+					nextStep.push(new Pos(next.x - 1, next.y));
+					nextStep.push(new Pos(next.x, next.y + 1));
+					nextStep.push(new Pos(next.x, next.y - 1));
+				}
+			}
+		}
+		//now we have our path, which of our possible moves is the best?
+		var options = []; //the index of this array is special, it's the direction to move
+		options[NONE] = 10000;
+		options[UP] = closed[(this.x) + ":" + (this.y - 1)];
+		options[LEFT] = closed[(this.x - 1) + ":" + (this.y)];
+		options[DOWN] = closed[(this.x) + ":" + (this.y + 1)];
+		options[RIGHT] = closed[(this.x + 1) + ":" + (this.y)];
+
+		var bestSoFar = 10000 - 1;
+		var bestDir = 0;
+		for (var i = 0; i < 5; i++) {
+			if (options[i] != undefined && options[i] < bestSoFar) {
+				bestSoFar = options[i];
+				bestDir = i;
+			}
+		}
+		return bestDir;
+	}
 }
 
 var PlayerAI = function () {
@@ -89,7 +137,7 @@ var AI = function () {
 			this.moveTarget = world.getRandomPos();
 		}
 
-		return this.owner.pos.dirTowards(this.moveTarget, true);
+		return this.owner.pos.dirOnPathTowards(this.moveTarget, world);
 	}
 
 	this.shoot = function(world) {
@@ -226,9 +274,13 @@ var createWorld = function() {
 	};
 
 	world.getRandomPos = function () {
-		var x = Math.floor(Math.random() * width);
-		var y = Math.floor(Math.random() * height);
-		return new Pos(x, y);
+		var pos = null;
+		while (pos === null || this.map.canMove(pos)===false) {
+			var x = Math.floor(Math.random() * width);
+			var y = Math.floor(Math.random() * height);
+			pos = new Pos(x, y);
+		}
+		return pos;
 	}
 
 	world.createPlayer();
