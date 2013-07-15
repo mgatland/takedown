@@ -140,13 +140,29 @@ var AI = function () {
 		return this.owner.pos.dirOnPathTowards(this.moveTarget, world);
 	}
 
+	var NO_SHOOT = {dir: NONE, mode: -1};
+
 	this.shoot = function(world) {
-		if (world.p.live === false) {
-			return {dir: NONE, mode: -1};
-		}
+		if (world.p.live === false) return NO_SHOOT;
 		var shootDir = this.owner.pos.dirTowards(world.p.pos, false);
+		if (shootDir == NONE) return NO_SHOOT;
 
 		//1. Is there a clear shot? Is there a straight or L-shaped path from me to the player?
+		var canSee1;
+		if (shootDir == LEFT || shootDir == RIGHT) {
+			var startX = this.owner.pos.x;
+			var endX = world.p.pos.x;
+			var startPos = new Pos(startX, this.owner.pos.y);
+			var midPos = new Pos(endX, this.owner.pos.y);
+		} else {
+			var startY = this.owner.pos.y;
+			var endY = world.p.pos.y;
+			var startPos = new Pos(this.owner.pos.x, startY);
+			var midPos = new Pos(this.owner.pos.x, endY);
+		}
+		var canSee1 = world.map.canSee(startPos, midPos);
+		var canSee2 = world.map.canSee(midPos, world.p.pos)
+		if (!canSee1 || !canSee2) return NO_SHOOT;
 
 		//2. Is this shot close enough? Either straight, or the player might walk sideways into it?
 
@@ -405,7 +421,7 @@ var createGrid = function () {
 
 	grid.canMove = function (pos) {
 		if (this.isValid(pos) === false) return false;
-		if (this.get(pos) > 0) return false;
+		if (this.get(pos) == 1) return false;
 		return true;
 	}
 
@@ -417,6 +433,26 @@ var createGrid = function () {
 			return false;	
 		}
 		return true;
+	}
+
+	grid.canSee = function (start, end) {
+		if (start.x == end.x) {
+			var min = Math.min(start.y, end.y);
+			var max = Math.max(start.y, end.y);
+			for (var i = min; i <= max; i++) {
+				if (!this.canMove(new Pos(start.x, i))) return;
+			}
+			return true;
+		}
+		if (start.y == end.y) {
+			var min = Math.min(start.x, end.x);
+			var max = Math.max(start.x, end.x);
+			for (var i = min; i <= max; i++) {
+				if (!this.canMove(new Pos(i, start.y))) return;
+			}
+			return true;
+		}
+		throw "canSee failed because it doesn't handle diagonals";
 	}
 
 	grid.get = function (pos) {
