@@ -374,8 +374,6 @@ var render = function (world) {
 		}
 	});
 
-	drawSquare(world.p.pos, world.p.live === true ? "blue": "black");
-
 	world.shots.forEach(function (shot) {
 		drawSquare(shot.pos, shot.live === true ? "red" : "orange");
 	});
@@ -383,6 +381,8 @@ var render = function (world) {
 	world.enemies.forEach(function (e) {
 		drawSquare(e.pos, e.live === true ? "cyan" : "black");
 	});
+
+	drawSquare(world.p.pos, world.p.live === true ? "blue": "black");
 };
 
 var drawSquare = function (pos, color) {
