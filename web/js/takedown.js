@@ -5,6 +5,7 @@ var width = 25;
 var height = 17;
 var tileSize = 32;
 
+var NONE = 0;
 var UP = 1;
 var RIGHT = 2;
 var DOWN = 3;
@@ -36,7 +37,31 @@ var Pos = function (x, y) {
 	}
 }
 
-var Person = function (pos) {
+var PlayerAI = function () {
+	this.moveDir = NONE;
+	this.fireDir = NONE;
+	this.fireMode = -1;
+
+	this.move = function() {
+		return this.moveDir;
+	}
+
+	this.shoot = function() {
+		return {dir: this.fireDir, mode: this.fireMode};
+	}
+}
+
+var AI = function () {
+	this.move = function() {
+		return UP;
+	}
+
+	this.shoot = function() {
+		return {dir: DOWN, mode: 0};
+	}
+}
+
+var Person = function (pos, ai) {
 	this.moved = 0;
 	this.moved = 0;
 	this.face = 2;
@@ -46,25 +71,30 @@ var Person = function (pos) {
 	this.maxHeat = 120;
 	this.pos = pos.clone();
 	this.live = true;
+	this.ai = ai;
 }
 
-Person.prototype.update = function (world, face, firing, fireMode) {
+Person.prototype.update = function (world) {
 	if (this.live === false) return;
 
 	if (this.moved > 0) {
 		this.moved--;
 	} else {
-		if (face > 0) {
-			tryMove(this, face, world.map);
+		var moveDir = this.ai.move();
+		if (moveDir > 0) {
+			tryMove(this, moveDir, world.map);
 		}
 	}
-	if (face > 0) this.face = face;
+	if (moveDir > 0) this.face = moveDir;
+
+	var shootAI = this.ai.shoot();
+	if (shootAI.dir > 0) this.face = shootAI.dir;
 
 	if (this.shot > 0) {
 		this.shot--;
 	} else {
-		if (firing) {
-			this.fire(fireMode, world);
+		if (shootAI.mode >= 0) {
+			this.fire(shootAI.mode, world);
 		}
 	}
 
@@ -146,13 +176,13 @@ var createWorld = function() {
 	}
 
 	world.createEnemy = function () {
-		var e = new Person(new Pos(10,10));
+		var e = new Person(new Pos(10,10), new AI());
 		this.enemies.push(e);
 		return e;
 	};
 
 	world.createPlayer = function () {
-		this.p = new Person(new Pos(5, 5));
+		this.p = new Person(new Pos(5, 5), new PlayerAI());
 	};
 
 	world.createPlayer();
@@ -193,17 +223,17 @@ var update = function (world, keyboard) {
 	if (keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN)) face = DOWN;
 	if (keyboard.isKeyDown(KeyEvent.DOM_VK_LEFT)) face = LEFT;
 
-	var firing = false;
-	var fireMode = 0;
+	var fireMode = -1;
 	if (keyboard.isKeyDown(KeyEvent.DOM_VK_M)) {
 		fireMode = 0;
-		firing = true;
 	} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_N)) {
 		fireMode = 1;
-		firing = true;
 	}
 
-	world.p.update(world, face, firing, fireMode);
+	world.p.ai.moveDir = face;
+	world.p.ai.fireDir = face;
+	world.p.ai.fireMode = fireMode;
+	world.p.update(world);
 
 	world.enemies.forEach(function(e) {
 		e.update(world, 1, 1, 2);
