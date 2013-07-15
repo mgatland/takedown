@@ -309,7 +309,11 @@ var tryMove = function (o, face, map) {
 var render = function (world) {
 
 	world.map.forEach(function (pos, tile) {
-		drawSquare(pos, "green");
+		if (tile === 0) {
+			drawSquare(pos, "green");
+		} else {
+			drawSquare(pos, "grey");
+		}
 	});
 
 	drawSquare(world.p.pos, world.p.live === true ? "blue": "black");
@@ -319,7 +323,7 @@ var render = function (world) {
 	});
 
 	world.enemies.forEach(function (e) {
-		drawSquare(e.pos, e.live === true ? "grey" : "black");
+		drawSquare(e.pos, e.live === true ? "cyan" : "black");
 	});
 };
 
@@ -334,13 +338,17 @@ var createGrid = function () {
 		terrain[i] = [];
 		for (var j = 0; j < height; j++) {
 			terrain[i][j] = 0;
+			if (Math.random() > 0.95) {
+				terrain[i][j] = 1;
+			}
 		}
 	}
 	var grid = {};
 
 	grid.canMove = function (pos) {
-		if (this.isValid(pos)) return true;
-		return false;
+		if (this.isValid(pos) === false) return false;
+		if (this.get(pos) > 0) return false;
+		return true;
 	}
 
 	grid.isValid = function (pos) {
@@ -354,7 +362,7 @@ var createGrid = function () {
 	}
 
 	grid.get = function (pos) {
-		if (!this.isValid(pos.x, pos.y)) {
+		if (!this.isValid(pos)) {
 			return 0;
 		}
 		return terrain[pos.x][pos.y]; 
