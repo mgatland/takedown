@@ -172,9 +172,17 @@ var start = function () {
 	world.map = createGrid();
 	world.createPlayer();
 
+	//cross browser hacks
+	var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+		window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+  	window.requestAnimationFrame = requestAnimationFrame;
+
 	window.setInterval(function () {
 		update(world, keyboard);
-		render(world);
+		//render(world);
+		requestAnimationFrame(function() {
+			render(world);
+		});
 	}, 40);
 };
 
