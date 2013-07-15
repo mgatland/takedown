@@ -48,7 +48,6 @@ var Pos = function (x, y) {
 		}
 		var xIsLargest = (Math.abs(dX) > Math.abs(dY));
 		var yIsLargest = (Math.abs(dY) > Math.abs(dX));
-		console.log(dX + ":" + dY);
 		if (dX != 0 && 
 			((xIsLargest && !manhatten) || (yIsLargest && manhatten) || dY == 0)) {
 			if (dX > 0) {
