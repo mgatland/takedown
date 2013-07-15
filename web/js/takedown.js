@@ -144,7 +144,13 @@ var AI = function () {
 		if (world.p.live === false) {
 			return {dir: NONE, mode: -1};
 		}
-		return {dir: this.owner.pos.dirTowards(world.p.pos, false), mode: 2};
+		var shootDir = this.owner.pos.dirTowards(world.p.pos, false);
+
+		//1. Is there a clear shot? Is there a straight or L-shaped path from me to the player?
+
+		//2. Is this shot close enough? Either straight, or the player might walk sideways into it?
+
+		return {dir: shootDir, mode: 2};
 	}
 }
 
