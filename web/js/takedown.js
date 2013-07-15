@@ -42,22 +42,45 @@ var PlayerAI = function () {
 	this.fireDir = NONE;
 	this.fireMode = -1;
 
-	this.move = function() {
+	this.move = function(world) {
 		return this.moveDir;
 	}
 
-	this.shoot = function() {
+	this.shoot = function(world) {
 		return {dir: this.fireDir, mode: this.fireMode};
 	}
 }
 
 var AI = function () {
-	this.move = function() {
+	this.owner = null; //must be set by Person
+
+	this.move = function(world) {
 		return UP;
 	}
 
-	this.shoot = function() {
-		return {dir: DOWN, mode: 0};
+	this.shoot = function(world) {
+		if (world.p.live === false) {
+			return {dir: NONE, mode: -1};
+		}
+
+		//face towards player, and always shoot
+		var dX = this.owner.pos.x - world.p.pos.x;
+		var dY = this.owner.pos.y - world.p.pos.y;
+		var dir;
+		if(Math.abs(dX) > Math.abs(dY)) {
+			if (dX > 0) {
+				dir =  LEFT;
+			} else {
+				dir = RIGHT;
+			}
+		} else {
+			if (dY > 0) {
+				dir = UP;
+			} else {
+				dir = DOWN;
+			}
+		}
+		return {dir: dir, mode: 2};
 	}
 }
 
@@ -72,6 +95,7 @@ var Person = function (pos, ai) {
 	this.pos = pos.clone();
 	this.live = true;
 	this.ai = ai;
+	ai.owner = this;
 }
 
 Person.prototype.update = function (world) {
@@ -80,14 +104,14 @@ Person.prototype.update = function (world) {
 	if (this.moved > 0) {
 		this.moved--;
 	} else {
-		var moveDir = this.ai.move();
+		var moveDir = this.ai.move(world);
 		if (moveDir > 0) {
 			tryMove(this, moveDir, world.map);
 		}
 	}
 	if (moveDir > 0) this.face = moveDir;
 
-	var shootAI = this.ai.shoot();
+	var shootAI = this.ai.shoot(world);
 	if (shootAI.dir > 0) this.face = shootAI.dir;
 
 	if (this.shot > 0) {
