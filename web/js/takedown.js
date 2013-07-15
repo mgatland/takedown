@@ -148,7 +148,6 @@ var AI = function () {
 		if (shootDir == NONE) return NO_SHOOT;
 
 		//1. Is there a clear shot? Is there a straight or L-shaped path from me to the player?
-		var canSee1;
 		if (shootDir == LEFT || shootDir == RIGHT) {
 			var startX = this.owner.pos.x;
 			var endX = world.p.pos.x;
@@ -165,7 +164,21 @@ var AI = function () {
 		if (!canSee1 || !canSee2) return NO_SHOOT;
 
 		//2. Is this shot close enough? Either straight, or the player might walk sideways into it?
+		var xDist = Math.abs(this.owner.pos.x - world.p.pos.x);
+		var yDist = Math.abs(this.owner.pos.y - world.p.pos.y);
+		if (shootDir == LEFT || shootDir == RIGHT) {
+			var dist = xDist;
+			var missAmount = yDist;
+		} else {
+			var dist = yDist;
+			var missAmount = xDist;
+		}
+		if (dist < 5 && missAmount > 1) return NO_SHOOT;
+		if (dist < 10 && missAmount > 2) return NO_SHOOT;
+		if (dist < 15 && missAmount > 3) return NO_SHOOT;
+		if (missAmount > 4) return NO_SHOOT;
 
+		//Cool, let's shoot then.
 		return {dir: shootDir, mode: 2};
 	}
 }
