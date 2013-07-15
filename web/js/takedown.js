@@ -193,6 +193,7 @@ var Person = function (pos, ai) {
 	this.maxHeat = 120;
 	this.pos = pos.clone();
 	this.live = true;
+	this.health = 5;
 	this.ai = ai;
 	ai.owner = this;
 }
@@ -248,6 +249,15 @@ Person.prototype.fire = function (mode, world) {
 	}
 };
 
+Person.prototype.hurt = function (damage) {
+	if (!this.live) return;
+	this.health -= damage;
+	if (this.health <= 0) {
+		this.live = false;
+	}
+	this.heat += 25; //does not scale with damage; should it?
+}
+
 var createWorld = function() {
 
 	var world = {};
@@ -270,14 +280,14 @@ var createWorld = function() {
 		//check for collisions with the player
 		if (this.type == 2) { //non-player shot
 			if (world.p.pos.equals(this.pos) && world.p.live === true) {
-				world.p.live = false;
+				world.p.hurt(this.damage);
 				this.live = false;
 			}
 		} else {
 			var that = this;
 			world.enemies.forEach(function (e) {
 				if (e.pos.equals(that.pos) && e.live === true) {
-					e.live = false;
+					e.hurt(that.damage);
 					that.live = false;
 				}
 			});
@@ -291,6 +301,7 @@ var createWorld = function() {
 		shot.pos = pos.clone();
 		shot.face = face;
 		shot.type = shotType;
+		shot.damage = 1;
 
 		shot.moveSpeed = 1;
 		shot.moved = 0;
@@ -412,6 +423,12 @@ var render = function (world) {
 	});
 
 	drawSquare(world.p.pos, world.p.live === true ? "blue": "black");
+
+	ctx.fillStyle = (world.p.heat < 100)  ? "white" : "red";
+	ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
+	ctx.fillText("Heat: " + Math.floor(world.p.heat), 40, height * tileSize - 32);
+	ctx.fillStyle = "white";
+	ctx.fillText("Health: " + world.p.health, width * tileSize - 200, height * tileSize - 32);
 };
 
 var drawSquare = function (pos, color) {
