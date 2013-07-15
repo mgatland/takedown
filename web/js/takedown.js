@@ -36,14 +36,21 @@ var Pos = function (x, y) {
 		return new Pos(this.x, this.y);
 	}
 
-	this.dirTowards = function(other) {
+	this.dirTowards = function(other, manhatten) {
+		if (manhatten !== true) {
+			manhatten = false;
+		}
 		var dX = this.x - other.x;
 		var dY = this.y - other.y;
 		var dir = NONE;
 		if (this.equals(other)) {
 			return NONE;
 		}
-		if(Math.abs(dX) > Math.abs(dY)) {
+		var xIsLargest = (Math.abs(dX) > Math.abs(dY));
+		var yIsLargest = (Math.abs(dY) > Math.abs(dX));
+		console.log(dX + ":" + dY);
+		if (dX != 0 && 
+			((xIsLargest && !manhatten) || (yIsLargest && manhatten) || dY == 0)) {
 			if (dX > 0) {
 				dir =  LEFT;
 			} else {
@@ -76,16 +83,21 @@ var PlayerAI = function () {
 
 var AI = function () {
 	this.owner = null; //must be set by Person
+	this.moveTarget = null;
 
 	this.move = function(world) {
-		return UP;
+		while (this.moveTarget === null || this.owner.pos.equals(this.moveTarget)) {
+			this.moveTarget = world.getRandomPos();
+		}
+
+		return this.owner.pos.dirTowards(this.moveTarget, true);
 	}
 
 	this.shoot = function(world) {
 		if (world.p.live === false) {
 			return {dir: NONE, mode: -1};
 		}
-		return {dir: this.owner.pos.dirTowards(world.p.pos), mode: 2};
+		return {dir: this.owner.pos.dirTowards(world.p.pos, false), mode: 2};
 	}
 }
 
@@ -213,6 +225,12 @@ var createWorld = function() {
 	world.createPlayer = function () {
 		this.p = new Person(new Pos(5, 5), new PlayerAI());
 	};
+
+	world.getRandomPos = function () {
+		var x = Math.floor(Math.random() * width);
+		var y = Math.floor(Math.random() * height);
+		return new Pos(x, y);
+	}
 
 	world.createPlayer();
 	world.createEnemy();
