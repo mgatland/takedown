@@ -35,6 +35,29 @@ var Pos = function (x, y) {
 	this.clone = function() {
 		return new Pos(this.x, this.y);
 	}
+
+	this.dirTowards = function(other) {
+		var dX = this.x - other.x;
+		var dY = this.y - other.y;
+		var dir = NONE;
+		if (this.equals(other)) {
+			return NONE;
+		}
+		if(Math.abs(dX) > Math.abs(dY)) {
+			if (dX > 0) {
+				dir =  LEFT;
+			} else {
+				dir = RIGHT;
+			}
+		} else {
+			if (dY > 0) {
+				dir = UP;
+			} else {
+				dir = DOWN;
+			}
+		}
+		return dir;
+	}
 }
 
 var PlayerAI = function () {
@@ -62,25 +85,7 @@ var AI = function () {
 		if (world.p.live === false) {
 			return {dir: NONE, mode: -1};
 		}
-
-		//face towards player, and always shoot
-		var dX = this.owner.pos.x - world.p.pos.x;
-		var dY = this.owner.pos.y - world.p.pos.y;
-		var dir;
-		if(Math.abs(dX) > Math.abs(dY)) {
-			if (dX > 0) {
-				dir =  LEFT;
-			} else {
-				dir = RIGHT;
-			}
-		} else {
-			if (dY > 0) {
-				dir = UP;
-			} else {
-				dir = DOWN;
-			}
-		}
-		return {dir: dir, mode: 2};
+		return {dir: this.owner.pos.dirTowards(world.p.pos), mode: 2};
 	}
 }
 
