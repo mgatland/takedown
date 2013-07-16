@@ -1,15 +1,19 @@
 "use strict";
 
-//so many globals
-var width = 25;
-var height = 17;
-var tileSize = 32;
+//globals
+var screen = {
+	width: 25,
+	height: 17,
+	tileSize: 32
+};
 
-var NONE = 0;
-var UP = 1;
-var RIGHT = 2;
-var DOWN = 3;
-var LEFT = 4;
+var dir = {
+	NONE: 0,
+	UP: 1,
+	RIGHT: 2,
+	DOWN: 3,
+	LEFT: 4
+};
 
 var canvas;
 var ctx;
@@ -44,27 +48,27 @@ var Pos = function (x, y) {
 		}
 		var dX = this.x - other.x;
 		var dY = this.y - other.y;
-		var dir = NONE;
+		var dirTowards = dir.NONE;
 		if (this.equals(other)) {
-			return NONE;
+			return dir.NONE;
 		}
 		var xIsLargest = (Math.abs(dX) > Math.abs(dY));
 		var yIsLargest = (Math.abs(dY) > Math.abs(dX));
 		if (dX != 0 && 
 			((xIsLargest && !manhatten) || (yIsLargest && manhatten) || dY == 0)) {
 			if (dX > 0) {
-				dir =  LEFT;
+				dirTowards =  dir.LEFT;
 			} else {
-				dir = RIGHT;
+				dirTowards = dir.RIGHT;
 			}
 		} else {
 			if (dY > 0) {
-				dir = UP;
+				dirTowards = dir.UP;
 			} else {
-				dir = DOWN;
+				dirTowards = dir.DOWN;
 			}
 		}
-		return dir;
+		return dirTowards;
 	}
 
 	//next step in the walkable path from here to there
@@ -96,11 +100,11 @@ var Pos = function (x, y) {
 		}
 		//now we have our path, which of our possible moves is the best?
 		var options = []; //the index of this array is special, it's the direction to move
-		options[NONE] = 10000;
-		options[UP] = closed[(this.x) + ":" + (this.y - 1)];
-		options[LEFT] = closed[(this.x - 1) + ":" + (this.y)];
-		options[DOWN] = closed[(this.x) + ":" + (this.y + 1)];
-		options[RIGHT] = closed[(this.x + 1) + ":" + (this.y)];
+		options[dir.NONE] = 10000;
+		options[dir.UP] = closed[(this.x) + ":" + (this.y - 1)];
+		options[dir.LEFT] = closed[(this.x - 1) + ":" + (this.y)];
+		options[dir.DOWN] = closed[(this.x) + ":" + (this.y + 1)];
+		options[dir.RIGHT] = closed[(this.x + 1) + ":" + (this.y)];
 
 		var bestSoFar = 10000 - 1;
 		var bestDir = 0;
@@ -114,9 +118,49 @@ var Pos = function (x, y) {
 	}
 }
 
+var Camera = function (startPos, mapWidth, mapHeight) {
+	var pos = startPos.clone();
+	var maxX = mapWidth;
+	var maxY = mapHeight;
+	
+	var scrollSpeed = function(dist) {
+		if (dist <1) return 0.1;
+		if (dist < 5) return 0.2;
+		if (dist < 9) return 0.3;
+		return 0.5;
+	};
+
+	//public
+	this.xOff = function () {
+		var xOff = (pos.x - screen.width / 2);
+		if (xOff < 0) xOff = 0;
+		if (xOff > maxX - screen.width) xOff = maxX - screen.width;
+		return xOff * screen.tileSize;
+	};
+
+	this.yOff = function() {
+		var yOff = (pos.y - screen.height / 2);
+		if (yOff < 0) yOff = 0;
+		if (yOff > maxY - screen.height) yOff = maxY - screen.height;
+		return yOff * screen.tileSize;
+	};
+
+	this.update = function(target) {
+		var xDist = Math.abs(pos.x - target.x);
+		var xSpeed = scrollSpeed(xDist);
+		if (target.x > pos.x) pos.x += xSpeed;
+		if (target.x < pos.x) pos.x -= xSpeed;
+
+		var yDist = Math.abs(pos.y - target.y);
+		var ySpeed = scrollSpeed(yDist);
+		if (target.y > pos.y) pos.y += ySpeed;
+		if (target.y < pos.y) pos.y -= ySpeed;
+	}
+};
+
 var PlayerAI = function () {
-	this.moveDir = NONE;
-	this.fireDir = NONE;
+	this.moveDir = dir.NONE;
+	this.fireDir = dir.NONE;
 	this.fireMode = -1;
 
 	this.move = function(world) {
@@ -140,15 +184,15 @@ var AI = function () {
 		return this.owner.pos.dirOnPathTowards(this.moveTarget, world);
 	}
 
-	var NO_SHOOT = {dir: NONE, mode: -1};
+	var NO_SHOOT = {dir: dir.NONE, mode: -1};
 
 	this.shoot = function(world) {
 		if (world.p.live === false) return NO_SHOOT;
 		var shootDir = this.owner.pos.dirTowards(world.p.pos, false);
-		if (shootDir == NONE) return NO_SHOOT;
+		if (shootDir == dir.NONE) return NO_SHOOT;
 
 		//1. Is there a clear shot? Is there a straight or L-shaped path from me to the player?
-		if (shootDir == LEFT || shootDir == RIGHT) {
+		if (shootDir == dir.LEFT || shootDir == dir.RIGHT) {
 			var startX = this.owner.pos.x;
 			var endX = world.p.pos.x;
 			var startPos = new Pos(startX, this.owner.pos.y);
@@ -166,7 +210,7 @@ var AI = function () {
 		//2. Is this shot close enough? Either straight, or the player might walk sideways into it?
 		var xDist = Math.abs(this.owner.pos.x - world.p.pos.x);
 		var yDist = Math.abs(this.owner.pos.y - world.p.pos.y);
-		if (shootDir == LEFT || shootDir == RIGHT) {
+		if (shootDir == dir.LEFT || shootDir == dir.RIGHT) {
 			var dist = xDist;
 			var missAmount = yDist;
 		} else {
@@ -258,12 +302,13 @@ Person.prototype.hurt = function (damage) {
 	this.heat += 25; //does not scale with damage; should it?
 }
 
-var createWorld = function() {
+var createWorld = function(map) {
 
 	var world = {};
 	world.shots = [];
 	world.enemies = [];
 	world.p = null;
+	world.map = map;
 
 	var shotUpdate = function(world) {
 		if (this.live === false) return;
@@ -322,8 +367,8 @@ var createWorld = function() {
 	world.getRandomPos = function () {
 		var pos = null;
 		while (pos === null || this.map.canMove(pos)===false) {
-			var x = Math.floor(Math.random() * width);
-			var y = Math.floor(Math.random() * height);
+			var x = Math.floor(Math.random() * this.map.width);
+			var y = Math.floor(Math.random() * this.map.height);
 			pos = new Pos(x, y);
 		}
 		return pos;
@@ -338,13 +383,13 @@ var createWorld = function() {
 var start = function () {
 	canvas = document.getElementById('gamescreen');
 	ctx = canvas.getContext("2d");
-	canvas.width = width * tileSize;
-	canvas.height = height * tileSize;
+	canvas.width = screen.width * screen.tileSize;
+	canvas.height = screen.height * screen.tileSize;
 	var keyboard = createKeyboard();
 
-	var world = createWorld();
-	world.map = createGrid();
+	var world = createWorld(createGrid(screen.width*2, screen.height*2));
 	world.createPlayer();
+	var camera = new Camera(world.p.pos, world.map.width, world.map.height);
 
 	//cross browser hacks
 	var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
@@ -352,20 +397,20 @@ var start = function () {
   	window.requestAnimationFrame = requestAnimationFrame;
 
 	window.setInterval(function () {
-		update(world, keyboard);
+		update(world, keyboard, camera);
 		//render(world);
 		requestAnimationFrame(function() {
-			render(world);
+			render(world, camera);
 		});
 	}, 40);
 };
 
-var update = function (world, keyboard) {
+var updatePlayerInput = function (keyboard, playerAI) {
 	var face = 0;
-	if (keyboard.isKeyDown(KeyEvent.DOM_VK_UP)) face = UP;
-	if (keyboard.isKeyDown(KeyEvent.DOM_VK_RIGHT)) face = RIGHT;
-	if (keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN)) face = DOWN;
-	if (keyboard.isKeyDown(KeyEvent.DOM_VK_LEFT)) face = LEFT;
+	if (keyboard.isKeyDown(KeyEvent.DOM_VK_UP)) face = dir.UP;
+	if (keyboard.isKeyDown(KeyEvent.DOM_VK_RIGHT)) face = dir.RIGHT;
+	if (keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN)) face = dir.DOWN;
+	if (keyboard.isKeyDown(KeyEvent.DOM_VK_LEFT)) face = dir.LEFT;
 
 	var fireMode = -1;
 	if (keyboard.isKeyDown(KeyEvent.DOM_VK_M)) {
@@ -374,9 +419,13 @@ var update = function (world, keyboard) {
 		fireMode = 1;
 	}
 
-	world.p.ai.moveDir = face;
-	world.p.ai.fireDir = face;
-	world.p.ai.fireMode = fireMode;
+	playerAI.moveDir = face;
+	playerAI.fireDir = face;
+	playerAI.fireMode = fireMode;
+}
+
+var update = function (world, keyboard, camera) {
+	updatePlayerInput(keyboard, world.p.ai);
 	world.p.update(world);
 
 	world.enemies.forEach(function(e) {
@@ -386,15 +435,17 @@ var update = function (world, keyboard) {
 	world.shots.forEach(function(shot) {
 		shot.update(world);
 	});
+
+	camera.update(world.p.pos);
 };
 
 //global...
 var tryMove = function (o, face, map) {
 	var movedPos = o.pos.clone();
-	if (face === UP) movedPos.y--;
-	if (face === RIGHT) movedPos.x++;
-	if (face === DOWN) movedPos.y++;
-	if (face === LEFT) movedPos.x--;
+	if (face === dir.UP) movedPos.y--;
+	if (face === dir.RIGHT) movedPos.x++;
+	if (face === dir.DOWN) movedPos.y++;
+	if (face === dir.LEFT) movedPos.x--;
 	if (map.canMove(movedPos)) {
 		o.pos = movedPos;
 		o.moved = o.moveSpeed;
@@ -404,43 +455,43 @@ var tryMove = function (o, face, map) {
 };
 
 // Draw everything
-var render = function (world) {
+var render = function (world, camera) {
 
 	world.map.forEach(function (pos, tile) {
 		if (tile === 0) {
-			drawSquare(pos, "green");
+			drawSquare(pos, "green", camera);
 		} else {
-			drawSquare(pos, "grey");
+			drawSquare(pos, "grey", camera);
 		}
 	});
 
 	world.shots.forEach(function (shot) {
-		drawSquare(shot.pos, shot.live === true ? "red" : "orange");
+		drawSquare(shot.pos, shot.live === true ? "red" : "orange", camera);
 	});
 
 	world.enemies.forEach(function (e) {
-		drawSquare(e.pos, e.live === true ? "cyan" : "black");
+		drawSquare(e.pos, e.live === true ? "cyan" : "black", camera);
 	});
 
-	drawSquare(world.p.pos, world.p.live === true ? "blue": "black");
+	drawSquare(world.p.pos, world.p.live === true ? "blue": "black", camera);
 
 	ctx.fillStyle = (world.p.heat < 100)  ? "white" : "red";
 	ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
-	ctx.fillText("Heat: " + Math.floor(world.p.heat), 40, height * tileSize - 32);
+	ctx.fillText("Heat: " + Math.floor(world.p.heat), 40, screen.height * screen.tileSize - 32);
 	ctx.fillStyle = "white";
-	ctx.fillText("Health: " + world.p.health, width * tileSize - 200, height * tileSize - 32);
+	ctx.fillText("Health: " + world.p.health, screen.width * screen.tileSize - 200, screen.height * screen.tileSize - 32);
 };
 
-var drawSquare = function (pos, color) {
+var drawSquare = function (pos, color, camera) {
 	ctx.fillStyle = color;
-	ctx.fillRect(pos.x*tileSize, pos.y*tileSize, tileSize, tileSize);
+	ctx.fillRect(pos.x*screen.tileSize - camera.xOff(), pos.y*screen.tileSize - camera.yOff(), screen.tileSize, screen.tileSize);
 }
 
-var createGrid = function () {
+var createGrid = function (myWidth, myHeight) {
 	var terrain = []; //t_type
-	for (var i = 0; i < width; i ++) {
+	for (var i = 0; i < myWidth; i ++) {
 		terrain[i] = [];
-		for (var j = 0; j < height; j++) {
+		for (var j = 0; j < myHeight; j++) {
 			terrain[i][j] = 0;
 			if (Math.random() > 0.95) {
 				terrain[i][j] = 1;
@@ -448,6 +499,8 @@ var createGrid = function () {
 		}
 	}
 	var grid = {};
+	grid.width = myWidth;
+	grid.height = myHeight;
 
 	grid.canMove = function (pos) {
 		if (this.isValid(pos) === false) return false;
@@ -456,10 +509,10 @@ var createGrid = function () {
 	}
 
 	grid.isValid = function (pos) {
-		if (pos.x < 0 || pos.x >= width) {
+		if (pos.x < 0 || pos.x >= this.width) {
 			return false;
 		}
-		if (pos.y < 0 || pos.y >= height) {
+		if (pos.y < 0 || pos.y >= this.height) {
 			return false;	
 		}
 		return true;
@@ -500,8 +553,8 @@ var createGrid = function () {
 	}
 
 	grid.forEach = function (func) {
-		for (var i = 0; i < width; i ++) {
-			for (var j = 0; j < height; j++) {
+		for (var i = 0; i < this.width; i ++) {
+			for (var j = 0; j < this.height; j++) {
 				var pos = new Pos(i,j);
 				func(pos, this.get(pos));
 			}
