@@ -100,7 +100,9 @@ function CampaignLoader() {
     req.onreadystatechange = function() {
       if (req.readyState == 4) {
         if (req.status == 200) {
-          lines = req.responseText.split(/\n/g);
+          //normalise different OS line endings
+          var responseText = req.responseText.replace(/(\r\n|\n|\r)/gm, "\n");
+          lines = responseText.split(/\n/g);
           callback();
         } else {
           throw "Error loading file " + url + ", request status " + req.status;
