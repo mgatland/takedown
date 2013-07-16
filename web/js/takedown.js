@@ -135,14 +135,14 @@ var Camera = function (startPos, mapWidth, mapHeight) {
 		var xOff = (pos.x - screen.width / 2);
 		if (xOff < 0) xOff = 0;
 		if (xOff > maxX - screen.width) xOff = maxX - screen.width;
-		return xOff * screen.tileSize;
+		return Math.floor(xOff * screen.tileSize);
 	};
 
 	this.yOff = function() {
 		var yOff = (pos.y - screen.height / 2);
 		if (yOff < 0) yOff = 0;
 		if (yOff > maxY - screen.height) yOff = maxY - screen.height;
-		return yOff * screen.tileSize;
+		return Math.floor(yOff * screen.tileSize);
 	};
 
 	this.update = function(target) {
@@ -227,10 +227,10 @@ var AI = function () {
 	}
 }
 
-var Person = function (pos, ai) {
+var Person = function (pos, face, ai) {
 	this.moved = 0;
 	this.moved = 0;
-	this.face = 2;
+	this.face = face;
 	this.moveSpeed = 4;
 	this.shot = 0;
 	this.heat = 0;
@@ -355,13 +355,13 @@ var createWorld = function(map) {
 	}
 
 	world.createEnemy = function () {
-		var e = new Person(new Pos(10,10), new AI());
+		var e = new Person(new Pos(10,10), dir.UP, new AI());
 		this.enemies.push(e);
 		return e;
 	};
 
-	world.createPlayer = function () {
-		this.p = new Person(new Pos(5, 5), new PlayerAI());
+	world.createPlayer = function (pos, face) {
+		this.p = new Person(pos, face, new PlayerAI());
 	};
 
 	world.getRandomPos = function () {
@@ -374,9 +374,6 @@ var createWorld = function(map) {
 		return pos;
 	}
 
-	world.createPlayer();
-	world.createEnemy();
-
 	return world;
 };
 
@@ -387,9 +384,13 @@ var start = function () {
 	canvas.height = screen.height * screen.tileSize;
 	var keyboard = createKeyboard();
 
-	var world = createWorld(createGrid(screen.width*2, screen.height*2));
-	world.createPlayer();
-	var camera = new Camera(world.p.pos, world.map.width, world.map.height);
+	var world = null;
+	var camera = null;
+	var campaignLoader = new CampaignLoader();
+	campaignLoader.load("./res/01.tdm", function (newWorld) {
+		world = newWorld;
+		camera = new Camera(world.p.pos, world.map.width, world.map.height);
+	});
 
 	//cross browser hacks
 	var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
@@ -398,7 +399,6 @@ var start = function () {
 
 	window.setInterval(function () {
 		update(world, keyboard, camera);
-		//render(world);
 		requestAnimationFrame(function() {
 			render(world, camera);
 		});
@@ -425,6 +425,7 @@ var updatePlayerInput = function (keyboard, playerAI) {
 }
 
 var update = function (world, keyboard, camera) {
+	if (world === null) return;
 	updatePlayerInput(keyboard, world.p.ai);
 	world.p.update(world);
 
@@ -456,6 +457,7 @@ var tryMove = function (o, face, map) {
 
 // Draw everything
 var render = function (world, camera) {
+	if (world === null) return;
 
 	world.map.forEach(function (pos, tile) {
 		if (tile === 0) {
@@ -504,7 +506,7 @@ var createGrid = function (myWidth, myHeight) {
 
 	grid.canMove = function (pos) {
 		if (this.isValid(pos) === false) return false;
-		if (this.get(pos) == 1) return false;
+		if (this.get(pos) > 0) return false;
 		return true;
 	}
 
