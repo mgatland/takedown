@@ -287,8 +287,8 @@ Person.prototype.fire = function (mode, world) {
 		this.shot = 10;
 		audio.play("overheat");
 	} else {
-		var shotType = mode; //use player gun
-		var shot = world.createShot(this.pos, this.face, shotType);
+		//mode is ignored
+		var shot = world.createShot(this.pos, this.face, this.team);
 		if (shot !== null) {
 			//set up shot stealth, special
 		}
@@ -329,30 +329,23 @@ var createWorld = function(map) {
 			}
 		}
 
-		//check for collisions with the player
-		if (this.type == 2) { //non-player shot
-			if (world.p.pos.equals(this.pos) && world.p.live === true) {
-				world.p.hurt(this.damage);
-				this.live = false;
+		//check for collisions with People
+		var that = this;
+		world.enemies.forEach(function (e) {
+			if (e.pos.equals(that.pos) && e.live === true && e.team != that.team) {
+				e.hurt(that.damage);
+				that.live = false;
 			}
-		} else {
-			var that = this;
-			world.enemies.forEach(function (e) {
-				if (e.pos.equals(that.pos) && e.live === true) {
-					e.hurt(that.damage);
-					that.live = false;
-				}
-			});
-		}
+		});
 	}
 
-	world.createShot = function(pos, face, shotType) {
+	world.createShot = function(pos, face, team) {
 		console.log("shot!");
 		var shot = {};
 		shot.live = true;
 		shot.pos = pos.clone();
 		shot.face = face;
-		shot.type = shotType;
+		shot.team = team;
 		shot.damage = 1;
 
 		shot.moveSpeed = 1;
@@ -364,12 +357,15 @@ var createWorld = function(map) {
 	world.createEnemy = function (pos) {
 		var e = new Person(pos, dir.UP, new AI());
 		e.health = 1;
+		e.team = 1;
 		this.enemies.push(e);
 		return e;
 	};
 
 	world.createPlayer = function (pos, face) {
 		this.p = new Person(pos, face, new PlayerAI());
+		this.p.team = 0;
+		this.enemies.push(this.p);
 	};
 
 	world.getRandomPos = function () {
@@ -381,7 +377,6 @@ var createWorld = function(map) {
 		}
 		return pos;
 	}
-
 	return world;
 };
 
@@ -413,7 +408,7 @@ var start = function () {
 			render(world, camera);
 		});
 
-		if (!world.enemies.some(function (e) {return e.live;})) {
+		if (!world.enemies.some(function (e) {return e.live && e.team != 0;})) {
 			console.log("You win!");
 			level++;
 			world = campaignLoader.loadMission(level);
@@ -445,10 +440,9 @@ var updatePlayerInput = function (keyboard, playerAI) {
 var update = function (world, keyboard, camera) {
 	if (world === null) return;
 	updatePlayerInput(keyboard, world.p.ai);
-	world.p.update(world);
 
 	world.enemies.forEach(function(e) {
-		e.update(world, 1, 1, 2);
+		e.update(world);
 	});
 
 	world.shots.forEach(function(shot) {
@@ -490,10 +484,12 @@ var render = function (world, camera) {
 	});
 
 	world.enemies.forEach(function (e) {
-		drawSquare(e.pos, e.live === true ? "cyan" : "black", camera);
+		if (e.team == 0) {
+			drawSquare(world.p.pos, world.p.live === true ? "blue": "black", camera);
+		} else {
+			drawSquare(e.pos, e.live === true ? "cyan" : "black", camera);
+		}
 	});
-
-	drawSquare(world.p.pos, world.p.live === true ? "blue": "black", camera);
 
 	ctx.fillStyle = (world.p.heat < 100)  ? "white" : "red";
 	ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
