@@ -170,46 +170,53 @@ var PlayerAI = function () {
 	this.shoot = function(world) {
 		return {dir: this.fireDir, mode: this.fireMode};
 	}
+
+	this.setOwner = function () {}; //ignore
 }
 
 var AI = function () {
-	this.owner = null; //must be set by Person
-	this.moveTarget = null;
+	var owner = null; //must be set by Person
+	var moveTarget = null;
+
+	this.setOwner = function (o) {
+		if (owner !== null) throw "Error, setting AI owner twice";
+		owner = o;
+	}
 
 	this.move = function(world) {
-		while (this.moveTarget === null || this.owner.pos.equals(this.moveTarget)) {
-			this.moveTarget = world.getRandomPos();
+		while (moveTarget === null || owner.pos.equals(moveTarget)) {
+			moveTarget = world.getRandomPos();
 		}
 
-		return this.owner.pos.dirOnPathTowards(this.moveTarget, world);
+		return owner.pos.dirOnPathTowards(moveTarget, world);
 	}
 
 	var NO_SHOOT = {dir: dir.NONE, mode: -1};
 
 	this.shoot = function(world) {
 		if (world.p.live === false) return NO_SHOOT;
-		var shootDir = this.owner.pos.dirTowards(world.p.pos, false);
+		var shootDir = owner.pos.dirTowards(world.p.pos, false);
 		if (shootDir == dir.NONE) return NO_SHOOT;
 
 		//1. Is there a clear shot? Is there a straight or L-shaped path from me to the player?
 		if (shootDir == dir.LEFT || shootDir == dir.RIGHT) {
-			var startX = this.owner.pos.x;
+			var startX = owner.pos.x;
 			var endX = world.p.pos.x;
-			var startPos = new Pos(startX, this.owner.pos.y);
-			var midPos = new Pos(endX, this.owner.pos.y);
+			var startPos = new Pos(startX, owner.pos.y);
+			var midPos = new Pos(endX, owner.pos.y);
 		} else {
-			var startY = this.owner.pos.y;
+			var startY = owner.pos.y;
 			var endY = world.p.pos.y;
-			var startPos = new Pos(this.owner.pos.x, startY);
-			var midPos = new Pos(this.owner.pos.x, endY);
+			var startPos = new Pos(owner.pos.x, startY);
+			var midPos = new Pos(owner.pos.x, endY);
 		}
 		var canSee1 = world.map.canSee(startPos, midPos);
 		var canSee2 = world.map.canSee(midPos, world.p.pos)
 		if (!canSee1 || !canSee2) return NO_SHOOT;
 
 		//2. Is this shot close enough? Either straight, or the player might walk sideways into it?
-		var xDist = Math.abs(this.owner.pos.x - world.p.pos.x);
-		var yDist = Math.abs(this.owner.pos.y - world.p.pos.y);
+		var xDist = Math.abs(owner.pos.x - world.p.pos.x);
+		var yDist = Math.abs(owner.pos.y - world.p.pos.y);
 		if (shootDir == dir.LEFT || shootDir == dir.RIGHT) {
 			var dist = xDist;
 			var missAmount = yDist;
@@ -239,7 +246,7 @@ var Person = function (pos, face, ai) {
 	this.live = true;
 	this.health = 5;
 	this.ai = ai;
-	ai.owner = this;
+	ai.setOwner(this);
 }
 
 Person.prototype.update = function (world) {
