@@ -356,6 +356,7 @@ var createWorld = function(map) {
 
 	world.createEnemy = function (pos) {
 		var e = new Person(pos, dir.UP, new AI());
+		e.health = 1;
 		this.enemies.push(e);
 		return e;
 	};
@@ -389,8 +390,8 @@ var start = function () {
 
 	var level = 1;
 	var campaignLoader = new CampaignLoader();
-	campaignLoader.load("./res/01.tdm", level, function (newWorld) {
-		world = newWorld;
+	campaignLoader.load("./res/01.tdm", function () {
+		world = campaignLoader.loadMission(level);
 		camera = new Camera(world.p.pos, world.map.width, world.map.height);
 	});
 
@@ -404,6 +405,14 @@ var start = function () {
 		requestAnimationFrame(function() {
 			render(world, camera);
 		});
+
+		if (!world.enemies.some(function (e) {return e.live;})) {
+			console.log("You win!");
+			level++;
+			world = campaignLoader.loadMission(level);
+			camera = new Camera(world.p.pos, world.map.width, world.map.height);
+		}
+
 	}, 40);
 };
 

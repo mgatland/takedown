@@ -2,12 +2,16 @@
 
 function CampaignLoader() {
 
-  var parseMissions = function (lines, level, callback) {
+  var lines = [];
+
+  this.loadMission = function (level) {
     var mission = 0;
-    for (var i = 0; i < lines.length; i++) {
+    var i = 0;
+    while (i < lines.length) {
       if (lines[i].lastIndexOf("[MISSION", 0) === 0) {
         mission++;
         i++;
+        console.log("Looking for level " + level + ", found " + mission);
         if (level != mission) continue; 
         console.log("Level " + level);
         console.log("Size: " + lines[i])
@@ -83,25 +87,21 @@ function CampaignLoader() {
         enemies.forEach(function (e) {
           world.createEnemy(new Pos(e.x, e.y));
         });
-        callback(world);
-        return; //no further processing.
+        return world;
       } else {
         i++; //ignore all other lines.
       }
     }
-
-
-
   }
 
-  this.load = function ( url, level, callback ) {
+  this.load = function ( url, callback ) {
     var req = new XMLHttpRequest();
     req.open('GET', url);
     req.onreadystatechange = function() {
       if (req.readyState == 4) {
         if (req.status == 200) {
-          var lines = req.responseText.split(/\n/g);
-          parseMissions(lines, level, callback);
+          lines = req.responseText.split(/\n/g);
+          callback();
         } else {
           throw "Error loading file " + url + ", request status " + req.status;
         }
