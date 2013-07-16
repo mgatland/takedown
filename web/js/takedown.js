@@ -172,6 +172,7 @@ var PlayerAI = function () {
 	}
 
 	this.setOwner = function () {}; //ignore
+	this.update = function () {}; //ignore
 }
 
 var AI = function () {
@@ -181,6 +182,14 @@ var AI = function () {
 	this.setOwner = function (o) {
 		if (owner !== null) throw "Error, setting AI owner twice";
 		owner = o;
+	}
+
+	this.update = function (world) {
+		//for each enemy who's not me, and who's not on my team...
+		var myEnemies = world.enemies.filter(function (e, i) { return e.live === true && e.team != owner.team});
+		myEnemies.forEach(function (e) {
+			console.log("Can I see this person?");
+		});
 	}
 
 	this.move = function(world) {
@@ -246,11 +255,14 @@ var Person = function (pos, face, ai) {
 	this.live = true;
 	this.health = 5;
 	this.ai = ai;
+	this.index = null;
 	ai.setOwner(this);
 }
 
 Person.prototype.update = function (world) {
 	if (this.live === false) return;
+
+	this.ai.update(world);
 
 	if (this.moved > 0) {
 		this.moved--;
@@ -358,6 +370,7 @@ var createWorld = function(map) {
 		var e = new Person(pos, dir.UP, new AI());
 		e.health = 1;
 		e.team = 1;
+		e.index = this.enemies.length;
 		this.enemies.push(e);
 		return e;
 	};
@@ -365,6 +378,7 @@ var createWorld = function(map) {
 	world.createPlayer = function (pos, face) {
 		this.p = new Person(pos, face, new PlayerAI());
 		this.p.team = 0;
+		this.p.index = this.enemies.length;
 		this.enemies.push(this.p);
 	};
 
