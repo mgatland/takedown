@@ -354,8 +354,8 @@ var createWorld = function(map) {
 		shot.update = shotUpdate;
 	}
 
-	world.createEnemy = function () {
-		var e = new Person(new Pos(10,10), dir.UP, new AI());
+	world.createEnemy = function (pos) {
+		var e = new Person(pos, dir.UP, new AI());
 		this.enemies.push(e);
 		return e;
 	};

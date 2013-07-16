@@ -49,9 +49,27 @@ function CampaignLoader() {
         var pY = parseInt(pPos[1]);
         var pFace = parseInt(pPos[2]);
 
-        //now load [enemy], [trigger], [misc], [brief]
-        // ...
+        var enemies = [];
+        var enemyTag = lines[i];
+        i++;
+        if (enemyTag != "[enemy]") throw "Excepted [enemy] tag at line " + (i - 1) + ", found " + enemyTag;
+        //loading enemes:
+        //"[]" ends the section
+        while (lines[i] != "[]") {
+          if (lines.length === 0 || lines[i].substring(0,1) === "'") {
+            i++;
+            continue; //ignore comments and blanks
+          }
+          var enemyLine = lines[i].split(","); //values are: index, x, y, type, state, goaldie, tag
+          var x = parseInt(enemyLine[1], 10);
+          var y = parseInt(enemyLine[2], 10);
+          enemies.push({x:x, y:y});
+          console.log("Enemy: " + x + "," + y);
+          i++;
+        }
 
+        //now load [trigger], [misc], [brief]
+        // ...
 
         //now initialize the world and call the callback  
         var world = createWorld(createGrid(width, height));
@@ -60,7 +78,9 @@ function CampaignLoader() {
           world.map.set(pos, tile);
         });
         world.createPlayer(new Pos(pX, pY), pFace);
-        world.createEnemy();
+        enemies.forEach(function (e) {
+          world.createEnemy(new Pos(e.x, e.y));
+        });
         callback(world);
         return; //no further processing.
       } else {
