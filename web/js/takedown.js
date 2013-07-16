@@ -386,8 +386,10 @@ var start = function () {
 
 	var world = null;
 	var camera = null;
+
+	var level = 1;
 	var campaignLoader = new CampaignLoader();
-	campaignLoader.load("./res/01.tdm", function (newWorld) {
+	campaignLoader.load("./res/01.tdm", level, function (newWorld) {
 		world = newWorld;
 		camera = new Camera(world.p.pos, world.map.width, world.map.height);
 	});

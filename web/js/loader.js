@@ -2,12 +2,14 @@
 
 function CampaignLoader() {
 
-  var parseMissions = function (lines, callback) {
+  var parseMissions = function (lines, level, callback) {
     var mission = 0;
     for (var i = 0; i < lines.length; i++) {
       if (lines[i].lastIndexOf("[MISSION", 0) === 0) {
         mission++;
         i++;
+        if (level != mission) continue; 
+        console.log("Level " + level);
         console.log("Size: " + lines[i])
         var sizes = lines[i].split(","); //size string e.g. "23,45"
         var width = parseInt(sizes[0], 10) + 1; //yep, it's inclusive.
@@ -92,14 +94,14 @@ function CampaignLoader() {
 
   }
 
-  this.load = function ( url, callback ) {
+  this.load = function ( url, level, callback ) {
     var req = new XMLHttpRequest();
     req.open('GET', url);
     req.onreadystatechange = function() {
       if (req.readyState == 4) {
         if (req.status == 200) {
           var lines = req.responseText.split(/\n/g);
-          parseMissions(lines, callback);
+          parseMissions(lines, level, callback);
         } else {
           throw "Error loading file " + url + ", request status " + req.status;
         }
