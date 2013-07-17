@@ -72,7 +72,7 @@ var Pos = function (x, y) {
 	}
 
 	//next step in the walkable path from here to there
-	this.dirOnPathTowards = function(other, world) {
+	this.dirOnPathTowards = function(other, map) {
 		//ok, here goes... calculate the cost to walk from every square to the other pos
 		var thisStep = [];
 		var nextStep = [];
@@ -89,7 +89,7 @@ var Pos = function (x, y) {
 			var key = next.x + ":" + next.y;
 			var existingValue = closed[key];
 			if (existingValue === null || existingValue === undefined || existingValue > cost) {
-				if (world.map.canMove(next)) {
+				if (map.canMove(next)) {
 					closed[key] = cost;
 					nextStep.push(new Pos(next.x + 1, next.y));
 					nextStep.push(new Pos(next.x - 1, next.y));
@@ -116,6 +116,12 @@ var Pos = function (x, y) {
 		}
 		return bestDir;
 	}
+
+	this.toString = function () {
+		return "(" + this.x + "," + this.y + ")";
+	}
+
+
 }
 
 var Camera = function (startPos, mapWidth, mapHeight) {
@@ -178,6 +184,7 @@ var PlayerAI = function () {
 var AI = function () {
 	var owner = null; //must be set by Person
 	var moveTarget = null;
+	var awareness = [];
 
 	this.setOwner = function (o) {
 		if (owner !== null) throw "Error, setting AI owner twice";
@@ -188,7 +195,13 @@ var AI = function () {
 		//for each enemy who's not me, and who's not on my team...
 		var myEnemies = world.enemies.filter(function (e, i) { return e.live === true && e.team != owner.team});
 		myEnemies.forEach(function (e) {
-			console.log("Can I see this person?");
+			if (world.map.canSee(owner.pos, e.pos)) {
+				if (awareness[e.index] === undefined) {
+					awareness[e.index] = 0;
+				}
+				awareness[e.index] += 1;
+				console.log(awareness);
+			}
 		});
 	}
 
@@ -197,7 +210,7 @@ var AI = function () {
 			moveTarget = world.getRandomPos();
 		}
 
-		return owner.pos.dirOnPathTowards(moveTarget, world);
+		return owner.pos.dirOnPathTowards(moveTarget, world.map);
 	}
 
 	var NO_SHOOT = {dir: dir.NONE, mode: -1};
@@ -549,11 +562,12 @@ var createGrid = function (myWidth, myHeight) {
 	}
 
 	grid.canSee = function (start, end) {
+		//handle orthoginal directions first
 		if (start.x == end.x) {
 			var min = Math.min(start.y, end.y);
 			var max = Math.max(start.y, end.y);
 			for (var i = min; i <= max; i++) {
-				if (!this.canMove(new Pos(start.x, i))) return;
+				if (!this.canMove(new Pos(start.x, i))) return false;
 			}
 			return true;
 		}
@@ -561,11 +575,82 @@ var createGrid = function (myWidth, myHeight) {
 			var min = Math.min(start.x, end.x);
 			var max = Math.max(start.x, end.x);
 			for (var i = min; i <= max; i++) {
-				if (!this.canMove(new Pos(i, start.y))) return;
+				if (!this.canMove(new Pos(i, start.y))) return false;
 			}
 			return true;
 		}
-		throw "canSee failed because it doesn't handle diagonals";
+
+		//OK, it's a diagonal. Both x and y are different.
+
+		//Trace a line from start to end.
+		//sweep along the line horizontally, for every x position
+		//we check each vertical strip - which may be one cell, or more
+		
+		//A special case when peering through the crack between corners
+		//aO     Ob			a is looking at b
+		//Ob     aO 		if both Os are occupied, the view is blocked.
+
+		//swap so X is always increasing.
+		if (end.x < start.x) {
+			var temp = end;
+			end = start;
+			start = temp;
+		}
+
+		var dX = (end.x - start.x); //always positive
+		var dY = (end.y - start.y);
+		var yRate = dY / dX; //when we add 1 to x, we must add yRate * 1 to y.
+
+		var backwards = dY < 0;
+
+		var x = start.x + 0.5;
+		var y = start.y + 0.5;
+		var firstHalf; //the value of the first half of the half-check. We need either side to be true to continue.
+
+		while (x <= end.x) { //for each vertical strip of squares that the LOS passes through
+			//console.log("x: " + x + ", y: " + y);
+
+			var xCell = Math.floor(x);
+			var top1 = Math.floor(y);
+			var topIsCorner1 = (y===Math.floor(y));
+
+			//the first and last step are half-cells, because the start and end are in the centre of a cell
+			var xDist = (x < start.x + 1 || x == end.x) ? 0.5 : 1.0;
+			y += yRate * xDist;
+
+			var bottom1 = Math.floor(y);
+			var bottomIsCorner1 = (y===Math.floor(y));
+
+			//console.log("y from " + top1 + " to " + bottom1);
+
+			//for simplicity, we swap so each strip is always done y-low to y-high
+			var top = backwards ? bottom1 : top1;
+			var bottom = backwards ? top1 : bottom1;
+			var topIsCorner = backwards ? bottomIsCorner1 : topIsCorner1;
+			var bottomIsCorner = backwards ? topIsCorner1 : bottomIsCorner1;
+
+			if (topIsCorner) {
+				//console.log("(" + xCell + "," + (top-1) + ") top");
+				var secondHalf = (this.canMove(new Pos(xCell, top-1)));
+				if (!firstHalf && !secondHalf) return false;
+			}
+
+			if (bottomIsCorner) bottom--;
+
+			for (var yCell = top; yCell <= bottom; yCell++) {
+				//console.log(xCell + "," + yCell);
+				if (!this.canMove(new Pos(xCell, yCell))) return false;
+			}
+
+			//special case: we end on a boundary
+			if (bottomIsCorner) {
+				//console.log("(" + xCell + "," + bottom+1 + ") bottom");
+				firstHalf = (this.canMove(new Pos(xCell, bottom+1)));
+			}
+
+			x += xDist;
+		}
+		return true;
 	}
 
 	grid.get = function (pos) {
@@ -593,4 +678,8 @@ var createGrid = function (myWidth, myHeight) {
 	return grid;
 };
 
-window.onload = start;
+if (typeof tests != "undefined") {
+	window.onload = tests;
+} else {
+	window.onload = start;
+}
