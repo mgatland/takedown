@@ -609,7 +609,7 @@ var createGrid = function (myWidth, myHeight) {
 
 		var x = start.x + 0.5;
 		var y = start.y + 0.5;
-		var firstHalf; //the value of the first half of the half-check. We need either side to be true to continue.
+		var firstHalf = null; //the value of the first half of the half-check. We need either side to be true to continue.
 
 		while (x <= end.x) { //for each vertical strip of squares that the LOS passes through
 			//console.log("x: " + x + ", y: " + y);
@@ -635,8 +635,13 @@ var createGrid = function (myWidth, myHeight) {
 
 			if (topIsCorner) {
 				//console.log("(" + xCell + "," + (top-1) + ") top");
-				var secondHalf = (this.canMove(new Pos(xCell, top-1)));
-				if (!firstHalf && !secondHalf) return false;
+				var thisHalf = (this.canMove(new Pos(xCell, top-1)));
+				if (firstHalf === null) {
+					firstHalf = thisHalf;
+				} else {
+					if (!firstHalf && !thisHalf) return false; //if both corners blocked our view
+					firstHalf = null; //we saw past this pair of corners
+				}
 			}
 
 			if (bottomIsCorner) bottom--;
@@ -646,10 +651,15 @@ var createGrid = function (myWidth, myHeight) {
 				if (!this.canMove(new Pos(xCell, yCell))) return false;
 			}
 
-			//special case: we end on a boundary
 			if (bottomIsCorner) {
 				//console.log("(" + xCell + "," + bottom+1 + ") bottom");
-				firstHalf = (this.canMove(new Pos(xCell, bottom+1)));
+				var thisHalf = (this.canMove(new Pos(xCell, bottom+1)));
+				if (firstHalf === null) {
+					firstHalf = thisHalf;
+				} else {
+					if (!firstHalf && !thisHalf) return false; //if both corners blocked our view
+					firstHalf = null; //we saw past this pair of corners
+				}
 			}
 
 			x += xDist;
