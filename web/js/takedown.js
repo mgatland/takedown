@@ -500,7 +500,11 @@ var render = function (world, camera) {
 
 	world.map.forEach(function (pos, tile) {
 		if (tile === 0) {
-			drawSquare(pos, "green", camera);
+			if (world.map.canSee(pos, world.p.pos)) {
+				drawSquare(pos, "green", camera);
+			} else {
+				drawSquare(pos, "darkgreen", camera);
+			}
 		} else {
 			drawSquare(pos, "grey", camera);
 		}
