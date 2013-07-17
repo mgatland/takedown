@@ -15,6 +15,8 @@ var dir = {
 	LEFT: 4
 };
 
+var maxCanSee = 3000;
+
 var canvas;
 var ctx;
 
@@ -117,6 +119,14 @@ var Pos = function (x, y) {
 		return bestDir;
 	}
 
+	//warning: returns a non-integer //TODO: consider returning an int
+	this.trueDistanceTo = function(other) {
+		return Math.sqrt( 
+			(this.x-other.x)*(this.x-other.x) +
+			(this.y-other.y)*(this.y-other.y)  
+			);
+	}
+
 	this.toString = function () {
 		return "(" + this.x + "," + this.y + ")";
 	}
@@ -184,7 +194,10 @@ var PlayerAI = function () {
 var AI = function () {
 	var owner = null; //must be set by Person
 	var moveTarget = null;
-	var awareness = [];
+
+	var iCanSee = []; //how long we've had line of sight to player i
+	var suspicion = []; //how much we suspect player i exists
+	//var aware = []; // Awareness type
 
 	this.setOwner = function (o) {
 		if (owner !== null) throw "Error, setting AI owner twice";
@@ -195,12 +208,30 @@ var AI = function () {
 		//for each enemy who's not me, and who's not on my team...
 		var myEnemies = world.enemies.filter(function (e, i) { return e.live === true && e.team != owner.team});
 		myEnemies.forEach(function (e) {
+
+			//TOOD: only initialize once
+			if (iCanSee[e.index] === undefined) {
+				iCanSee[e.index] = 0;
+				suspicion[e.index] = 0;
+				//aware[e.index] = "not at all";
+			}
+
+			//update canSee
 			if (world.map.canSee(owner.pos, e.pos)) {
-				if (awareness[e.index] === undefined) {
-					awareness[e.index] = 0;
-				}
-				awareness[e.index] += 1;
-				console.log(awareness);
+				if (iCanSee[e.index] < maxCanSee) iCanSee[e.index] += 10;
+			} else {
+				if (iCanSee[e.index] > 0) iCanSee[e.index] -= 10;
+			}
+
+			//update suspicion
+			if (iCanSee[e.index] > 0) {
+				var dist = owner.pos.trueDistanceTo(e.pos);
+				var suspicionPoints = Math.max(60 - dist * 5, 10);
+				//TODO: reduce if you are behind me
+				suspicion[e.index] += Math.floor(suspicionPoints);
+				console.log(suspicion[e.index]);
+			} else {
+				if (suspicion[e.index] > 0) suspicion[e.index] -= 1;
 			}
 		});
 	}
