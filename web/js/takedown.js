@@ -15,7 +15,9 @@ var dir = {
 	LEFT: 4
 };
 
+//globals to un-globalify
 var maxCanSee = 3000;
+var suspicionBehindMulti = 0.2;
 
 var canvas;
 var ctx;
@@ -206,6 +208,23 @@ var AI = function () {
 		owner = o;
 	}
 
+	var addSuspicion = function(amount, i) {
+		suspicion[i] += amount;
+		if (suspicion[i] > 300) {
+			aware[i] = true;
+			anyAware = true;
+		}
+	}
+
+	var reduceSuspicion = function(amount, i) {
+		suspicion[i] -= amount;
+		if (suspicion[i] < 0) suspicion[i] = 0;
+	}
+
+	var awareOf = function (whoIndex) {
+		return aware[whoIndex];
+	}
+
 	this.update = function (world) {
 		//for each enemy who's not me, and who's not on my team...
 		var myEnemies = world.enemies.filter(function (e, i) { return e.live === true && e.team != owner.team});
@@ -215,7 +234,7 @@ var AI = function () {
 			if (iCanSee[i] === undefined) {
 				iCanSee[i] = 0;
 				suspicion[i] = 0;
-				//aware[i] = "not at all";
+				aware[i] = false;
 			}
 
 			//update canSee
@@ -226,21 +245,30 @@ var AI = function () {
 			}
 
 			//update suspicion, unless we're already aware of them.
-			if (typeof aware[i] === "undefined") {
+			if (aware[i] === false) {
 				if (iCanSee[i] > 0) {
 					var dist = owner.pos.trueDistanceTo(e.pos);
-					var suspicionPoints = Math.max(60 - dist * 5, 10);
-					//TODO: reduce if you are behind me
-					suspicion[i] += Math.floor(suspicionPoints);
-					console.log(suspicion[i]);
-
-					if (suspicion[i] > 300) {
-						aware[i] = true;
-						anyAware = true;
-					}
+					var suspicionPoints = Math.max(30 - dist * 3, 5);
+					if (owner.facingAwayFrom(e.pos)) suspicionPoints *= suspicionBehindMulti;
+					addSuspicion(Math.floor(suspicionPoints), i);
+					console.log(Math.floor(suspicion[i]));
 				} else {
-					if (suspicion[i] > 0) suspicion[i] -= 1;
+					reduceSuspicion(1, i);
 				}
+			}
+		});
+
+		//for every shot
+		world.shots.forEach(function (s) {
+			if (s.ownerIndex === owner.index) return;
+			if (awareOf(s.ownerIndex)) return;
+
+			var canSee = world.map.canSee(owner.pos, s.pos);
+			if (canSee) {
+				var dist = owner.pos.trueDistanceTo(s.pos);
+				var suspicionPoints = Math.max(125 - dist * 20, 20);
+				if (owner.facingAwayFrom(s.pos)) suspicionPoints *= suspicionBehindMulti;
+				addSuspicion(Math.floor(suspicionPoints), s.ownerIndex);
 			}
 		});
 	}
@@ -260,7 +288,7 @@ var AI = function () {
 
 	this.shoot = function(world) {
 
-		if (typeof aware[world.p.index] === "undefined") return NO_SHOOT;
+		if (awareOf(world.p.index) == false) return NO_SHOOT;
 
 		if (world.p.live === false) return NO_SHOOT;
 		var shootDir = owner.pos.dirTowards(world.p.pos, false);
@@ -318,6 +346,16 @@ var Person = function (pos, face, ai) {
 	ai.setOwner(this);
 }
 
+Person.prototype.facingAwayFrom = function (pos) {
+	switch (this.face) {
+		case dir.UP: return pos.y < this.pos.y;
+		case dir.DOWN: return pos.y > this.pos.y;
+		case dir.LEFT: return pos.x > this.pos.x;
+		case dir.RIGHT: return pos.x < this.pos.x;
+		case dir.NONE: return false; //weird case
+	}
+}
+
 Person.prototype.update = function (world) {
 	if (this.live === false) return;
 
@@ -359,7 +397,7 @@ Person.prototype.fire = function (mode, world) {
 		audio.play("overheat");
 	} else {
 		//mode is ignored
-		var shot = world.createShot(this.pos, this.face, this.team);
+		var shot = world.createShot(this.pos, this.face, this.team, this.index);
 		if (shot !== null) {
 			//set up shot stealth, special
 		}
@@ -410,13 +448,14 @@ var createWorld = function(map) {
 		});
 	}
 
-	world.createShot = function(pos, face, team) {
+	world.createShot = function(pos, face, team, ownerIndex) {
 		console.log("shot!");
 		var shot = {};
 		shot.live = true;
 		shot.pos = pos.clone();
 		shot.face = face;
 		shot.team = team;
+		shot.ownerIndex = ownerIndex;
 		shot.damage = 1;
 
 		shot.moveSpeed = 1;
@@ -562,9 +601,9 @@ var render = function (world, camera) {
 
 	world.enemies.forEach(function (e) {
 		if (e.team == 0) {
-			drawSquare(world.p.pos, world.p.live === true ? "blue": "black", camera);
+			drawPerson(world.p.pos, world.p.live === true ? "blue": "black", camera, e.face);
 		} else {
-			drawSquare(e.pos, e.live === true ? "cyan" : "black", camera);
+			drawPerson(e.pos, e.live === true ? "cyan" : "black", camera, e.face);
 		}
 	});
 
@@ -578,6 +617,20 @@ var render = function (world, camera) {
 var drawSquare = function (pos, color, camera) {
 	ctx.fillStyle = color;
 	ctx.fillRect(pos.x*screen.tileSize - camera.xOff(), pos.y*screen.tileSize - camera.yOff(), screen.tileSize, screen.tileSize);
+}
+
+var drawPerson = function (pos, color, camera, face) {
+	drawSquare(pos, color, camera);
+	ctx.fillStyle = "white";
+	var x = 0;
+	var y = 0;
+	switch (face) {
+		case dir.LEFT: x = 0.1; y = 0.25; break;
+		case dir.RIGHT: x = 0.4; y = 0.25; break;
+		case dir.UP: x = 0.25; y = 0.1; break;
+		case dir.DOWN: x = 0.25; y = 0.4; break;
+	}
+	ctx.fillRect((pos.x+x)*screen.tileSize - camera.xOff(), (pos.y+y)*screen.tileSize - camera.yOff(), screen.tileSize/2, screen.tileSize/2);
 }
 
 var createGrid = function (myWidth, myHeight) {
