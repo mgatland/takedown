@@ -239,24 +239,25 @@ var Fighting = function () {
 		}
 	}
 
+	//We might move randomly in either of the given directions,
+	//Or we might decide to close the difference and try to get in line with our opponent
+	//if difference is > 0, that means dirUp will close the gap.
+	//if difference is < 0, that means dirDown will close the gap.
+	var dodgeMove = function (difference, dirUp, dirDown) {
+		if (Math.random() > 0.75 || difference == 0) { //move randomly
+			return (Math.random() > 0.5) ? dirUp : dirDown;
+		} else { //or move towards the firing line
+			return (difference > 0) ? dirUp : dirDown;
+		}
+	}
+
 	this.move = function (ai, owner, world) {
 		var dX = Math.abs(owner.pos.x - world.p.pos.x);
 		var dY = Math.abs(owner.pos.y - world.p.pos.y);
 		if (dX == dY) return dir.random();
-		if (dX > dY) { // y mode
-			if (Math.random() > 0.75 || dY == 0) { //move randomly up or down
-				return (Math.random() > 0.5) ? dir.UP : dir.DOWN;
-			} else { //move towards the firing line
-				return (owner.pos.y > world.p.pos.y) ? dir.UP : dir.DOWN;
-			}
-		} else { //x mode
-			if (Math.random() > 0.75 || dX == 0) { //move randomly up or down
-				return (Math.random() > 0.5) ? dir.LEFT : dir.RIGHT;
-			} else { //move towards the firing line
-				return (owner.pos.x > world.p.pos.x) ? dir.LEFT : dir.RIGHT;
-			}
-		}
-	}	
+		if (dX > dY) return dodgeMove(owner.pos.y - world.p.pos.y, dir.UP, dir.DOWN);
+		return dodgeMove(owner.pos.x - world.p.pos.x, dir.LEFT, dir.RIGHT);
+	}
 }
 
 var AI = function () {
