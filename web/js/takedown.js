@@ -240,7 +240,22 @@ var Fighting = function () {
 	}
 
 	this.move = function (ai, owner, world) {
-		return dir.random();
+		var dX = Math.abs(owner.pos.x - world.p.pos.x);
+		var dY = Math.abs(owner.pos.y - world.p.pos.y);
+		if (dX == dY) return dir.random();
+		if (dX > dY) { // y mode
+			if (Math.random() > 0.75 || dY == 0) { //move randomly up or down
+				return (Math.random() > 0.5) ? dir.UP : dir.DOWN;
+			} else { //move towards the firing line
+				return (owner.pos.y > world.p.pos.y) ? dir.UP : dir.DOWN;
+			}
+		} else { //x mode
+			if (Math.random() > 0.75 || dX == 0) { //move randomly up or down
+				return (Math.random() > 0.5) ? dir.LEFT : dir.RIGHT;
+			} else { //move towards the firing line
+				return (owner.pos.x > world.p.pos.x) ? dir.LEFT : dir.RIGHT;
+			}
+		}
 	}	
 }
 
