@@ -24,7 +24,7 @@ dir.random = function () {
 };
 
 //AI globals to un-globalify
-var maxCanSee = 3000;
+var maxCanSee = 25 * 2;
 var suspicionBehindMulti = 0.2;
 var closeEnoughToFight = 7;
 
@@ -220,7 +220,7 @@ var Pursuing = function () {
 	this.name = "Pursuing";
 	this.update = function (ai, owner, world) {
 		var distance = owner.pos.trueDistanceTo(world.p.pos);
-		if (distance < closeEnoughToFight && ai.getCanSee(world.p.index) > 50) {
+		if (distance < closeEnoughToFight && ai.getCanSee(world.p.index) > 5) {
 			ai.setState(new Fighting());
 		}
 	}
@@ -234,7 +234,7 @@ var Fighting = function () {
 	this.name = "Fighting";
 	this.update = function (ai, owner, world) {
 		var distance = owner.pos.trueDistanceTo(world.p.pos);
-		if (distance > closeEnoughToFight + 4 || ai.getCanSee(world.p.index) < -100) {
+		if (distance > closeEnoughToFight + 4 || ai.getCanSee(world.p.index) < 1) {
 			ai.setState(new Pursuing());
 		}
 	}
@@ -308,15 +308,16 @@ var AI = function () {
 			}
 
 			//update canSee
-			if (world.map.canSee(owner.pos, e.pos)) {
-				if (iCanSee[i] < maxCanSee) iCanSee[i] += 10;
+			var canSeeNow = world.map.canSee(owner.pos, e.pos);
+			if (canSeeNow) {
+				if (iCanSee[i] < maxCanSee) iCanSee[i] += 1;
 			} else {
-				if (iCanSee[i] > 0) iCanSee[i] -= 10;
+				if (iCanSee[i] > 0) iCanSee[i] -= 1;
 			}
 
 			//update suspicion, unless we're already aware of them.
 			if (aware[i] === false) {
-				if (iCanSee[i] > 0) {
+				if (canSeeNow) {
 					var dist = owner.pos.trueDistanceTo(e.pos);
 					var suspicionPoints = Math.max(30 - dist * 3, 5);
 					if (owner.facingAwayFrom(e.pos)) suspicionPoints *= suspicionBehindMulti;
