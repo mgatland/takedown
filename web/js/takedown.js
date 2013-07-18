@@ -197,7 +197,9 @@ var AI = function () {
 
 	var iCanSee = []; //how long we've had line of sight to player i
 	var suspicion = []; //how much we suspect player i exists
-	//var aware = []; // Awareness type
+	var aware = []; // Awareness type
+
+	var anyAware = undefined; //Are we aware of anyone?
 
 	this.setOwner = function (o) {
 		if (owner !== null) throw "Error, setting AI owner twice";
@@ -208,35 +210,45 @@ var AI = function () {
 		//for each enemy who's not me, and who's not on my team...
 		var myEnemies = world.enemies.filter(function (e, i) { return e.live === true && e.team != owner.team});
 		myEnemies.forEach(function (e) {
-
-			//TOOD: only initialize once
-			if (iCanSee[e.index] === undefined) {
-				iCanSee[e.index] = 0;
-				suspicion[e.index] = 0;
-				//aware[e.index] = "not at all";
+			var i = e.index;
+			//TODO: perf: only initialize once, then never do this check again.
+			if (iCanSee[i] === undefined) {
+				iCanSee[i] = 0;
+				suspicion[i] = 0;
+				//aware[i] = "not at all";
 			}
 
 			//update canSee
 			if (world.map.canSee(owner.pos, e.pos)) {
-				if (iCanSee[e.index] < maxCanSee) iCanSee[e.index] += 10;
+				if (iCanSee[i] < maxCanSee) iCanSee[i] += 10;
 			} else {
-				if (iCanSee[e.index] > 0) iCanSee[e.index] -= 10;
+				if (iCanSee[i] > 0) iCanSee[i] -= 10;
 			}
 
-			//update suspicion
-			if (iCanSee[e.index] > 0) {
-				var dist = owner.pos.trueDistanceTo(e.pos);
-				var suspicionPoints = Math.max(60 - dist * 5, 10);
-				//TODO: reduce if you are behind me
-				suspicion[e.index] += Math.floor(suspicionPoints);
-				console.log(suspicion[e.index]);
-			} else {
-				if (suspicion[e.index] > 0) suspicion[e.index] -= 1;
+			//update suspicion, unless we're already aware of them.
+			if (typeof aware[i] === "undefined") {
+				if (iCanSee[i] > 0) {
+					var dist = owner.pos.trueDistanceTo(e.pos);
+					var suspicionPoints = Math.max(60 - dist * 5, 10);
+					//TODO: reduce if you are behind me
+					suspicion[i] += Math.floor(suspicionPoints);
+					console.log(suspicion[i]);
+
+					if (suspicion[i] > 300) {
+						aware[i] = true;
+						anyAware = true;
+					}
+				} else {
+					if (suspicion[i] > 0) suspicion[i] -= 1;
+				}
 			}
 		});
 	}
 
 	this.move = function(world) {
+
+		if (!anyAware) return;
+
 		while (moveTarget === null || owner.pos.equals(moveTarget)) {
 			moveTarget = world.getRandomPos();
 		}
@@ -247,6 +259,9 @@ var AI = function () {
 	var NO_SHOOT = {dir: dir.NONE, mode: -1};
 
 	this.shoot = function(world) {
+
+		if (typeof aware[world.p.index] === "undefined") return NO_SHOOT;
+
 		if (world.p.live === false) return NO_SHOOT;
 		var shootDir = owner.pos.dirTowards(world.p.pos, false);
 		if (shootDir == dir.NONE) return NO_SHOOT;
