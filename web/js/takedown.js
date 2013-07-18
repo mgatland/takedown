@@ -191,21 +191,53 @@ var PlayerAI = function () {
 
 	this.setOwner = function () {}; //ignore
 	this.update = function () {}; //ignore
+	this.setState = function () {}; //ignore
+}
+
+var Unaware = function () {
+	this.update = function (ai) {
+		if (ai.isAwareOfAnyone()) {
+			ai.setState(new Pursuing());
+		}
+	}
+
+	this.move = function (ai, world) {
+
+	}
+}
+
+var Pursuing = function () {
+
+	this.update = function (ai) {
+	}
+
+	this.move = function (ai, owner, world) {
+		return owner.pos.dirOnPathTowards(world.p.pos, world.map);
+	}
 }
 
 var AI = function () {
 	var owner = null; //must be set by Person
-	var moveTarget = null;
 
 	var iCanSee = []; //how long we've had line of sight to player i
 	var suspicion = []; //how much we suspect player i exists
 	var aware = []; // Awareness type
 
-	var anyAware = undefined; //Are we aware of anyone?
+	var anyAware = false; //Are we aware of anyone?
+
+	var state = null; //must be set by Person
+
+	this.setState = function (newState) {
+		state = newState;
+	}
 
 	this.setOwner = function (o) {
 		if (owner !== null) throw "Error, setting AI owner twice";
 		owner = o;
+	}
+
+	this.isAwareOfAnyone = function () {
+		return anyAware;
 	}
 
 	var addSuspicion = function(amount, i) {
@@ -226,6 +258,7 @@ var AI = function () {
 	}
 
 	this.update = function (world) {
+
 		//for each enemy who's not me, and who's not on my team...
 		var myEnemies = world.enemies.filter(function (e, i) { return e.live === true && e.team != owner.team});
 		myEnemies.forEach(function (e) {
@@ -271,17 +304,12 @@ var AI = function () {
 				addSuspicion(Math.floor(suspicionPoints), s.ownerIndex);
 			}
 		});
+
+		state.update(this);
 	}
 
 	this.move = function(world) {
-
-		if (!anyAware) return;
-
-		while (moveTarget === null || owner.pos.equals(moveTarget)) {
-			moveTarget = world.getRandomPos();
-		}
-
-		return owner.pos.dirOnPathTowards(moveTarget, world.map);
+		return state.move(this, owner, world);
 	}
 
 	var NO_SHOOT = {dir: dir.NONE, mode: -1};
@@ -344,6 +372,7 @@ var Person = function (pos, face, ai) {
 	this.ai = ai;
 	this.index = null;
 	ai.setOwner(this);
+	ai.setState(new Unaware());
 }
 
 Person.prototype.facingAwayFrom = function (pos) {
@@ -480,6 +509,7 @@ var createWorld = function(map) {
 		this.enemies.push(this.p);
 	};
 
+	//Delete this if it remains unused
 	world.getRandomPos = function () {
 		var pos = null;
 		while (pos === null || this.map.canMove(pos)===false) {
