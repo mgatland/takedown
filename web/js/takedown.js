@@ -14,10 +14,19 @@ var dir = {
 	DOWN: 3,
 	LEFT: 4
 };
+dir.random = function () {
+	switch (Math.floor(Math.random() * 4)) {
+		case 0: return dir.UP;
+		case 1: return dir.RIGHT;
+		case 2: return dir.DOWN;
+		case 3: return dir.LEFT;
+	}
+};
 
-//globals to un-globalify
+//AI globals to un-globalify
 var maxCanSee = 3000;
 var suspicionBehindMulti = 0.2;
+var closeEnoughToFight = 7;
 
 var canvas;
 var ctx;
@@ -195,7 +204,8 @@ var PlayerAI = function () {
 }
 
 var Unaware = function () {
-	this.update = function (ai) {
+	this.name = "Unaware";
+	this.update = function (ai, owner, world) {
 		if (ai.isAwareOfAnyone()) {
 			ai.setState(new Pursuing());
 		}
@@ -207,13 +217,31 @@ var Unaware = function () {
 }
 
 var Pursuing = function () {
-
-	this.update = function (ai) {
+	this.name = "Pursuing";
+	this.update = function (ai, owner, world) {
+		var distance = owner.pos.trueDistanceTo(world.p.pos);
+		if (distance < closeEnoughToFight && ai.getCanSee(world.p.index) > 50) {
+			ai.setState(new Fighting());
+		}
 	}
 
 	this.move = function (ai, owner, world) {
 		return owner.pos.dirOnPathTowards(world.p.pos, world.map);
 	}
+}
+
+var Fighting = function () {
+	this.name = "Fighting";
+	this.update = function (ai, owner, world) {
+		var distance = owner.pos.trueDistanceTo(world.p.pos);
+		if (distance > closeEnoughToFight + 4 || ai.getCanSee(world.p.index) < -100) {
+			ai.setState(new Pursuing());
+		}
+	}
+
+	this.move = function (ai, owner, world) {
+		return dir.random();
+	}	
 }
 
 var AI = function () {
@@ -228,6 +256,7 @@ var AI = function () {
 	var state = null; //must be set by Person
 
 	this.setState = function (newState) {
+		console.log("new state: " + newState.name);
 		state = newState;
 	}
 
@@ -236,9 +265,17 @@ var AI = function () {
 		owner = o;
 	}
 
+	//methods used by AI states
+
 	this.isAwareOfAnyone = function () {
 		return anyAware;
 	}
+
+	this.getCanSee = function (i) {
+		return iCanSee[i];
+	}
+
+	// end of
 
 	var addSuspicion = function(amount, i) {
 		suspicion[i] += amount;
@@ -305,7 +342,7 @@ var AI = function () {
 			}
 		});
 
-		state.update(this);
+		state.update(this, owner, world);
 	}
 
 	this.move = function(world) {
@@ -550,7 +587,7 @@ var start = function () {
 			render(world, camera);
 		});
 
-		if (!world.enemies.some(function (e) {return e.live && e.team != 0;})) {
+		if (world && !world.enemies.some(function (e) {return e.live && e.team != 0;})) {
 			console.log("You win!");
 			level++;
 			world = campaignLoader.loadMission(level);
@@ -669,9 +706,6 @@ var createGrid = function (myWidth, myHeight) {
 		terrain[i] = [];
 		for (var j = 0; j < myHeight; j++) {
 			terrain[i][j] = 0;
-			if (Math.random() > 0.95) {
-				terrain[i][j] = 1;
-			}
 		}
 	}
 	var grid = {};
