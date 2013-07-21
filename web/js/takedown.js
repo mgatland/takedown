@@ -514,7 +514,27 @@ var Shot = function (pos, face, team, ownerIndex, world) {
 	world.shots.push(this);
 };
 
+Shot.prototype._checkHitPeople = function(people) {
+	var that = this;
+	var hit = false;
+	people.forEach(function (e) {
+		if (that.live === false) return; //we can only hit one person per turn
+		if (e.pos.equals(that.pos) && e.live === true && e.team != that.team) {
+			e.hurt(that.damage);
+			that.live = false;
+			hit = true;
+		}
+	});
+	return hit;
+}
+
 Shot.prototype.update = function(world) {
+	if (this.live === false) return;
+
+	//We check for collisions before and after moving
+	//when we implement piercing shots this will have to change - you only want to hit someone
+	//if they moved into your square this frame, not if they were already there in the previous frame.
+	this._checkHitPeople(world.enemies);
 	if (this.live === false) return;
 
 	if (this.moved > 0) {
@@ -525,15 +545,8 @@ Shot.prototype.update = function(world) {
 			this.live = false;
 		}
 	}
-
-	//check for collisions with People
-	var that = this;
-	world.enemies.forEach(function (e) {
-		if (e.pos.equals(that.pos) && e.live === true && e.team != that.team) {
-			e.hurt(that.damage);
-			that.live = false;
-		}
-	});
+	//we check again after moving
+	this._checkHitPeople(world.enemies);
 }
 
 var createWorld = function(map) {
