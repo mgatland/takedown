@@ -23,6 +23,28 @@ dir.random = function () {
 	}
 };
 
+dir.adjacentDirs = function (face) {
+	switch (face) {
+		case dir.UP:
+		case dir.DOWN: return [dir.LEFT, dir.RIGHT];
+		case dir.LEFT:
+		case dir.RIGHT: return [dir.UP, dir.DOWN];
+	}
+	console.log("error: finding adjacent dirs for unnatural dir " + face);
+	return [dir.UP, dir.DOWN, dir.lEFT, dir.RIGHT];
+}
+
+dir.name = function (face) {
+	switch (face) {
+		case 1: return "UP";
+		case 2: return "RIGHT";
+		case 3: return "DOWN";
+		case 4: return "LEFT";
+		case 0: return "NONE";
+	}
+	return "ERROR: dir " + face;
+}
+
 //AI globals to un-globalify
 var maxCanSee = 25 * 2;
 var suspicionBehindMulti = 0.2;
@@ -84,8 +106,12 @@ var Pos = function (x, y) {
 		return dirTowards;
 	}
 
+	this.dirOnPathTowards = function (other, map) {
+		return this.dirOnPathTowardsAvoiding(other, map, null);
+	}
+
 	//next step in the walkable path from here to there
-	this.dirOnPathTowards = function(other, map) {
+	this.dirOnPathTowardsAvoiding = function(other, map, avoidPos, dangerDistance) {
 		//ok, here goes... calculate the cost to walk from every square to the other pos
 		var thisStep = [];
 		var nextStep = [];
@@ -102,7 +128,7 @@ var Pos = function (x, y) {
 			var key = next.x + ":" + next.y;
 			var existingValue = closed[key];
 			if (existingValue === null || existingValue === undefined || existingValue > cost) {
-				if (map.canMove(next)) {
+				if (map.canMove(next) && (avoidPos == null || avoidPos.trueDistanceTo(next) > dangerDistance)) {
 					closed[key] = cost;
 					nextStep.push(new Pos(next.x + 1, next.y));
 					nextStep.push(new Pos(next.x - 1, next.y));
@@ -211,6 +237,19 @@ var PlayerAI = function () {
 	this.setState = function () {}; //ignore
 }
 
+/* AT States:
+
+    Waiting
+       |
+       |
+       V
+	Pursuing  <-> Fighting <-> Surrounding
+
+When combat is over, any combat state transitions to Waiting
+If line of sight is lost, any combat state transitions to Pursuing
+
+*/
+
 var Waiting = function () {
 	this.name = "Waiting";
 	this.update = function (ai, owner, world, target) {
@@ -242,7 +281,58 @@ var Pursuing = function () {
 	}
 }
 
+//must check isValid after construction
+var Surrounding = function (owner, world, target) {
+	this.name = "Surrounding";
+
+	//initialize, choose which way to surround
+	var dirTowards = owner.pos.dirTowards(target.pos, false);
+	var dirsToTry = dir.adjacentDirs(dirTowards);
+	var clearDirs = [];
+	var movesAllowed = 10; //abort after 10 moves, just to avoid us getting stuck
+	var distanceRequired = 4;
+	dirsToTry.forEach(function (face) {
+		var pos = target.pos.clone();
+		var clearDistanceFromTarget = 0;
+		while (clearDistanceFromTarget < distanceRequired && world.map.canMove(pos)) {
+			pos.moveInDir(face, 1);
+			clearDistanceFromTarget++;
+		}
+		if (clearDistanceFromTarget === distanceRequired) clearDirs.push(face);
+	});
+
+	var failed = (clearDirs.length === 0); //if this fialed, we will abort this state on next update
+
+	if (!failed) {
+		var bestDir = clearDirs[Math.floor(Math.random() * clearDirs.length)];
+		console.log("dir: " + dir.name(bestDir));
+		var destination = target.pos.clone().moveInDir(bestDir, distanceRequired);
+	}
+
+	this.isValid = function () {
+		return !failed;
+	}
+
+	this.update = function (ai, owner, world, target) {
+		if (owner.pos.trueDistanceTo(destination) < 3 || movesAllowed <= 0) {
+			ai.setState(new Fighting());
+			return;
+		}
+		if (target === null || target.live === false) {
+			ai.setState(new Waiting());
+			return;
+		}
+	};
+
+	this.move = function (ai, owner, world, target) {
+		movesAllowed--;
+		return owner.pos.dirOnPathTowardsAvoiding(destination, world.map, target.pos, 2);
+	};
+}
+
 var Fighting = function () {
+	var minMovesUntilTactics = 5;
+	var movesUntilTactics = Math.floor(Math.random() * minMovesUntilTactics + minMovesUntilTactics);
 	this.name = "Fighting";
 	this.update = function (ai, owner, world, target) {
 		if (target === null || target.live === false) {
@@ -253,8 +343,19 @@ var Fighting = function () {
 		var distance = owner.pos.trueDistanceTo(target.pos);
 		if (distance > closeEnoughToFight + 4 || ai.getCanSee(target.index) < 1) {
 			ai.setState(new Pursuing());
+			return;
 		}
-	}
+
+		if (movesUntilTactics <= 0) {
+			var tactic = new Surrounding(owner, world, target);
+			if (tactic.isValid()) {
+				ai.setState(tactic);
+				return;
+			} else {
+				movesUntilTactics = minMovesUntilTactics * 2;
+			}
+		}
+	};
 
 	//We might move randomly in either of the given directions,
 	//Or we might decide to close the difference and try to get in line with our opponent
@@ -266,15 +367,16 @@ var Fighting = function () {
 		} else { //or move towards the firing line
 			return (difference > 0) ? dirUp : dirDown;
 		}
-	}
+	};
 
 	this.move = function (ai, owner, world, target) {
+		movesUntilTactics--;
 		var dX = Math.abs(owner.pos.x - target.pos.x);
 		var dY = Math.abs(owner.pos.y - target.pos.y);
 		if (dX == dY) return dir.random();
 		if (dX > dY) return dodgeMove(owner.pos.y - target.pos.y, dir.UP, dir.DOWN);
 		return dodgeMove(owner.pos.x - target.pos.x, dir.LEFT, dir.RIGHT);
-	}
+	};
 }
 
 var AI = function () {
@@ -358,7 +460,6 @@ var AI = function () {
 					var suspicionPoints = Math.max(30 - dist * 3, 5);
 					if (owner.facingAwayFrom(e.pos)) suspicionPoints *= suspicionBehindMulti;
 					addSuspicion(Math.floor(suspicionPoints), i);
-					console.log(Math.floor(suspicion[i]));
 				} else {
 					reduceSuspicion(1, i);
 				}
