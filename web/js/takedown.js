@@ -249,7 +249,7 @@ var Fighting = function () {
 			ai.setState(new Waiting());
 			return;
 		}
-		
+
 		var distance = owner.pos.trueDistanceTo(target.pos);
 		if (distance > closeEnoughToFight + 4 || ai.getCanSee(target.index) < 1) {
 			ai.setState(new Pursuing());
@@ -607,7 +607,7 @@ var World = function(map) {
 	}
 
 	this.createEnemy = function (pos) {
-		var e = new Person(pos, dir.UP, new AI());
+		var e = new Person(pos, dir.random(), new AI());
 		e.health = 1;
 		e.team = 1;
 		e.index = this.enemies.length;
