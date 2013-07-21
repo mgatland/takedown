@@ -509,7 +509,19 @@ var createWorld = function(map) {
 	world.p = null;
 	world.map = map;
 
-	var shotUpdate = function(world) {
+	var Shot = function (pos, face, team, ownerIndex, world) {
+		this.live = true;
+		this.pos = pos.clone();
+		this.face = face;
+		this.team = team;
+		this.ownerIndex = ownerIndex;
+		this.damage = 1;
+		this.moveSpeed = 1;
+		this.moved = 0;
+		world.shots.push(this);
+	};
+
+	Shot.prototype.update = function(world) {
 		if (this.live === false) return;
 
 		if (this.moved > 0) {
@@ -533,18 +545,7 @@ var createWorld = function(map) {
 
 	world.createShot = function(pos, face, team, ownerIndex) {
 		console.log("shot!");
-		var shot = {};
-		shot.live = true;
-		shot.pos = pos.clone();
-		shot.face = face;
-		shot.team = team;
-		shot.ownerIndex = ownerIndex;
-		shot.damage = 1;
-
-		shot.moveSpeed = 1;
-		shot.moved = 0;
-		this.shots.push(shot);
-		shot.update = shotUpdate;
+		var shot = new Shot(pos, face, team, ownerIndex, this);
 	}
 
 	world.createEnemy = function (pos) {
