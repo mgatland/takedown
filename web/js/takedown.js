@@ -549,20 +549,19 @@ Shot.prototype.update = function(world) {
 	this._checkHitPeople(world.enemies);
 }
 
-var createWorld = function(map) {
+var World = function(map) {
 
-	var world = {};
-	world.shots = [];
-	world.enemies = [];
-	world.p = null;
-	world.map = map;
+	this.shots = [];
+	this.enemies = [];
+	this.p = null;
+	this.map = map;
 
-	world.createShot = function(pos, face, team, ownerIndex) {
+	this.createShot = function(pos, face, team, ownerIndex) {
 		console.log("shot!");
 		var shot = new Shot(pos, face, team, ownerIndex, this);
 	}
 
-	world.createEnemy = function (pos) {
+	this.createEnemy = function (pos) {
 		var e = new Person(pos, dir.UP, new AI());
 		e.health = 1;
 		e.team = 1;
@@ -571,7 +570,7 @@ var createWorld = function(map) {
 		return e;
 	};
 
-	world.createPlayer = function (pos, face) {
+	this.createPlayer = function (pos, face) {
 		this.p = new Person(pos, face, new PlayerAI());
 		this.p.team = 0;
 		this.p.index = this.enemies.length;
@@ -579,7 +578,7 @@ var createWorld = function(map) {
 	};
 
 	//Delete this if it remains unused
-	world.getRandomPos = function () {
+	this.getRandomPos = function () {
 		var pos = null;
 		while (pos === null || this.map.canMove(pos)===false) {
 			var x = Math.floor(Math.random() * this.map.width);
@@ -588,7 +587,6 @@ var createWorld = function(map) {
 		}
 		return pos;
 	}
-	return world;
 };
 
 var start = function () {

@@ -78,7 +78,7 @@ function CampaignLoader() {
         // ...
 
         //now initialize the world and call the callback  
-        var world = createWorld(createGrid(width, height));
+        var world = new World(createGrid(width, height));
         world.map.forEach(function (pos, value) {
           var tile = terrain[pos.x + ":" + pos.y];
           world.map.set(pos, tile);
