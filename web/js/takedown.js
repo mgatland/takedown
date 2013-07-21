@@ -211,10 +211,10 @@ var PlayerAI = function () {
 	this.setState = function () {}; //ignore
 }
 
-var Unaware = function () {
-	this.name = "Unaware";
+var Waiting = function () {
+	this.name = "Waiting";
 	this.update = function (ai, owner, world, target) {
-		if (ai.isAwareOfAnyone()) {
+		if (ai.isAwareOfAnyone(world)) {
 			ai.setState(new Pursuing());
 		}
 	}
@@ -227,6 +227,10 @@ var Unaware = function () {
 var Pursuing = function () {
 	this.name = "Pursuing";
 	this.update = function (ai, owner, world, target) {
+		if (target === null || target.live === false) {
+			ai.setState(new Waiting());
+			return;
+		}
 		var distance = owner.pos.trueDistanceTo(target.pos);
 		if (distance < closeEnoughToFight && ai.getCanSee(target.index) > 5) {
 			ai.setState(new Fighting());
@@ -241,6 +245,11 @@ var Pursuing = function () {
 var Fighting = function () {
 	this.name = "Fighting";
 	this.update = function (ai, owner, world, target) {
+		if (target === null || target.live === false) {
+			ai.setState(new Waiting());
+			return;
+		}
+		
 		var distance = owner.pos.trueDistanceTo(target.pos);
 		if (distance > closeEnoughToFight + 4 || ai.getCanSee(target.index) < 1) {
 			ai.setState(new Pursuing());
@@ -275,8 +284,6 @@ var AI = function () {
 	var suspicion = []; //how much we suspect player i exists
 	var aware = []; // Awareness type
 
-	var anyAware = false; //Are we aware of anyone?
-
 	var state = null; //must be set by Person
 
 	this.setState = function (newState) {
@@ -291,7 +298,13 @@ var AI = function () {
 
 	//methods used by AI states
 
-	this.isAwareOfAnyone = function () {
+	this.isAwareOfAnyone = function (world) {
+		var anyAware = false;
+		var myEnemies = world.enemies.filter(function (e, i) { return e.live === true && e.team != owner.team});
+		myEnemies.forEach(function (e) {
+			var i = e.index;
+			if (aware[i] === true) anyAware = true;
+		});
 		return anyAware;
 	}
 
@@ -305,7 +318,6 @@ var AI = function () {
 		suspicion[i] += amount;
 		if (suspicion[i] > 300) {
 			aware[i] = true;
-			anyAware = true;
 		}
 	}
 
@@ -374,7 +386,7 @@ var AI = function () {
 		var plannedMove = state.move(this, owner, world, world.p);
 
 		//based on danger, we might decide not to use our planned move.
-		if (this.isAwareOfAnyone() === false) return plannedMove;
+		if (this.isAwareOfAnyone(world) === false) return plannedMove;
 
 		var bestMove = 0;
 		var bestScore = -999;
@@ -458,7 +470,7 @@ var Person = function (pos, face, ai) {
 	this.ai = ai;
 	this.index = null;
 	ai.setOwner(this);
-	ai.setState(new Unaware());
+	ai.setState(new Waiting());
 }
 
 Person.prototype.facingAwayFrom = function (pos) {
