@@ -205,36 +205,36 @@ var PlayerAI = function () {
 
 var Unaware = function () {
 	this.name = "Unaware";
-	this.update = function (ai, owner, world) {
+	this.update = function (ai, owner, world, target) {
 		if (ai.isAwareOfAnyone()) {
 			ai.setState(new Pursuing());
 		}
 	}
 
-	this.move = function (ai, world) {
+	this.move = function (ai, world, target) {
 
 	}
 }
 
 var Pursuing = function () {
 	this.name = "Pursuing";
-	this.update = function (ai, owner, world) {
-		var distance = owner.pos.trueDistanceTo(world.p.pos);
-		if (distance < closeEnoughToFight && ai.getCanSee(world.p.index) > 5) {
+	this.update = function (ai, owner, world, target) {
+		var distance = owner.pos.trueDistanceTo(target.pos);
+		if (distance < closeEnoughToFight && ai.getCanSee(target.index) > 5) {
 			ai.setState(new Fighting());
 		}
 	}
 
-	this.move = function (ai, owner, world) {
-		return owner.pos.dirOnPathTowards(world.p.pos, world.map);
+	this.move = function (ai, owner, world, target) {
+		return owner.pos.dirOnPathTowards(target.pos, world.map);
 	}
 }
 
 var Fighting = function () {
 	this.name = "Fighting";
-	this.update = function (ai, owner, world) {
-		var distance = owner.pos.trueDistanceTo(world.p.pos);
-		if (distance > closeEnoughToFight + 4 || ai.getCanSee(world.p.index) < 1) {
+	this.update = function (ai, owner, world, target) {
+		var distance = owner.pos.trueDistanceTo(target.pos);
+		if (distance > closeEnoughToFight + 4 || ai.getCanSee(target.index) < 1) {
 			ai.setState(new Pursuing());
 		}
 	}
@@ -251,12 +251,12 @@ var Fighting = function () {
 		}
 	}
 
-	this.move = function (ai, owner, world) {
-		var dX = Math.abs(owner.pos.x - world.p.pos.x);
-		var dY = Math.abs(owner.pos.y - world.p.pos.y);
+	this.move = function (ai, owner, world, target) {
+		var dX = Math.abs(owner.pos.x - target.pos.x);
+		var dY = Math.abs(owner.pos.y - target.pos.y);
 		if (dX == dY) return dir.random();
-		if (dX > dY) return dodgeMove(owner.pos.y - world.p.pos.y, dir.UP, dir.DOWN);
-		return dodgeMove(owner.pos.x - world.p.pos.x, dir.LEFT, dir.RIGHT);
+		if (dX > dY) return dodgeMove(owner.pos.y - target.pos.y, dir.UP, dir.DOWN);
+		return dodgeMove(owner.pos.x - target.pos.x, dir.LEFT, dir.RIGHT);
 	}
 }
 
@@ -359,11 +359,11 @@ var AI = function () {
 			}
 		});
 
-		state.update(this, owner, world);
+		state.update(this, owner, world, world.p);
 	}
 
 	this.move = function(world) {
-		return state.move(this, owner, world);
+		return state.move(this, owner, world, world.p);
 	}
 
 	var NO_SHOOT = {dir: dir.NONE, mode: -1};
