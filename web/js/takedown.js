@@ -130,6 +130,14 @@ var Pos = function (x, y) {
 		return bestDir;
 	}
 
+	this.moveInDir = function (face, distance) {
+		if (face === dir.UP) this.y -= distance;
+		if (face === dir.RIGHT) this.x += distance;
+		if (face === dir.DOWN) this.y += distance;
+		if (face === dir.LEFT) this.x -= distance;
+		return this; //for chaining
+	}
+
 	//warning: returns a non-integer //TODO: consider returning an int
 	this.trueDistanceTo = function(other) {
 		return Math.sqrt( 
@@ -212,7 +220,7 @@ var Unaware = function () {
 	}
 
 	this.move = function (ai, world, target) {
-
+		return dir.NONE;
 	}
 }
 
@@ -363,7 +371,29 @@ var AI = function () {
 	}
 
 	this.move = function(world) {
-		return state.move(this, owner, world, world.p);
+		var plannedMove = state.move(this, owner, world, world.p);
+
+		//based on danger, we might decide not to use our planned move.
+		var bestMove = 0;
+		var bestScore = -999;
+		var clumsy = (Math.random() > 0.9);
+		for (var i = 0; i <= 4; i++) {
+			var movedPos = owner.pos.clone().moveInDir(i, 1);
+			if (!world.map.canMove(movedPos)) continue; //can't move here
+			var moveScore = 0;
+			if (i === dir.NONE && i != plannedMove) moveScore += 0.5; // standing still usually beats pointless movement.
+			if (i === plannedMove) moveScore += 4;
+			if (!clumsy) moveScore -= world.getDangerAt(movedPos); //I usually spot danger, but occasionally forget to look
+
+			//random variation
+			moveScore += Math.random() * 1.0;
+			if (moveScore > bestScore) {
+				bestScore = moveScore;
+				bestMove = i;
+			}
+		}
+		if (bestMove != plannedMove) console.log("dodged!");
+		return bestMove;
 	}
 
 	var NO_SHOOT = {dir: dir.NONE, mode: -1};
@@ -555,6 +585,7 @@ var World = function(map) {
 	this.enemies = [];
 	this.p = null;
 	this.map = map;
+	var dangerMap = make2DArray(map.width, map.height, 0);
 
 	this.createShot = function(pos, face, team, ownerIndex) {
 		console.log("shot!");
@@ -576,6 +607,69 @@ var World = function(map) {
 		this.p.index = this.enemies.length;
 		this.enemies.push(this.p);
 	};
+
+	var setDangerAt = function (pos, value) {
+		if (map.isValid(pos)) {
+			if (dangerMap[pos.x][pos.y] < value) {
+				dangerMap[pos.x][pos.y] = value;
+			}
+		}
+	}
+
+	var updateDangerMap = function () {
+		this.map.forEach(function (pos, value) {
+			dangerMap[pos.x][pos.y] = 0;
+		});
+		
+		//Danger around the player
+		if (this.p.live === true) {
+			var pos = this.p.pos;
+			setDangerAt(pos.clone().moveInDir(dir.UP, 1), 2);
+			setDangerAt(pos.clone().moveInDir(dir.DOWN, 1), 2);
+			setDangerAt(pos.clone().moveInDir(dir.LEFT, 1), 2);
+			setDangerAt(pos.clone().moveInDir(dir.RIGHT, 1), 2);
+
+			setDangerAt(pos.clone().moveInDir(dir.UP, 2), 1);
+			setDangerAt(pos.clone().moveInDir(dir.DOWN, 2), 1);
+			setDangerAt(pos.clone().moveInDir(dir.LEFT, 2), 1);
+			setDangerAt(pos.clone().moveInDir(dir.RIGHT, 2), 1);
+		}
+
+		//Danger in front of shots that can hurt enemies
+		this.shots.forEach(function (s) {
+			if (s.live === false) return;
+			if (s.team === 1) return; //ignore my own shots
+			var pos = s.pos.clone();
+			var danger = 100;
+			while (map.isValid(pos) && danger > 0) {
+				setDangerAt(pos, danger);
+				pos.moveInDir(s.face, 1);
+				danger -= 8;
+			}
+		});
+	};
+
+	this.getDangerAt = function (pos) {
+		if (map.isValid(pos)) {
+			return dangerMap[pos.x][pos.y];
+		} else {
+			return 0;
+		}
+	}
+
+	this.update = function () {
+		var world = this;
+
+		updateDangerMap.call(this); //ewww javascript.
+
+		this.enemies.forEach(function(e) {
+			e.update(world);
+		});
+
+		this.shots.forEach(function(shot) {
+			shot.update(world);
+		});
+	}
 
 	//Delete this if it remains unused
 	this.getRandomPos = function () {
@@ -649,25 +743,13 @@ var updatePlayerInput = function (keyboard, playerAI) {
 var update = function (world, keyboard, camera) {
 	if (world === null) return;
 	updatePlayerInput(keyboard, world.p.ai);
-
-	world.enemies.forEach(function(e) {
-		e.update(world);
-	});
-
-	world.shots.forEach(function(shot) {
-		shot.update(world);
-	});
-
+	world.update();
 	camera.update(world.p.pos);
 };
 
 //global...
 var tryMove = function (o, face, map) {
-	var movedPos = o.pos.clone();
-	if (face === dir.UP) movedPos.y--;
-	if (face === dir.RIGHT) movedPos.x++;
-	if (face === dir.DOWN) movedPos.y++;
-	if (face === dir.LEFT) movedPos.x--;
+	var movedPos = o.pos.clone().moveInDir(face, 1);
 	if (map.canMove(movedPos)) {
 		o.pos = movedPos;
 		o.moved = o.moveSpeed;
@@ -730,14 +812,19 @@ var drawPerson = function (pos, color, camera, face) {
 	ctx.fillRect((pos.x+x)*screen.tileSize - camera.xOff(), (pos.y+y)*screen.tileSize - camera.yOff(), screen.tileSize/2, screen.tileSize/2);
 }
 
-var createGrid = function (myWidth, myHeight) {
-	var terrain = []; //t_type
-	for (var i = 0; i < myWidth; i ++) {
-		terrain[i] = [];
-		for (var j = 0; j < myHeight; j++) {
-			terrain[i][j] = 0;
+var make2DArray = function (width, height, defaultValue) {
+	var array = [];
+	for (var i = 0; i < width; i ++) {
+		array[i] = [];
+		for (var j = 0; j < height; j++) {
+			array[i][j] = defaultValue;
 		}
 	}
+	return array;
+}
+
+var createGrid = function (myWidth, myHeight) {
+	var terrain = make2DArray(myWidth, myHeight, 0);
 	var grid = {};
 	grid.width = myWidth;
 	grid.height = myHeight;
