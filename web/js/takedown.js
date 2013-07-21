@@ -501,6 +501,41 @@ Person.prototype.hurt = function (damage) {
 	this.heat += 25; //does not scale with damage; should it?
 }
 
+
+var Shot = function (pos, face, team, ownerIndex, world) {
+	this.live = true;
+	this.pos = pos.clone();
+	this.face = face;
+	this.team = team;
+	this.ownerIndex = ownerIndex;
+	this.damage = 1;
+	this.moveSpeed = 1;
+	this.moved = 0;
+	world.shots.push(this);
+};
+
+Shot.prototype.update = function(world) {
+	if (this.live === false) return;
+
+	if (this.moved > 0) {
+		this.moved--;
+	} else {
+		var moved = tryMove(this, this.face, world.map);
+		if (moved===false) {
+			this.live = false;
+		}
+	}
+
+	//check for collisions with People
+	var that = this;
+	world.enemies.forEach(function (e) {
+		if (e.pos.equals(that.pos) && e.live === true && e.team != that.team) {
+			e.hurt(that.damage);
+			that.live = false;
+		}
+	});
+}
+
 var createWorld = function(map) {
 
 	var world = {};
@@ -508,40 +543,6 @@ var createWorld = function(map) {
 	world.enemies = [];
 	world.p = null;
 	world.map = map;
-
-	var Shot = function (pos, face, team, ownerIndex, world) {
-		this.live = true;
-		this.pos = pos.clone();
-		this.face = face;
-		this.team = team;
-		this.ownerIndex = ownerIndex;
-		this.damage = 1;
-		this.moveSpeed = 1;
-		this.moved = 0;
-		world.shots.push(this);
-	};
-
-	Shot.prototype.update = function(world) {
-		if (this.live === false) return;
-
-		if (this.moved > 0) {
-			this.moved--;
-		} else {
-			var moved = tryMove(this, this.face, world.map);
-			if (moved===false) {
-				this.live = false;
-			}
-		}
-
-		//check for collisions with People
-		var that = this;
-		world.enemies.forEach(function (e) {
-			if (e.pos.equals(that.pos) && e.live === true && e.team != that.team) {
-				e.hurt(that.damage);
-				that.live = false;
-			}
-		});
-	}
 
 	world.createShot = function(pos, face, team, ownerIndex) {
 		console.log("shot!");
