@@ -484,13 +484,11 @@ var AI = function () {
 
 	this.move = function(world) {
 		var plannedMove = state.move(this, owner, world, world.p);
-
+		
 		//based on danger, we might decide not to use our planned move.
-		if (this.isAwareOfAnyone(world) === false) return plannedMove;
-
 		var bestMove = 0;
 		var bestScore = -999;
-		var clumsy = (Math.random() > 0.9);
+		var clumsy = (this.isAwareOfAnyone(world) === false) || (Math.random() * 110 > owner.type.skill);
 		for (var i = 0; i <= 4; i++) {
 			var movedPos = owner.pos.clone().moveInDir(i, 1);
 			if (!world.map.canMove(movedPos)) continue; //can't move here
