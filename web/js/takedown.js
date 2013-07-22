@@ -48,7 +48,7 @@ dir.name = function (face) {
 //AI globals to un-globalify
 var maxCanSee = 25 * 2;
 var suspicionBehindMulti = 0.2;
-
+var maxDeadTime = 25;
 
 var Assets = function () {
 	var itemsToLoad = 0;
@@ -626,6 +626,7 @@ var Person = function (pos, face, ai, type) {
 	this.index = null;
 	ai.setOwner(this);
 	ai.setState(new Waiting());
+	this.deadTimer = 0;
 }
 
 Person.prototype.facingAwayFrom = function (pos) {
@@ -639,7 +640,13 @@ Person.prototype.facingAwayFrom = function (pos) {
 }
 
 Person.prototype.update = function (world) {
-	if (this.live === false) return;
+	if (this.health <= 0) {
+		this.deadTimer--;
+		if (this.deadTimer <= 0) {
+			this.live = false;
+		}
+		return;
+	}
 
 	this.ai.update(world);
 
@@ -692,10 +699,11 @@ Person.prototype.fire = function (mode, world) {
 };
 
 Person.prototype.hurt = function (damage) {
-	if (!this.live) return;
+	if (!this.live || this.health <= 0) return;
 	this.health -= damage;
 	if (this.health <= 0) {
-		this.live = false;
+		//die
+		this.deadTimer = maxDeadTime;
 	}
 	this.heat += 25; //does not scale with damage; should it?
 }
@@ -983,10 +991,15 @@ var drawTile = function (tilesImg, pos, tX, tY, camera) {
 };
 
 var drawPerson = function (person, camera, assets) {
+	if (person.live === false) return;
 	var pos = person.pos;
-	var tX = person.face - 1;
-	var tY = person.type.skin;
-	drawTile(assets.humanImage, pos, tX, tY, camera);
+	if (person.health > 0) {
+		var tX = person.face - 1;
+		var tY = person.type.skin;
+		drawTile(assets.humanImage, pos, tX, tY, camera);
+	} else {
+		drawTile(assets.deadImage, pos, 4 - Math.min(4, person.deadTimer), 0, camera);
+	}
 }
 
 var make2DArray = function (width, height, defaultValue) {
