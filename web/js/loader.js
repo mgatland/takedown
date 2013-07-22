@@ -15,7 +15,7 @@ function CampaignLoader() {
         if (level != mission) continue; 
         console.log("Level " + level);
         console.log("Size: " + lines[i])
-        var sizes = lines[i].split(","); //size string e.g. "23,45"
+        var sizes = CSVToArray(lines[i]); //size string e.g. "23,45"
         var width = parseInt(sizes[0], 10) + 1; //yep, it's inclusive.
         var height = parseInt(sizes[1], 10) + 1; //
         i++;
@@ -49,7 +49,7 @@ function CampaignLoader() {
         var unusedBlankLine = lines[i];
         i++;
         console.log("player position: " + lines[i]);
-        var pPos = lines[i].split(",");
+        var pPos = CSVToArray(lines[i]);
         i++;
         var pX = parseInt(pPos[0]);
         var pY = parseInt(pPos[1]);
@@ -66,7 +66,7 @@ function CampaignLoader() {
             i++;
             continue; //ignore comments and blanks
           }
-          var enemyLine = lines[i].split(","); //values are: index, x, y, type, state, goaldie, tag
+          var enemyLine = CSVToArray(lines[i]); //values are: index, x, y, type, state, goaldie, tag
           var x = parseInt(enemyLine[1], 10);
           var y = parseInt(enemyLine[2], 10);
           enemies.push({x:x, y:y});
@@ -110,5 +110,90 @@ function CampaignLoader() {
       }
     };
     req.send();
-  }  
+  }
+
+
+  //from http://stackoverflow.com/a/1293163
+  // This will parse a delimited string into an array
+  //The default delimiter is the comma, but this
+  // can be overriden in the second argument.
+  function CSVToArray( strData, strDelimiter ){
+    // Check to see if the delimiter is defined. If not,
+    // then default to comma.
+    strDelimiter = (strDelimiter || ",");
+
+    // Create a regular expression to parse the CSV values.
+    var objPattern = new RegExp(
+      (
+        // Delimiters.
+        "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+
+        // Quoted fields.
+        "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+
+        // Standard fields.
+        "([^\"\\" + strDelimiter + "\\r\\n]*))"
+      ),
+      "gi"
+      );
+
+
+    // Create an array to hold our data.
+    var arrData = [];
+
+    // Create an array to hold our individual pattern
+    // matching groups.
+    var arrMatches = null;
+
+
+    // Keep looping over the regular expression matches
+    // until we can no longer find a match.
+    while (arrMatches = objPattern.exec( strData )){
+
+      // Get the delimiter that was found.
+      var strMatchedDelimiter = arrMatches[ 1 ];
+
+      // Check to see if the given delimiter has a length
+      // (is not the start of string) and if it matches
+      // field delimiter. If id does not, then we know
+      // that this delimiter is a row delimiter.
+      if (
+        strMatchedDelimiter.length &&
+        (strMatchedDelimiter != strDelimiter)
+        ){
+
+        // We have reached a new row of data
+
+      }
+
+
+      // Now that we have our delimiter out of the way,
+      // let's check to see which kind of value we
+      // captured (quoted or unquoted).
+      if (arrMatches[ 2 ]){
+
+        // We found a quoted value. When we capture
+        // this value, unescape any double quotes.
+        var strMatchedValue = arrMatches[ 2 ].replace(
+          new RegExp( "\"\"", "g" ),
+          "\""
+          );
+
+      } else {
+
+        // We found a non-quoted value.
+        var strMatchedValue = arrMatches[ 3 ];
+
+      }
+
+
+      // Now that we have our value string, let's add
+      // it to the data array.
+      arrData.push( strMatchedValue );
+    }
+
+    // Return the parsed data.
+    return( arrData );
+  }
+
 }
