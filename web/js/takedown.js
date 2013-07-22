@@ -48,7 +48,6 @@ dir.name = function (face) {
 //AI globals to un-globalify
 var maxCanSee = 25 * 2;
 var suspicionBehindMulti = 0.2;
-var closeEnoughToFight = 7;
 
 var canvas;
 var ctx;
@@ -271,7 +270,7 @@ var Pursuing = function () {
 			return;
 		}
 		var distance = owner.pos.trueDistanceTo(target.pos);
-		if (distance < closeEnoughToFight && ai.getCanSee(target.index) > 5) {
+		if (distance < owner.type.fightDistMax && ai.getCanSee(target.index) > 5) {
 			ai.setState(new Fighting());
 		}
 	}
@@ -341,7 +340,7 @@ var Fighting = function () {
 		}
 
 		var distance = owner.pos.trueDistanceTo(target.pos);
-		if (distance > closeEnoughToFight + 4 || ai.getCanSee(target.index) < 1) {
+		if (distance > owner.type.fightDistMax + 4 || ai.getCanSee(target.index) < 1) {
 			ai.setState(new Pursuing());
 			return;
 		}
@@ -557,17 +556,37 @@ var AI = function () {
 	}
 }
 
-var Person = function (pos, face, ai) {
-	this.moved = 0;
+var shotTypes = [];
+shotTypes[0] = {damage: 4, moveSpeed: 1, skin: 0}; //blue normal player shot
+shotTypes[1] = {damage: 2, moveSpeed: 1, skin: 2}; //red tiny enemy shot
+shotTypes[2] = {damage: 5, moveSpeed: 0, skin: 3}; // purple supershot
+shotTypes[3] = {damage: 6, moveSpeed: 0, skin: 1}; // unused
+shotTypes[4] = {damage: 2, moveSpeed: -1, skin: 2}; // instant hit enemy shot
+
+//player
+var playerType = {health: 10, shootSpeed: 14, moveSpeed: 4, skin: 0, shotType: 0, skill: 99, fightDistMax: 10, fightDistMin: 3};
+//player guns:
+// 0 - heatInc: 20, projType: 0, sspeed: 14
+// 1 - heatInc: 35, kick: 15, projType: 2, sspeed: 22
+
+var enemyTypes = [];
+enemyTypes[1] = {health:  4, shootSpeed: 40, moveSpeed: 8, skin: 1, shotType: 1, skill: 50, fightDistMax: 7, fightDistMin: 2 }; //grunt
+enemyTypes[3] = {health: 10, shootSpeed: 40, moveSpeed: 8, skin: 2, shotType: 1, skill: 50, fightDistMax: 7, fightDistMin: 2 }; //armoured
+enemyTypes[5] = {health:  4, shootSpeed: 15, moveSpeed: 8, skin: 3, shotType: 1, skill: 50, fightDistMax: 7, fightDistMin: 2 }; //rapid fire
+enemyTypes[7] = {health: 10, shootSpeed: 30, moveSpeed: 8, skin: 4, shotType: 0, skill: 70, fightDistMax: 9, fightDistMin: 2 }; //commando
+enemyTypes[9] = {health: 12, shootSpeed: 20, moveSpeed: 4, skin: 5, shotType: 2, skill: 85, fightDistMax: 10, fightDistMin: 3}; //elite commando
+enemyTypes[11] = {health: 5, shootSpeed: 20, moveSpeed: 8, skin: 6, shotType: 4, skill: 65, fightDistMax: 20, fightDistMin: 4}; //sniper
+
+var Person = function (pos, face, ai, type) {
+	this.type = type;
 	this.moved = 0;
 	this.face = face;
-	this.moveSpeed = 4;
 	this.shot = 0;
 	this.heat = 0;
 	this.maxHeat = 120;
 	this.pos = pos.clone();
 	this.live = true;
-	this.health = 5;
+	this.health = type.health;
 	this.ai = ai;
 	this.index = null;
 	ai.setOwner(this);
@@ -625,7 +644,7 @@ Person.prototype.fire = function (mode, world) {
 		audio.play("overheat");
 	} else {
 		//mode is ignored
-		var shot = world.createShot(this.pos, this.face, this.team, this.index);
+		var shot = world.createShot(this.type.shotType, this.pos, this.face, this.team, this.index);
 		if (shot !== null) {
 			//set up shot stealth, special
 		}
@@ -647,14 +666,13 @@ Person.prototype.hurt = function (damage) {
 }
 
 
-var Shot = function (pos, face, team, ownerIndex, world) {
+var Shot = function (typeIndex, pos, face, team, ownerIndex, world) {
 	this.live = true;
+	this.type = shotTypes[typeIndex];
 	this.pos = pos.clone();
 	this.face = face;
 	this.team = team;
 	this.ownerIndex = ownerIndex;
-	this.damage = 1;
-	this.moveSpeed = 1;
 	this.moved = 0;
 	world.shots.push(this);
 };
@@ -665,7 +683,7 @@ Shot.prototype._checkHitPeople = function(people) {
 	people.forEach(function (e) {
 		if (that.live === false) return; //we can only hit one person per turn
 		if (e.pos.equals(that.pos) && e.live === true && e.team != that.team) {
-			e.hurt(that.damage);
+			e.hurt(that.type.damage);
 			that.live = false;
 			hit = true;
 		}
@@ -702,22 +720,22 @@ var World = function(map) {
 	this.map = map;
 	var dangerMap = make2DArray(map.width, map.height, 0);
 
-	this.createShot = function(pos, face, team, ownerIndex) {
+	this.createShot = function(typeIndex, pos, face, team, ownerIndex) {
 		console.log("shot!");
-		var shot = new Shot(pos, face, team, ownerIndex, this);
+		var shot = new Shot(typeIndex, pos, face, team, ownerIndex, this);
 	}
 
-	this.createEnemy = function (pos) {
-		var e = new Person(pos, dir.random(), new AI());
-		e.health = 1;
+	this.createEnemy = function (pos, type, state) {
+		var e = new Person(pos, dir.random(), new AI(), enemyTypes[type]);
 		e.team = 1;
 		e.index = this.enemies.length;
+		//set state
 		this.enemies.push(e);
 		return e;
 	};
 
 	this.createPlayer = function (pos, face) {
-		this.p = new Person(pos, face, new PlayerAI());
+		this.p = new Person(pos, face, new PlayerAI(), playerType);
 		this.p.team = 0;
 		this.p.index = this.enemies.length;
 		this.enemies.push(this.p);
@@ -867,7 +885,7 @@ var tryMove = function (o, face, map) {
 	var movedPos = o.pos.clone().moveInDir(face, 1);
 	if (map.canMove(movedPos)) {
 		o.pos = movedPos;
-		o.moved = o.moveSpeed;
+		o.moved = o.type.moveSpeed;
 		return true;
 	}
 	return false;
@@ -890,15 +908,11 @@ var render = function (world, camera) {
 	});
 
 	world.shots.forEach(function (shot) {
-		drawSquare(shot.pos, shot.live === true ? "red" : "orange", camera);
+		drawShot(shot, camera);
 	});
 
 	world.enemies.forEach(function (e) {
-		if (e.team == 0) {
-			drawPerson(world.p.pos, world.p.live === true ? "blue": "black", camera, e.face);
-		} else {
-			drawPerson(e.pos, e.live === true ? "cyan" : "black", camera, e.face);
-		}
+		drawPerson(e, camera);
 	});
 
 	ctx.fillStyle = (world.p.heat < 100)  ? "white" : "red";
@@ -913,7 +927,55 @@ var drawSquare = function (pos, color, camera) {
 	ctx.fillRect(pos.x*screen.tileSize - camera.xOff(), pos.y*screen.tileSize - camera.yOff(), screen.tileSize, screen.tileSize);
 }
 
-var drawPerson = function (pos, color, camera, face) {
+//Hacks, until we have sprites
+var getPersonColor = function (skinType) {
+	switch (skinType) {
+		case 0: return "blue";
+		//grunt, armoured, rapid, commando, elite, sniper
+		case 1: return "lightgreen"; 
+		case 2: return "darkgreen";
+		case 3: return "orange";
+		case 4: return "red";
+		case 5: return "purple";
+		case 6: return "darkgrey";
+	}
+	return "white";
+}
+
+//Hacks, until we have sprites
+var getShotColor = function (skinType) {
+	switch (skinType) {
+		case 0: return "cyan";
+		//1 is unused
+		case 2: return "red"; 
+		case 3: return "magenta";
+	}
+	return "white";
+}
+
+var drawShot = function (shot, camera) {
+	var pos = shot.pos;
+	var face = shot.face;
+	var color = shot.live ? getShotColor(shot.type.skin) : "orange";
+	ctx.fillStyle = color;
+	var x = 0;
+	var y = 0;
+	var width = screen.tileSize / 2;
+	var height = screen.tileSize / 2;
+	switch (face) {
+		case dir.LEFT: x = 0; y = 0; width *= 2; break;
+		case dir.RIGHT: x = 0; y = 0.5; width *= 2; break;
+		case dir.UP: x = 0.5; y = 0; height *= 2; break;
+		case dir.DOWN: x = 0; y = 0; height *= 2; break;
+	}
+	ctx.fillRect((pos.x+x)*screen.tileSize - camera.xOff(), (pos.y+y)*screen.tileSize - camera.yOff(), width, height);
+
+}
+
+var drawPerson = function (person, camera) {
+	var pos = person.pos;
+	var face = person.face;
+	var color = person.live ? getPersonColor(person.type.skin) : "black";
 	drawSquare(pos, color, camera);
 	ctx.fillStyle = "white";
 	var x = 0;

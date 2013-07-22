@@ -69,8 +69,10 @@ function CampaignLoader() {
           var enemyLine = CSVToArray(lines[i]); //values are: index, x, y, type, state, goaldie, tag
           var x = parseInt(enemyLine[1], 10);
           var y = parseInt(enemyLine[2], 10);
-          enemies.push({x:x, y:y});
-          console.log("Enemy: " + x + "," + y);
+          var type = parseInt(enemyLine[3], 10);
+          var state = enemyLine[4];
+          enemies.push({x:x, y:y, type:type, state: state});
+          console.log(enemies[enemies.length - 1]);
           i++;
         }
 
@@ -85,7 +87,7 @@ function CampaignLoader() {
         });
         world.createPlayer(new Pos(pX, pY), pFace);
         enemies.forEach(function (e) {
-          world.createEnemy(new Pos(e.x, e.y));
+          world.createEnemy(new Pos(e.x, e.y), e.type, e.state);
         });
         return world;
       } else {
