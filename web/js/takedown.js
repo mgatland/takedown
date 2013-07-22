@@ -4,15 +4,15 @@
 var screen = {
 	width: 25,
 	height: 17,
-	tileSize: 32
+	tileSize: 30
 };
 
 var dir = {
 	NONE: 0,
 	UP: 1,
-	RIGHT: 2,
+	LEFT: 2,
 	DOWN: 3,
-	LEFT: 4
+	RIGHT: 4
 };
 dir.random = function () {
 	switch (Math.floor(Math.random() * 4)) {
@@ -48,6 +48,43 @@ dir.name = function (face) {
 //AI globals to un-globalify
 var maxCanSee = 25 * 2;
 var suspicionBehindMulti = 0.2;
+
+
+var Assets = function () {
+	var itemsToLoad = 0;
+
+    var loadImage = function (name) {
+        itemsToLoad++;
+        var image = new Image();
+        image.onload = function () {
+            itemHasLoaded(name);
+        }
+        image.src = name;
+        return image;
+    };
+
+    var onAllLoaded;
+
+    var itemHasLoaded = function (name) {
+    	console.log("loaded " + name);
+    	itemsToLoad--;
+    	if (itemsToLoad == 0) {
+    		console.log("Loaded all assets");
+    		onAllLoaded();
+    	}
+    }
+
+    this.load = function (callback) {
+    	onAllLoaded = callback;
+	    var itemsToLoad = 0;
+		this.deadImage = loadImage("res/gfx/dead.png");
+		this.decImage = loadImage("res/gfx/dec.png");
+		this.effectsImage = loadImage("res/gfx/effects.png");
+		this.groundImage = loadImage("res/gfx/ground.png");
+		this.humanImage = loadImage("res/gfx/human.png");
+		this.shotImage = loadImage("res/gfx/shots.png");
+    }
+}
 
 var canvas;
 var ctx;
@@ -824,11 +861,16 @@ var start = function () {
 	var world = null;
 	var camera = null;
 
-	var level = 1;
+	var assets = new Assets();
 	var campaignLoader = new CampaignLoader();
-	campaignLoader.load("./res/01.tdm", function () {
-		world = campaignLoader.loadMission(level);
-		camera = new Camera(world.p.pos, world.map.width, world.map.height);
+	var level = 1;
+
+	//once all assets have loaded, load the campaign. Once that has loaded, set the world and camera.
+	assets.load(function () {
+		campaignLoader.load("./res/01.tdm", function () {
+			world = campaignLoader.loadMission(level);
+			camera = new Camera(world.p.pos, world.map.width, world.map.height);
+		});
 	});
 
 	//cross browser hacks
@@ -839,7 +881,7 @@ var start = function () {
 	window.setInterval(function () {
 		update(world, keyboard, camera);
 		requestAnimationFrame(function() {
-			render(world, camera);
+			render(world, camera, assets);
 		});
 
 		if (world && !world.enemies.some(function (e) {return e.live && e.team != 0;})) {
@@ -890,27 +932,28 @@ var tryMove = function (o, face, map) {
 };
 
 // Draw everything
-var render = function (world, camera) {
+var render = function (world, camera, assets) {
 	if (world === null) return;
 
+	//draw grass everywhere
+	var groundType = 3;
 	world.map.forEach(function (pos, tile) {
-		if (tile === 0) {
-			if (world.map.canSee(pos, world.p.pos)) {
-				drawSquare(pos, "green", camera);
-			} else {
-				drawSquare(pos, "darkgreen", camera);
-			}
-		} else {
-			drawSquare(pos, "grey", camera);
+		drawTile(assets.groundImage, pos, groundType, 0, camera);
+	});
+
+	//draw tiles
+	world.map.forEach(function (pos, tile) {
+		if (tile != 0) {
+			drawTile(assets.groundImage, pos, tile+6, 0, camera);
 		}
 	});
 
 	world.shots.forEach(function (shot) {
-		drawShot(shot, camera);
+		drawShot(shot, camera, assets);
 	});
 
 	world.enemies.forEach(function (e) {
-		drawPerson(e, camera);
+		drawPerson(e, camera, assets);
 	});
 
 	ctx.fillStyle = (world.p.heat < 100)  ? "white" : "red";
@@ -920,71 +963,30 @@ var render = function (world, camera) {
 	ctx.fillText("Health: " + world.p.health, screen.width * screen.tileSize - 200, screen.height * screen.tileSize - 32);
 };
 
+//unused for now
 var drawSquare = function (pos, color, camera) {
 	ctx.fillStyle = color;
 	ctx.fillRect(pos.x*screen.tileSize - camera.xOff(), pos.y*screen.tileSize - camera.yOff(), screen.tileSize, screen.tileSize);
 }
 
-//Hacks, until we have sprites
-var getPersonColor = function (skinType) {
-	switch (skinType) {
-		case 0: return "blue";
-		//grunt, armoured, rapid, commando, elite, sniper
-		case 1: return "lightgreen"; 
-		case 2: return "darkgreen";
-		case 3: return "orange";
-		case 4: return "red";
-		case 5: return "purple";
-		case 6: return "darkgrey";
-	}
-	return "white";
+var drawShot = function (shot, camera, assets) {
+	var tX = shot.face - 1 + shot.type.skin*4;
+	var tY = 0;
+	drawTile(assets.shotImage, shot.pos, tX, tY, camera);
 }
 
-//Hacks, until we have sprites
-var getShotColor = function (skinType) {
-	switch (skinType) {
-		case 0: return "cyan";
-		//1 is unused
-		case 2: return "red"; 
-		case 3: return "magenta";
-	}
-	return "white";
-}
+var drawTile = function (tilesImg, pos, tX, tY, camera) {
+    ctx.drawImage(tilesImg, tX*screen.tileSize, tY*screen.tileSize, 
+    	screen.tileSize, screen.tileSize, 
+    	pos.x*screen.tileSize- camera.xOff(),pos.y*screen.tileSize- camera.yOff(),
+    	screen.tileSize,screen.tileSize);
+};
 
-var drawShot = function (shot, camera) {
-	var pos = shot.pos;
-	var face = shot.face;
-	var color = shot.live ? getShotColor(shot.type.skin) : "orange";
-	ctx.fillStyle = color;
-	var x = 0;
-	var y = 0;
-	var width = screen.tileSize / 2;
-	var height = screen.tileSize / 2;
-	switch (face) {
-		case dir.LEFT: x = 0; y = 0; width *= 2; break;
-		case dir.RIGHT: x = 0; y = 0.5; width *= 2; break;
-		case dir.UP: x = 0.5; y = 0; height *= 2; break;
-		case dir.DOWN: x = 0; y = 0; height *= 2; break;
-	}
-	ctx.fillRect((pos.x+x)*screen.tileSize - camera.xOff(), (pos.y+y)*screen.tileSize - camera.yOff(), width, height);
-
-}
-
-var drawPerson = function (person, camera) {
+var drawPerson = function (person, camera, assets) {
 	var pos = person.pos;
-	var face = person.face;
-	var color = person.live ? getPersonColor(person.type.skin) : "black";
-	drawSquare(pos, color, camera);
-	ctx.fillStyle = "white";
-	var x = 0;
-	var y = 0;
-	switch (face) {
-		case dir.LEFT: x = 0.1; y = 0.25; break;
-		case dir.RIGHT: x = 0.4; y = 0.25; break;
-		case dir.UP: x = 0.25; y = 0.1; break;
-		case dir.DOWN: x = 0.25; y = 0.4; break;
-	}
-	ctx.fillRect((pos.x+x)*screen.tileSize - camera.xOff(), (pos.y+y)*screen.tileSize - camera.yOff(), screen.tileSize/2, screen.tileSize/2);
+	var tX = person.face - 1;
+	var tY = person.type.skin;
+	drawTile(assets.humanImage, pos, tX, tY, camera);
 }
 
 var make2DArray = function (width, height, defaultValue) {
