@@ -708,6 +708,27 @@ Person.prototype.hurt = function (damage) {
 	this.heat += 25; //does not scale with damage; should it?
 }
 
+var explosionFrameRate = 1; //how many frames each image is shown for
+var explosionFrames = 5; //how many frames of animation there are
+
+var Explosion = function (skin, pos, ownerIndex, world) {
+	this.live = true;
+	this.skin = skin;
+	this.pos = pos.clone();
+	this.ownerIndex = ownerIndex;
+	world.explosions.push(this);
+	this.age = 0;
+}
+Explosion.prototype.update = function (world) {
+	if (this.live === false) return;
+	this.age++;
+	if (this.getAnimFrame() >= explosionFrames) {
+		this.live = false;
+	}
+}
+Explosion.prototype.getAnimFrame = function() {
+	return Math.floor(this.age / explosionFrameRate);
+};
 
 var Shot = function (typeIndex, pos, face, team, ownerIndex, world) {
 	this.live = true;
@@ -720,7 +741,28 @@ var Shot = function (typeIndex, pos, face, team, ownerIndex, world) {
 	world.shots.push(this);
 };
 
-Shot.prototype._checkHitPeople = function(people) {
+Shot.prototype.explode = function (world, hitWall) {
+
+	//position so it looks correct
+	var pos = this.pos.clone();
+	switch (this.face) {
+		case dir.LEFT: pos.y += 0.25; break;
+		case dir.RIGHT: pos.y -= 0.25; break;
+		case dir.UP: pos.x -= 0.25; break;
+		case dir.DOWN: pos.x += 0.25; break;
+	};
+	if (hitWall) {
+		switch (this.face) {
+			case dir.LEFT: pos.x -= 0.5; break;
+			case dir.RIGHT: pos.x += 0.5; break;
+			case dir.UP: pos.y -= 0.5; break;
+			case dir.DOWN: pos.y += 0.5; break;
+		};	
+	}
+	var explosion = new Explosion(this.type.skin, pos, this.ownerIndex, world);
+}
+
+Shot.prototype._checkHitPeople = function(people, world) {
 	var that = this;
 	var hit = false;
 	people.forEach(function (e) {
@@ -729,6 +771,7 @@ Shot.prototype._checkHitPeople = function(people) {
 			e.hurt(that.type.damage);
 			that.live = false;
 			hit = true;
+			that.explode(world, false);
 		}
 	});
 	return hit;
@@ -740,7 +783,7 @@ Shot.prototype.update = function(world) {
 	//We check for collisions before and after moving
 	//when we implement piercing shots this will have to change - you only want to hit someone
 	//if they moved into your square this frame, not if they were already there in the previous frame.
-	this._checkHitPeople(world.enemies);
+	this._checkHitPeople(world.enemies, world);
 	if (this.live === false) return;
 
 	if (this.moved > 0) {
@@ -748,17 +791,19 @@ Shot.prototype.update = function(world) {
 	} else {
 		var moved = tryMove(this, this.face, world.map);
 		if (moved===false) {
+			this.explode(world, true);
 			this.live = false;
 		}
 	}
 	//we check again after moving
-	this._checkHitPeople(world.enemies);
+	this._checkHitPeople(world.enemies, world);
 }
 
 var World = function(map) {
 
 	this.shots = [];
 	this.enemies = [];
+	this.explosions = [];
 	this.p = null;
 	this.map = map;
 	var dangerMap = make2DArray(map.width, map.height, 0);
@@ -844,6 +889,10 @@ var World = function(map) {
 
 		this.shots.forEach(function(shot) {
 			shot.update(world);
+		});
+
+		this.explosions.forEach(function(exp) {
+			exp.update(world);
 		});
 	}
 
@@ -964,6 +1013,10 @@ var render = function (world, camera, assets) {
 		drawPerson(e, camera, assets);
 	});
 
+	world.explosions.forEach(function (e) {
+		drawExplosion(e, camera, assets);
+	});
+
 	ctx.fillStyle = (world.p.heat < 100)  ? "white" : "red";
 	ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
 	ctx.fillText("Heat: " + Math.floor(world.p.heat), 40, screen.height * screen.tileSize - 32);
@@ -978,9 +1031,17 @@ var drawSquare = function (pos, color, camera) {
 }
 
 var drawShot = function (shot, camera, assets) {
+	if (shot.live === false) return;
 	var tX = shot.face - 1 + shot.type.skin*4;
 	var tY = 0;
 	drawTile(assets.shotImage, shot.pos, tX, tY, camera);
+}
+
+var drawExplosion = function (exp, camera, assets) {
+	if (exp.live === false) return;
+	var tX = exp.getAnimFrame() + exp.skin*5;
+	var tY = 0;
+	drawTile(assets.effectsImage, exp.pos, tX, tY, camera);
 }
 
 var drawTile = function (tilesImg, pos, tX, tY, camera) {
