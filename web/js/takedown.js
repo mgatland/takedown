@@ -714,6 +714,8 @@ var explosionFrames = 5; //how many frames of animation there are
 var Explosion = function (skin, pos, ownerIndex, world) {
 	this.live = true;
 	this.skin = skin;
+	//hack because art is out of order
+	if (this.skin == 2) this.skin = 1;
 	this.pos = pos.clone();
 	this.ownerIndex = ownerIndex;
 	world.explosions.push(this);
