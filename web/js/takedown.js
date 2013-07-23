@@ -789,9 +789,13 @@ Shot.prototype.update = function(world) {
 	if (this.moved > 0) {
 		this.moved--;
 	} else {
-		var moved = tryMove(this, this.face, world.map);
+		var moved = tryMove(this, this.face, world.map, true);
 		if (moved===false) {
 			this.explode(world, true);
+			this.live = false;
+		}
+		//if it moved off screen
+		if (!world.map.isValid(this.pos)) {
 			this.live = false;
 		}
 	}
@@ -978,9 +982,9 @@ var update = function (world, keyboard, camera) {
 };
 
 //global...
-var tryMove = function (o, face, map) {
+var tryMove = function (o, face, map, allowOffScreen) {
 	var movedPos = o.pos.clone().moveInDir(face, 1);
-	if (map.canMove(movedPos)) {
+	if (map.canMove(movedPos, allowOffScreen)) {
 		o.pos = movedPos;
 		o.moved = o.type.moveSpeed;
 		return true;
@@ -1080,8 +1084,9 @@ var createGrid = function (myWidth, myHeight) {
 	grid.width = myWidth;
 	grid.height = myHeight;
 
-	grid.canMove = function (pos) {
-		if (this.isValid(pos) === false) return false;
+	grid.canMove = function (pos, allowOffScreen) {
+		allowOffScreen = allowOffScreen ? true : false;
+		if (this.isValid(pos) === false) return allowOffScreen;
 		if (this.get(pos) > 0) return false;
 		return true;
 	}
