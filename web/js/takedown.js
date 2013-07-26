@@ -584,6 +584,9 @@ var AI = function () {
 		var shootDir = owner.pos.dirTowards(world.p.pos, false);
 		if (shootDir == dir.NONE) return NO_SHOOT;
 
+		//From now on, even if we don't shoot, we'll face the right way
+		var aimButDontShoot = {dir: shootDir, mode: -1};
+
 		//1. Is there a clear shot? Is there a straight or L-shaped path from me to the player?
 		if (shootDir == dir.LEFT || shootDir == dir.RIGHT) {
 			var startX = owner.pos.x;
@@ -598,7 +601,13 @@ var AI = function () {
 		}
 		var canSee1 = world.map.canSee(startPos, midPos);
 		var canSee2 = world.map.canSee(midPos, world.p.pos)
-		if (!canSee1 || !canSee2) return NO_SHOOT;
+		if (!canSee1 || !canSee2) {
+			//Cosmetic - we face the player if we can see them but otherwise look where we're going
+			if (iCanSee[world.p.index] < 5) {
+				return NO_SHOOT;
+			}
+			return aimButDontShoot;
+		}
 
 		//2. Is this shot close enough? Either straight, or the player might walk sideways into it?
 		var xDist = Math.abs(owner.pos.x - world.p.pos.x);
@@ -610,10 +619,10 @@ var AI = function () {
 			var dist = yDist;
 			var missAmount = xDist;
 		}
-		if (dist < 5 && missAmount > 1) return NO_SHOOT;
-		if (dist < 10 && missAmount > 2) return NO_SHOOT;
-		if (dist < 15 && missAmount > 3) return NO_SHOOT;
-		if (missAmount > 4) return NO_SHOOT;
+		if (dist < 5 && missAmount > 1) return aimButDontShoot;
+		if (dist < 10 && missAmount > 2) return aimButDontShoot;
+		if (dist < 15 && missAmount > 3) return aimButDontShoot;
+		if (missAmount > 4) return aimButDontShoot;
 
 		//Cool, let's shoot then.
 		return {dir: shootDir, mode: 2};
