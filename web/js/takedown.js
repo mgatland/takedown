@@ -557,7 +557,7 @@ var AI = function () {
 		var clumsy = (this.isAwareOfAnyone(world) === false) || (Math.random() * 110 > owner.type.skill);
 		for (var i = 0; i <= 4; i++) {
 			var movedPos = owner.pos.clone().moveInDir(i, 1);
-			if (!world.map.canMove(movedPos)) continue; //can't move here
+			if (!world.map.canMove(movedPos) || (world.personAt(movedPos) && !movedPos.equals(owner.pos))) continue; //can't move here
 			var moveScore = 0;
 			if (i === dir.NONE && i != plannedMove) moveScore += 0.5; // standing still usually beats pointless movement.
 			if (i === plannedMove) moveScore += 4;
