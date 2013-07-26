@@ -460,7 +460,7 @@ var AI = function () {
 
 	var addSuspicion = function(amount, i) {
 		suspicion[i] += amount;
-		if (suspicion[i] > 300) {
+		if (suspicion[i] >= 300) {
 			aware[i] = true;
 		}
 	}
@@ -510,7 +510,7 @@ var AI = function () {
 			//update suspicion, unless we're already aware of them.
 			if (aware[i] === false) {
 				if (canSeeNow) {
-					that.seeSuspiciousThing(e.pos, 3, i);
+					that.seeSuspiciousThing(e.pos, 6, i);
 				} else {
 					reduceSuspicion(1, i);
 				}
@@ -524,7 +524,7 @@ var AI = function () {
 
 			var canSee = world.map.canSee(owner.pos, s.pos);
 			if (canSee) {
-				that.seeSuspiciousThing(s.pos, 12, s.ownerIndex);
+				that.seeSuspiciousThing(s.pos, 50, s.ownerIndex);
 			}
 		});
 
@@ -540,7 +540,7 @@ var AI = function () {
 			if (e.age === 0) {
 				//and sound (which travels through walls)
 				var dist = owner.pos.trueDistanceTo(e.pos);
-				var amount = Math.max(3.5 - dist, 0) * 100;
+				var amount = Math.max(3.5 - dist, 0) * 210;
 				addSuspicion(Math.floor(amount), e.ownerIndex);
 			}
 		});
