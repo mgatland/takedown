@@ -208,6 +208,12 @@ var Pos = function (x, y) {
 			);
 	}
 
+	this.floor = function () {
+		this.x = Math.floor(this.x);
+		this.y = Math.floor(this.y);
+		return this; //for chaining
+	}
+
 	this.toString = function () {
 		return "(" + this.x + "," + this.y + ")";
 	}
@@ -468,7 +474,19 @@ var AI = function () {
 		return aware[whoIndex];
 	}
 
+	//You have aleady done a line of sight check
+	//this adds suspicion from 1 to 10 * the suspicousness argument, based on distance
+	//suspicion is reduced if the thing is behind me
+	this.seeSuspiciousThing = function (pos, suspicousness, suspectIndex) {
+		var dist = owner.pos.trueDistanceTo(pos);
+		var suspicionPoints = Math.max((10 - dist), 1) * suspicousness;
+		if (owner.facingAwayFrom(pos)) suspicionPoints *= suspicionBehindMulti;
+		addSuspicion(Math.floor(suspicionPoints), suspectIndex);
+	};
+
 	this.update = function (world) {
+
+		var that = this;
 
 		//for each enemy who's not me, and who's not on my team...
 		var myEnemies = world.enemies.filter(function (e, i) { return e.live === true && e.team != owner.team});
@@ -492,27 +510,38 @@ var AI = function () {
 			//update suspicion, unless we're already aware of them.
 			if (aware[i] === false) {
 				if (canSeeNow) {
-					var dist = owner.pos.trueDistanceTo(e.pos);
-					var suspicionPoints = Math.max(30 - dist * 3, 5);
-					if (owner.facingAwayFrom(e.pos)) suspicionPoints *= suspicionBehindMulti;
-					addSuspicion(Math.floor(suspicionPoints), i);
+					that.seeSuspiciousThing(e.pos, 3, i);
 				} else {
 					reduceSuspicion(1, i);
 				}
 			}
 		});
 
-		//for every shot
 		world.shots.forEach(function (s) {
+			if (s.live === false) return;
 			if (s.ownerIndex === owner.index) return;
 			if (awareOf(s.ownerIndex)) return;
 
 			var canSee = world.map.canSee(owner.pos, s.pos);
 			if (canSee) {
-				var dist = owner.pos.trueDistanceTo(s.pos);
-				var suspicionPoints = Math.max(125 - dist * 20, 20);
-				if (owner.facingAwayFrom(s.pos)) suspicionPoints *= suspicionBehindMulti;
-				addSuspicion(Math.floor(suspicionPoints), s.ownerIndex);
+				that.seeSuspiciousThing(s.pos, 12, s.ownerIndex);
+			}
+		});
+
+		world.explosions.forEach(function (e) {
+			if (e.live === false) return;
+			if (e.ownerIndex === owner.index) return;
+			if (awareOf(e.ownerIndex)) return;
+
+			var canSee = world.map.canSee(owner.pos, e.pos);
+			if (canSee) {
+				that.seeSuspiciousThing(e.pos, 25, e.ownerIndex);
+			}
+			if (e.age === 0) {
+				//and sound (which travels through walls)
+				var dist = owner.pos.trueDistanceTo(e.pos);
+				var amount = Math.max(3.5 - dist, 0) * 100;
+				addSuspicion(Math.floor(amount), e.ownerIndex);
 			}
 		});
 
@@ -716,10 +745,12 @@ var Explosion = function (skin, pos, ownerIndex, world) {
 	this.skin = skin;
 	//hack because art is out of order
 	if (this.skin == 2) this.skin = 1;
-	this.pos = pos.clone();
+	this.renderPos = pos.clone();
+	this.pos = pos.clone().floor();
 	this.ownerIndex = ownerIndex;
 	world.explosions.push(this);
-	this.age = 0;
+	this.age = -1; //hack: We're spawned and then updated in the same tick, before we're drawn
+					//starting this from -1 means we are at frame 0 when we're first drawn.
 }
 Explosion.prototype.update = function (world) {
 	if (this.live === false) return;
@@ -900,6 +931,7 @@ var World = function(map) {
 		this.explosions.forEach(function(exp) {
 			exp.update(world);
 		});
+
 	}
 
 	//Delete this if it remains unused
@@ -1047,7 +1079,7 @@ var drawExplosion = function (exp, camera, assets) {
 	if (exp.live === false) return;
 	var tX = exp.getAnimFrame() + exp.skin*5;
 	var tY = 0;
-	drawTile(assets.effectsImage, exp.pos, tX, tY, camera);
+	drawTile(assets.effectsImage, exp.renderPos, tX, tY, camera);
 }
 
 var drawTile = function (tilesImg, pos, tX, tY, camera) {
