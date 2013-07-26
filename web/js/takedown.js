@@ -684,7 +684,7 @@ Person.prototype.update = function (world) {
 	} else {
 		var moveDir = this.ai.move(world);
 		if (moveDir > 0) {
-			tryMove(this, moveDir, world.map);
+			tryMove(this, moveDir, world, false, false);
 		}
 	}
 	if (moveDir > 0) this.face = moveDir;
@@ -822,7 +822,7 @@ Shot.prototype.update = function(world) {
 	if (this.moved > 0) {
 		this.moved--;
 	} else {
-		var moved = tryMove(this, this.face, world.map, true);
+		var moved = tryMove(this, this.face, world, true, true);
 		if (moved===false) {
 			this.explode(world, true);
 			this.live = false;
@@ -913,6 +913,12 @@ var World = function(map) {
 		} else {
 			return 0;
 		}
+	}
+
+	this.personAt = function (pos) {
+		return this.enemies.some(function (e) {
+			return e.live && e.pos.equals(pos);
+		});
 	}
 
 	this.update = function () {
@@ -1016,9 +1022,10 @@ var update = function (world, keyboard, camera) {
 };
 
 //global...
-var tryMove = function (o, face, map, allowOffScreen) {
+var tryMove = function (o, face, world, allowOffScreen, allowThroughPeople) {
 	var movedPos = o.pos.clone().moveInDir(face, 1);
-	if (map.canMove(movedPos, allowOffScreen)) {
+	if (world.map.canMove(movedPos, allowOffScreen)) {
+		if (!allowThroughPeople && world.personAt(movedPos)) return false;
 		o.pos = movedPos;
 		o.moved = o.type.moveSpeed;
 		return true;
