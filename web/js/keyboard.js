@@ -26,7 +26,7 @@ function createKeyboard() {
             case KeyEvent.DOM_VK_DOWN:
             case KeyEvent.DOM_VK_UP:
             case KeyEvent.DOM_VK_RIGHT:
-            case KeyEvent.DOM_VK_LEFT: 
+            case KeyEvent.DOM_VK_LEFT:
             e.preventDefault();
             break;
         }

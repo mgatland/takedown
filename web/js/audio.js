@@ -45,10 +45,10 @@ function createAudio() {
 	  	//add a volume node
 	  	var volumeNode = context.createGain();
 	  	source.connect(volumeNode);
-	  	volumeNode.connect(compressor);
+	  	volumeNode.connect(context.destination);
 	  	volumeNode.gain.value = volume;
 	  } else {
-	  	source.connect(compressor);	
+	  	source.connect(context.destination);
 	  }
 
 	  if (loop) source.loop = true;
@@ -58,18 +58,15 @@ function createAudio() {
 
 	var context = init();
 
-    var compressor = context.createDynamicsCompressor();
-    compressor.connect(context.destination);
-
     audio.loadSoundFiles = function () {
 		for (var i = 0; i < 5; i++) {
-			loadSound("shot" + i, "res/snd/shot" + i + ".wav");	
+			loadSound("shot" + i, "res/snd/shot" + i + ".wav");
 		}
 		for (var i = 0; i < 2; i++) {
-			loadSound("thud" + i, "res/snd/thud" + i + ".wav");	
+			loadSound("thud" + i, "res/snd/thud" + i + ".wav");
 		}
 		for (var i = 0; i < 4; i++) {
-			loadSound("explosion" + i, "res/snd/exp" + i + ".wav");	
+			loadSound("explosion" + i, "res/snd/exp" + i + ".wav");
 		}
 		loadSound("dead0", "res/snd/dead0.wav");
 		loadSound("overheat0", "res/snd/overheat0.wav");
@@ -80,7 +77,7 @@ function createAudio() {
 		//music3 is danger
 		//music4 is extreme danger
 		for (var i = 0; i < 5; i++) {
-			loadSound("music" + i, "res/snd/music" + i + ".wav");	
+			loadSound("music" + i, "res/snd/music" + i + ".wav");
 		}
     };
 

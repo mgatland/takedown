@@ -45,7 +45,7 @@ var tests = function() {
 
 	var grid = createGrid(4,4);
 
-	
+
 	assert.that("horizontal LOS can see", grid.canSee(new Pos(0,0), new Pos(1,0)), is(true));
 	assert.that("vertical LOS can see", grid.canSee(new Pos(0,0), new Pos(0,1)), is(true));
 
@@ -54,7 +54,7 @@ var tests = function() {
 	assert.that("vertical LOS is blocked", grid.canSee(new Pos(0,1), new Pos(2,1)), is(false));
 
 	grid.set(new Pos(1,1), 0);
-	
+
 	//To test complex LOS checks, we're going to spy on which cells are looked through.
 	var cellsChecked = [];
 	grid.canMove = function (pos) {
@@ -62,21 +62,21 @@ var tests = function() {
 		return true;
 	}
 
-	//aO a is looking at b 
+	//aO a is looking at b
 	//Ob
 	cellsChecked.splice(0);
 	grid.canSee(new Pos(0,0), new Pos(1,1));
 	var expected = [new Pos(0,0), new Pos(0,1), new Pos(1,0), new Pos(1,1)];
 	assert.that("through corner with y increasing", cellsChecked, is(expected));
 
-	//Ob a is looking at b 
+	//Ob a is looking at b
 	//aO
 	cellsChecked.splice(0);
 	grid.canSee(new Pos(0,1), new Pos(1,0));
 	var expected = [new Pos(0,0), new Pos(0,1), new Pos(1,0), new Pos(1,1)];
 	assert.that("through corner with y decreasing", cellsChecked, is(expected));
 
-	
+
 
 	cellsChecked.splice(0);
 	grid.canSee(new Pos(0,0), new Pos(1,2));
@@ -87,5 +87,5 @@ var tests = function() {
 	grid.canSee(new Pos(0,0), new Pos(1,3));
 	var expected = [new Pos(0,0), new Pos(0,1), new Pos(0,2), new Pos(1,1), new Pos(1,2), new Pos(1,3)];
 	assert.that("diagonal left-down cansee steep", cellsChecked, is(expected));
-	
+
 }

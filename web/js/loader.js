@@ -12,7 +12,7 @@ function CampaignLoader() {
         mission++;
         i++;
         console.log("Looking for level " + level + ", found " + mission);
-        if (level != mission) continue; 
+        if (level != mission) continue;
         console.log("Level " + level);
         console.log("Size: " + lines[i])
         var sizes = CSVToArray(lines[i]); //size string e.g. "23,45"
@@ -79,7 +79,7 @@ function CampaignLoader() {
         //now load [trigger], [misc], [brief]
         // ...
 
-        //now initialize the world and call the callback  
+        //now initialize the world and call the callback
         var world = new World(createGrid(width, height));
         world.map.forEach(function (pos, value) {
           var tile = terrain[pos.x + ":" + pos.y];

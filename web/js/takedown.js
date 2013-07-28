@@ -119,7 +119,7 @@ var Pos = function (x, y) {
 		}
 		var xIsLargest = (Math.abs(dX) > Math.abs(dY));
 		var yIsLargest = (Math.abs(dY) > Math.abs(dX));
-		if (dX != 0 && 
+		if (dX != 0 &&
 			((xIsLargest && !manhatten) || (yIsLargest && manhatten) || dY == 0)) {
 			if (dX > 0) {
 				dirTowards =  dir.LEFT;
@@ -196,9 +196,9 @@ var Pos = function (x, y) {
 
 	//warning: returns a non-integer //TODO: consider returning an int
 	this.trueDistanceTo = function(other) {
-		return Math.sqrt( 
+		return Math.sqrt(
 			(this.x-other.x)*(this.x-other.x) +
-			(this.y-other.y)*(this.y-other.y)  
+			(this.y-other.y)*(this.y-other.y)
 			);
 	}
 
@@ -219,7 +219,7 @@ var Camera = function (startPos, mapWidth, mapHeight) {
 	var pos = startPos.clone();
 	var maxX = mapWidth;
 	var maxY = mapHeight;
-	
+
 	var scrollSpeed = function(dist) {
 		if (dist <1) return 0.1;
 		if (dist < 5) return 0.2;
@@ -544,7 +544,7 @@ var AI = function () {
 
 	this.move = function(world) {
 		var plannedMove = state.move(this, owner, world, world.p);
-		
+
 		//based on danger, we might decide not to use our planned move.
 		var bestMove = 0;
 		var bestScore = -999;
@@ -735,7 +735,7 @@ Person.prototype.hurt = function (audio, damage) {
 	if (!this.live || this.health <= 0) return;
 	this.health -= damage;
 	if (this.health <= 0) {
-		
+
 		this.deadTimer = maxDeadTime;
 
 		if (this.isLocalPlayer) {
@@ -758,7 +758,7 @@ Person.prototype.hurt = function (audio, damage) {
 		} else {
 			audio.play(audio.thud0);
 		}
-		
+
 	}
 	this.heat += 25; //does not scale with damage; should it?
 }
@@ -817,7 +817,7 @@ Shot.prototype.explode = function (world, hitWall) {
 			case dir.RIGHT: pos.x += 0.5; break;
 			case dir.UP: pos.y -= 0.5; break;
 			case dir.DOWN: pos.y += 0.5; break;
-		};	
+		};
 	}
 	var explosion = new Explosion(this.type.skin, pos, this.ownerIndex, world);
 	world.audio.play(world.audio["explosion" + this.typeIndex]);
@@ -907,7 +907,7 @@ var World = function(map) {
 		this.map.forEach(function (pos, value) {
 			dangerMap[pos.x][pos.y] = 0;
 		});
-		
+
 		//Danger around the player
 		if (this.p.live === true) {
 			var pos = this.p.pos;
@@ -1124,8 +1124,8 @@ var drawExplosion = function (exp, camera, assets) {
 }
 
 var drawTile = function (tilesImg, pos, tX, tY, camera) {
-    ctx.drawImage(tilesImg, tX*screen.tileSize, tY*screen.tileSize, 
-    	screen.tileSize, screen.tileSize, 
+    ctx.drawImage(tilesImg, tX*screen.tileSize, tY*screen.tileSize,
+    	screen.tileSize, screen.tileSize,
     	pos.x*screen.tileSize- camera.xOff(),pos.y*screen.tileSize- camera.yOff(),
     	screen.tileSize,screen.tileSize);
 };
@@ -1171,7 +1171,7 @@ var createGrid = function (myWidth, myHeight) {
 			return false;
 		}
 		if (pos.y < 0 || pos.y >= this.height) {
-			return false;	
+			return false;
 		}
 		return true;
 	}
@@ -1200,7 +1200,7 @@ var createGrid = function (myWidth, myHeight) {
 		//Trace a line from start to end.
 		//sweep along the line horizontally, for every x position
 		//we check each vertical strip - which may be one cell, or more
-		
+
 		//A special case when peering through the crack between corners
 		//aO     Ob			a is looking at b
 		//Ob     aO 		if both Os are occupied, the view is blocked.
@@ -1282,8 +1282,8 @@ var createGrid = function (myWidth, myHeight) {
 		if (!this.isValid(pos)) {
 			return 0;
 		}
-		return terrain[pos.x][pos.y]; 
-	}; 
+		return terrain[pos.x][pos.y];
+	};
 
 	grid.set = function (pos, value) {
 		if (!this.isValid(pos.x, pos.y)) {
