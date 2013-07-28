@@ -1030,22 +1030,43 @@ var start = function () {
 };
 
 var updatePlayerInput = function (keyboard, playerAI) {
+
+	//we face the last direction we fired in for a while, just as a cosmetic thing
+	playerAI.timeSinceFired++;
+	if (playerAI.timeSinceFired > 60) {
+		playerAI.lastFireDir = -1;
+	}
+
 	var face = 0;
 	if (keyboard.isKeyDown(KeyEvent.DOM_VK_UP)) face = dir.UP;
 	if (keyboard.isKeyDown(KeyEvent.DOM_VK_RIGHT)) face = dir.RIGHT;
 	if (keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN)) face = dir.DOWN;
 	if (keyboard.isKeyDown(KeyEvent.DOM_VK_LEFT)) face = dir.LEFT;
 
+	var fireDir = -1;
 	var fireMode = -1;
-	if (keyboard.isKeyDown(KeyEvent.DOM_VK_M)) {
-		fireMode = 0;
-	} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_N)) {
-		fireMode = 1;
+	if (keyboard.isKeyDown(KeyEvent.DOM_VK_W)) fireDir = dir.UP;
+	if (keyboard.isKeyDown(KeyEvent.DOM_VK_D)) fireDir = dir.RIGHT;
+	if (keyboard.isKeyDown(KeyEvent.DOM_VK_S)) fireDir = dir.DOWN;
+	if (keyboard.isKeyDown(KeyEvent.DOM_VK_A)) fireDir = dir.LEFT;
+
+	if (fireDir != -1) {
+		if (keyboard.isKeyDown(KeyEvent.DOM_VK_SHIFT)) {
+			fireMode = 1;
+		} else {
+			fireMode = 0;
+		}
 	}
 
 	playerAI.moveDir = face;
-	playerAI.fireDir = face;
 	playerAI.fireMode = fireMode;
+	if (fireDir == -1) {
+		playerAI.fireDir = playerAI.lastFireDir == -1 ? face : playerAI.lastFireDir;
+	} else {
+		playerAI.fireDir = fireDir;
+		playerAI.lastFireDir = fireDir;
+		playerAI.timeSinceFired = 0;
+	}
 }
 
 var update = function (world, keyboard, camera) {

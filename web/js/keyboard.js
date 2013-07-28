@@ -6,12 +6,17 @@ if (typeof KeyEvent == "undefined") {
         DOM_VK_RETURN: 13,
         DOM_VK_ENTER: 14,
         DOM_VK_SPACE: 32,
+        DOM_VK_SHIFT: 16,
+
         DOM_VK_LEFT: 37,
         DOM_VK_UP: 38,
         DOM_VK_RIGHT: 39,
         DOM_VK_DOWN: 40,
-        DOM_VK_M: 77,
-        DOM_VK_N: 78
+
+        DOM_VK_W: 87,
+        DOM_VK_A: 65,
+        DOM_VK_S: 83,
+        DOM_VK_D: 68
     }
 }
 
