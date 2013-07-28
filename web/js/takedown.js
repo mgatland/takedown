@@ -89,15 +89,9 @@ var Assets = function () {
 var canvas;
 var ctx;
 
-var audio = {};
-
 var heatOnFiring = 20;
 var refireRate = 10;
 var gunKick = 0;
-
-audio.play = function (sound) {
-    console.log(sound);
-};
 
 var Pos = function (x, y) {
 	this.x = x;
@@ -721,12 +715,13 @@ Person.prototype.update = function (world) {
 Person.prototype.fire = function (mode, world) {
 	if (this.heat >= 100) {
 		this.shot = 10;
-		audio.play("overheat");
+		if (this.isLocalPlayer) world.audio.play(world.audio.overheat0);
 	} else {
 		//mode is ignored
 		var shot = world.createShot(this.type.shotType, this.pos, this.face, this.team, this.index);
 		if (shot !== null) {
 			//set up shot stealth, special
+			world.audio.play(world.audio["shot" + this.type.shotType]);
 		}
 		this.heat += heatOnFiring;
 		this.shot = refireRate;
@@ -736,12 +731,34 @@ Person.prototype.fire = function (mode, world) {
 	}
 };
 
-Person.prototype.hurt = function (damage) {
+Person.prototype.hurt = function (audio, damage) {
 	if (!this.live || this.health <= 0) return;
 	this.health -= damage;
 	if (this.health <= 0) {
-		//die
+		
 		this.deadTimer = maxDeadTime;
+
+		if (this.isLocalPlayer) {
+			audio.stopMusic();
+			audio.play(audio.music1) //lose sound
+		} else {
+			audio.play(audio.dead0);
+		}
+	} else {
+		if (this.isLocalPlayer) {
+			audio.play(audio.thud1);
+			//change to danger music
+			if (this.health <= 6 && this.health + damage > 6) {
+				audio.playMusic(audio.music3);
+			}
+			//change to extreme danger music
+			if (this.health <= 2 && this.health + damage > 2) {
+				audio.playMusic(audio.music4);
+			}
+		} else {
+			audio.play(audio.thud0);
+		}
+		
 	}
 	this.heat += 25; //does not scale with damage; should it?
 }
@@ -775,6 +792,7 @@ Explosion.prototype.getAnimFrame = function() {
 var Shot = function (typeIndex, pos, face, team, ownerIndex, world) {
 	this.live = true;
 	this.type = shotTypes[typeIndex];
+	this.typeIndex = typeIndex; //hack, used for sound effect
 	this.pos = pos.clone();
 	this.face = face;
 	this.team = team;
@@ -802,6 +820,7 @@ Shot.prototype.explode = function (world, hitWall) {
 		};	
 	}
 	var explosion = new Explosion(this.type.skin, pos, this.ownerIndex, world);
+	world.audio.play(world.audio["explosion" + this.typeIndex]);
 }
 
 Shot.prototype._checkHitPeople = function(people, world) {
@@ -810,7 +829,7 @@ Shot.prototype._checkHitPeople = function(people, world) {
 	people.forEach(function (e) {
 		if (that.live === false) return; //we can only hit one person per turn
 		if (e.pos.equals(that.pos) && e.live === true && e.team != that.team) {
-			e.hurt(that.type.damage);
+			e.hurt(world.audio, that.type.damage);
 			that.live = false;
 			hit = true;
 			that.explode(world, false);
@@ -871,6 +890,7 @@ var World = function(map) {
 	this.createPlayer = function (pos, face) {
 		this.p = new Person(pos, face, new PlayerAI(), playerType);
 		this.p.team = 0;
+		this.p.isLocalPlayer = true;
 		this.p.index = this.enemies.length;
 		this.enemies.push(this.p);
 	};
@@ -967,11 +987,12 @@ var start = function () {
 	canvas.width = screen.width * screen.tileSize;
 	canvas.height = screen.height * screen.tileSize;
 	var keyboard = createKeyboard();
+	var audio = createAudio();
 
 	var world = null;
 	var camera = null;
 
-	var assets = new Assets();
+	var assets = new Assets(audio);
 	var campaignLoader = new CampaignLoader();
 	var level = 1;
 
@@ -979,7 +1000,9 @@ var start = function () {
 	assets.load(function () {
 		campaignLoader.load("./res/01.tdm", function () {
 			world = campaignLoader.loadMission(level);
+			world.audio = audio;
 			camera = new Camera(world.p.pos, world.map.width, world.map.height);
+			world.audio.playMusic(world.audio.music0);
 		});
 	});
 
@@ -998,7 +1021,9 @@ var start = function () {
 			console.log("You win!");
 			level++;
 			world = campaignLoader.loadMission(level);
+			world.audio = audio;
 			camera = new Camera(world.p.pos, world.map.width, world.map.height);
+			world.audio.playMusic(world.audio.music0);
 		}
 
 	}, 40);
