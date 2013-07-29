@@ -277,6 +277,7 @@ var PlayerAI = function () {
 
     Waiting
        |
+    Startled
        |
        V
 	Pursuing  <-> Fighting <-> Surrounding
@@ -290,6 +291,23 @@ var Waiting = function () {
 	this.name = "Waiting";
 	this.update = function (ai, owner, world, target) {
 		if (ai.isAwareOfAnyone(world)) {
+			ai.setState(new Startled());
+		}
+	}
+
+	this.move = function (ai, world, target) {
+		return dir.NONE;
+	}
+}
+
+var Startled = function () {
+	this.name = "Startled";
+	this.disableShooting = true;
+
+	var timer = 0;
+	this.update = function (ai, owner, world, target) {
+		timer++;
+		if (timer > 25 - owner.type.skill / 10) {
 			ai.setState(new Pursuing());
 		}
 	}
@@ -580,6 +598,8 @@ var AI = function () {
 
 		//From now on, even if we don't shoot, we'll face the right way
 		var aimButDontShoot = {dir: shootDir, mode: -1};
+
+		if (state.disableShooting) return aimButDontShoot;
 
 		//1. Is there a clear shot? Is there a straight or L-shaped path from me to the player?
 		if (shootDir == dir.LEFT || shootDir == dir.RIGHT) {
