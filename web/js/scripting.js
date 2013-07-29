@@ -83,6 +83,14 @@ var Scripting = function (flags) {
 				var briefing = createBriefing(action.val);
 				world.setBriefing(briefing);
 				break;
+			case "dec":
+				var decNum = parseInt(action.val[0]);
+				var rawDecValue = parseInt(action.val[1]);
+				var decValue = rawDecValue == 1 ? true: false;
+				//-1 is meant to toggle but it's not used in the main campaign so i don't support it
+				if (rawDecValue != 0 && rawDecValue != 1) console.log("WARNING: we do not support a 'dec' action with a value of " + rawDecValue);
+				world.decorations[decNum].live = decValue;
+				break;
 			default:
 				console.log("Firing unknown action " + action.type);
 		}
