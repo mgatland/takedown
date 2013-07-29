@@ -859,7 +859,7 @@ Shot.prototype._checkHitPeople = function(people, world) {
 	var hit = false;
 	people.forEach(function (e) {
 		if (that.live === false) return; //we can only hit one person per turn
-		if (e.pos.equals(that.pos) && e.live === true && e.team != that.team) {
+		if (e.pos.equals(that.pos) && e.live === true && e.health > 0 && e.team != that.team) {
 			e.hurt(world.audio, that.type.damage);
 			that.live = false;
 			hit = true;
