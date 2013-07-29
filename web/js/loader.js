@@ -4,6 +4,17 @@ function CampaignLoader() {
 
   var lines = [];
 
+  var findSection = function (startTag, lines, i) {
+    var skipped = 0;
+    while (lines[i].lastIndexOf(startTag, 0) !== 0) {
+      i++;
+      skipped++;
+    }
+    console.log("Skipped " + skipped + " lines");
+    console.log("Section " + startTag);
+    return i+1;
+  }
+
   this.loadMission = function (level) {
     var mission = 0;
     var i = 0;
@@ -56,9 +67,7 @@ function CampaignLoader() {
         var pFace = parseInt(pPos[2]);
 
         var enemies = [];
-        var enemyTag = lines[i];
-        i++;
-        if (enemyTag != "[enemy]") throw "Excepted [enemy] tag at line " + (i - 1) + ", found " + enemyTag;
+        i = findSection("[enemy]", lines, i);
         //loading enemes:
         //"[]" ends the section
         while (lines[i] != "[]") {
@@ -76,8 +85,21 @@ function CampaignLoader() {
           i++;
         }
 
-        //now load [trigger], [misc], [brief]
-        // ...
+        i = findSection("[trigger]", lines, i);
+
+        var decs = [];
+        i = findSection("[misc]", lines, i);
+        while (lines[i] != "[]") {
+          if (lines.length === 0 || lines[i].substring(0,1) === "'") {
+            i++;
+            continue; //ignore comments and blanks
+          }
+          var decLine = CSVToArray(lines[i]);
+          decs.push({x: decLine[1], y:decLine[2], type:decLine[3], live:decLine[4] >= 0});
+          i++;
+        }
+
+        i = findSection("[brief]", lines, i);
 
         //now initialize the world and call the callback
         var world = new World(createGrid(width, height));
@@ -88,6 +110,9 @@ function CampaignLoader() {
         world.createPlayer(new Pos(pX, pY), pFace);
         enemies.forEach(function (e) {
           world.createEnemy(new Pos(e.x, e.y), e.type, e.state);
+        });
+        decs.forEach(function (d) {
+          world.createDecoration(new Pos(d.x, d.y), d.type, d.live ? true : false);
         });
         return world;
       } else {

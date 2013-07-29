@@ -195,6 +195,8 @@ dec,21,12,3,0
 4,0,and,win,0,0,0,flag,0,0,+?,briefing,"^wOne other thing: In that battle several enemies became aware of you at one time. You should try to take on the enemies one at a time, without alerting the others.","","",null,"","",""
 5,0,and,aware,any,0,3,true,0,0,0,flag_setval,0,1,0,null,0,0,0
 []
+[misc]
+[]
 [brief]
 "^wUNITY has just finished with the results from your first battle. You're well within all the safety thresholds, and seem totally desensitized to the idea of killing. Apart from minor equipment checks, you and your equipment are working exactly as planned. Considering how long it's been since we last used soldiers, it's amazing that we've so quickly redeveloped the concept.^2You've now arrived at a small camp of Stall troopers. I want you to take them all out. Because they're spread out, you should be able to take them down one at a time if you use a stealthy approach.^wTry not to fire stray shots where other enemies will see them.^2Good luck.","^gTo avoid detection, stay out of sight. If you must move past an enemy, wait until he is facing directly away from you.","^gUse the X key to open your digital notes. Important information will be added to your notes when you discover it."
 100
@@ -237,7 +239,7 @@ dec,21,12,3,0
 []
 [misc]
 dec,19,14,3,0
-[]a
+[]
 [brief]
 "^wThere are four troopers here. Once again, try to avoid alerting too many enemies to your presence at one time, because they are more dangerous in groups.","^gPay attention to bottlenecks. If you are trapped between two walls, you are unable to dodge. Try to avoid being pinned down and try to force your enemies through bottlenecks so they are easier to hit.", ""
 100
@@ -282,6 +284,8 @@ dec,19,14,3,0
 8,0,and,delay,480,-1,0,true,0,0,0,enemy,1,24,8,null,0,0,
 9,0,and,kills,6,0,0,true,0,0,0,endmission,50,1,0,text,"Area Secure","",""
 10,0,and,win,0,0,0,true,0,0,0,briefing,"^wOk, that's all of them for now.^2Peacekeeper 2 is still having trouble so we need to keep an eye out for enemies heading his way.","","",null,0,0,0
+[]
+[misc]
 []
 [brief]
 "^wSeveral Stall troopers are travelling through this area to reach Sector 17, where Peacekeeper 2 is working. His repair unit is out, so he needs to be kept safe until it's working again.^2Kill the troopers as they arrive.","^gWhen fighting at long range, use your rifle (N) to pick off opponents. At closer range, you will have to use your pistol (M) as the rifle's kickback will prevent you from dodging attacks.^2Try to snipe the enemies as soon as they enter your area, if possible.",""
@@ -695,6 +699,8 @@ dec,16,31,16,0
 14,0,and,kills,7,0,0,flag,0,0,-?,endmission,50,1,0,text,"Area Secure","",""
 15,0,and,win,0,0,0,flag,0,0,-?,briefing,"^wGood work. From here on, there's going to be a significant change of plan. UNITY has run an evaluation and found that somehow Stall is learning of or even anticipating UNITY's decisions.^2The only way we can proceed from here is by breaking contact with the UNITY processor. From here on, there will be no transmissions to or from UNITY. The tracking devices attached to our equipment are being disabled. We will operate independent of any outside influence until such time as the source of Stall's intelligence can be identified and destroyed.^2We are completely on our own from here on in.","","",null,0,0,0
 []
+[misc]
+[]
 [brief]
 "^wWe've got enemies approaching all over the place. Fight them off.^2UNITY is having trouble calculating a course of action. Stall isn't following any recorded behaviour pattern. Their movements seem totally unpredictable.","^wNumber two managed to access some upgrade technology during his mission. Now that we've got that info, he's expendable. Try to keep him alive while you can.^2We've got resources to give you a one-off upgrade, and we should be able to do more soon. Choose an upgrade from the list.",""
 50
@@ -747,6 +753,8 @@ dec,16,31,16,0
 13,0,and,delay,580,-1,0,true,0,0,0,enemy,2,9,16,null,0,0,
 14,0,and,kills,7,0,0,flag,0,0,-?,endmission,50,1,0,text,"Area Secure","",""
 15,0,and,win,0,0,0,flag,0,0,-?,briefing,"^wGood work. From here on, there's going to be a significant change of plan. UNITY has run an evaluation and found that somehow Stall is learning of or even anticipating UNITY's decisions.^2The only way we can proceed from here is by breaking contact with the UNITY processor. From here on, there will be no transmissions to or from UNITY. The tracking devices attached to our equipment are being disabled. We will operate independent of any outside influence until such time as the source of Stall's intelligence can be identified and destroyed.^2We are completely on our own from here on in.","","",null,0,0,0
+[]
+[misc]
 []
 [brief]
 "^wWe will need intelligence before we can safely move. I'm dropping you into a building that may have terminal access to maps showing Stall's forces. Because of the UNITY's radio jamming, everything will be stored locally. You should have no trouble retrieving the information.^2Go back to the blue beacon when you've finished.","",""

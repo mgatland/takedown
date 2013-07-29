@@ -810,6 +810,13 @@ Explosion.prototype.getAnimFrame = function() {
 	return Math.floor(this.age / explosionFrameRate);
 };
 
+var Decoration = function (pos, type, world, live) {
+	this.live = live;
+	this.pos = pos;
+	this.type = type;
+	world.decorations.push(this);
+}
+
 var Shot = function (typeIndex, pos, face, team, ownerIndex, world) {
 	this.live = true;
 	this.type = shotTypes[typeIndex];
@@ -890,9 +897,14 @@ var World = function(map) {
 	this.shots = [];
 	this.enemies = [];
 	this.explosions = [];
+	this.decorations = [];
 	this.p = null;
 	this.map = map;
 	var dangerMap = make2DArray(map.width, map.height, 0);
+
+	this.createDecoration = function (pos, type, live) {
+		new Decoration(pos, type, this, live);
+	}
 
 	this.createShot = function(typeIndex, pos, face, team, ownerIndex) {
 		console.log("shot!");
@@ -1137,6 +1149,10 @@ var render = function (world, camera, assets) {
 		}
 	});
 
+	world.decorations.forEach(function (dec) {
+		drawDec(dec, camera, assets);
+	});
+
 	world.shots.forEach(function (shot) {
 		drawShot(shot, camera, assets);
 	});
@@ -1160,6 +1176,12 @@ var render = function (world, camera, assets) {
 var drawSquare = function (pos, color, camera) {
 	ctx.fillStyle = color;
 	ctx.fillRect(pos.x*screen.tileSize - camera.xOff(), pos.y*screen.tileSize - camera.yOff(), screen.tileSize, screen.tileSize);
+}
+
+var drawDec = function (dec, camera, assets) {
+	if (dec.live === false) return;
+	var tX = dec.type;
+	drawTile(assets.decImage, dec.pos, tX, 0, camera);
 }
 
 var drawShot = function (shot, camera, assets) {
