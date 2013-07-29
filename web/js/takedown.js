@@ -899,6 +899,8 @@ Shot.prototype.update = function(world) {
 var World = function(map) {
 
 	this.kills = 0;
+	this.messages = [];
+	this.hasEnded = false;
 
 	this.shots = [];
 	this.enemies = [];
@@ -909,6 +911,9 @@ var World = function(map) {
 	var flags = [];
 	var scripting = new Scripting(flags);
 	var dangerMap = make2DArray(map.width, map.height, 0);
+
+	var endMissionTimer = 0;
+	var missionIsEnding = false;
 
 	//TODO: move to separate Briefing class
 	var briefingPage = null;
@@ -956,11 +961,20 @@ var World = function(map) {
 
 	//
 
+	this.endMission = function (timeDelay) {
+		missionIsEnding = true;
+		endMissionTimer = timeDelay;
+	}
+
+	this.addMessage = function (string) {
+		this.messages.unshift({msg:string, age:0});
+	}
+
 	this.setTriggers = function (newTriggers) {
 		scripting.setTriggers(newTriggers);
 	}
 
-	this.win = function () {
+	this.callWinMissionTriggers = function () {
 		scripting.win(this);
 	}
 
@@ -1052,6 +1066,14 @@ var World = function(map) {
 
 		if (briefingPage != null) return; //pause while briefing is displayed
 
+		if (missionIsEnding) {
+			endMissionTimer--;
+			if (endMissionTimer <= 0) {
+				missionIsEnding = false;
+				this.hasEnded = true;
+			}
+		}
+
 		var world = this;
 
 		if (firstFrame) {
@@ -1133,8 +1155,8 @@ var start = function () {
 			render(world, camera, assets);
 		});
 
-		if (world && !world.enemies.some(function (e) {return e.live && e.team != 0;})) {
-			world.win();
+		if (world && world.hasEnded) {
+			world.callWinMissionTriggers();
 			level++;
 			loadMission();
 		}
@@ -1204,6 +1226,8 @@ var optionsTimer = 0;
 
 var update = function (world, keyboard, camera) {
 
+	if (world === null) return;
+
 	if (optionsTimer == 0) {
 		if (keyboard.isKeyDown(KeyEvent.DOM_VK_M)) {
 			world.audio.toggleMusic();
@@ -1213,7 +1237,6 @@ var update = function (world, keyboard, camera) {
 		optionsTimer--;
 	}
 
-	if (world === null) return;
 	updatePlayerInput(keyboard, world.p.ai);
 	world.update();
 	camera.update(world.p.pos);
@@ -1273,9 +1296,16 @@ var render = function (world, camera, assets) {
 
 	ctx.fillStyle = (world.p.heat < 100)  ? "white" : "red";
 	ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
-	ctx.fillText("Heat: " + Math.floor(world.p.heat), 40, screen.height * screen.tileSize - 32);
+	ctx.fillText("Heat: " + Math.floor(world.p.heat), 300, screen.height * screen.tileSize - 32);
 	ctx.fillStyle = "white";
 	ctx.fillText("Health: " + world.p.health, screen.width * screen.tileSize - 200, screen.height * screen.tileSize - 32);
+
+	ctx.font = '16px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
+	for (var i = 0; i < 3; i++) {
+		if (world.messages[i]) {
+			ctx.fillText(world.messages[i].msg, 15, screen.height * screen.tileSize - 60 + i * 20);
+		}
+	}
 };
 
 //unused for now

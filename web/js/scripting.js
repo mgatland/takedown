@@ -83,6 +83,17 @@ var Scripting = function (flags) {
 				var briefing = createBriefing(action.val);
 				world.setBriefing(briefing);
 				break;
+			case "text":
+				world.audio.play(world.audio.msg);
+				action.val.forEach(function (string) {
+					if (string && string.length > 0) world.addMessage(string);
+				});
+				break;
+			case "endmission":
+				var timeDelay = parseInt(action.val[0]);
+				//ignore the other parameters
+				world.endMission(timeDelay);
+				break;
 			case "dec":
 				var decNum = toInt(action.val[0]);
 				var rawDecValue = toInt(action.val[1]);

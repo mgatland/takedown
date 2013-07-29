@@ -96,6 +96,7 @@ function createAudio() {
 		}
 		loadSound("dead", 0, "res/snd/dead0.wav");
 		loadSound("overheat", 0, "res/snd/overheat0.wav");
+		loadSound("msg", 0, "res/snd/msg0.wav");
 
 		//music0 is normal background music
 		//music1 is the lose level sfx
