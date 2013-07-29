@@ -36,7 +36,7 @@ var Scripting = function (flags) {
 				condsTrue[i] = checkCondition(cond, scriptEvent, world);
 			});
 			if (trigger.actWhen === "and") {
-				if (condsTrue[0] && condsTrue[1]) fireTrigger(trigger, triggerIndex);
+				if (condsTrue[0] && condsTrue[1]) fireTrigger(trigger, triggerIndex, world);
 			}
 		});
 	}
@@ -61,7 +61,7 @@ var Scripting = function (flags) {
 				break;
 			case "playerxy":
 				result = (world.p.pos.x == parseInt(cond.val[0], 10)
-					&& world.p.pos.x == parseInt(cond.val[1], 10));
+					&& world.p.pos.y == parseInt(cond.val[1], 10));
 				break;
 			default:
 				console.log("Unsupported condition " + cond.type);
@@ -69,7 +69,7 @@ var Scripting = function (flags) {
 		return result;
 	}
 
-	var processAction = function (action) {
+	var processAction = function (action, world) {
 		switch (action.type) {
 			case "mistxt":
 				console.log("Update mission text...");
@@ -79,15 +79,19 @@ var Scripting = function (flags) {
 				var flagValue = parseInt(action.val[1], 10);
 				flags[flagNumber] = flagValue;
 				break;
+			case "briefing":
+				var briefing = createBriefing(action.val);
+				world.setBriefing(briefing);
+				break;
 			default:
 				console.log("Firing unknown action " + action.type);
 		}
 	}
 
-	var fireTrigger = function (trigger, i) {
-		console.log("Firing trigger");
+	var fireTrigger = function (trigger, i, world) {
+		console.log("Firing trigger (" + trigger.cond[0].type + "," + trigger.cond[1].type + ")");
 		trigger.act.forEach(function (action) {
-			processAction(action);
+			processAction(action, world);
 		});
 		if (!trigger.repeating) trigger.live = false;
 	}

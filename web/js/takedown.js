@@ -915,9 +915,9 @@ var World = function(map) {
 	var missionText = [];
 	var missionButtons = [];
 
-	this.setBriefing = function (newMissionText, newMissionButtons) {
-		missionText = newMissionText;
-		missionButtons = newMissionButtons;
+	this.setBriefing = function (briefing) {
+		missionText = briefing.text;
+		missionButtons = briefing.buttons;
 		briefingPage = 0;
 		this.updateBriefingDisplay();
 	}
@@ -927,6 +927,7 @@ var World = function(map) {
 			document.getElementById("briefing").style.display = "none";
 			briefingPage = null;
 		} else {
+			document.getElementById("briefing").style.display = null;
 			document.getElementById("briefingText").innerHTML = missionText[briefingPage];
 			if (missionButtons[briefingPage].length == 0) {
 				document.getElementById("continueButton").style.display = null;
