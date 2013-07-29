@@ -14,6 +14,9 @@ var dir = {
 	DOWN: 3,
 	RIGHT: 4
 };
+
+var messageTextDelay = 50;
+
 dir.random = function () {
 	switch (Math.floor(Math.random() * 4)) {
 		case 0: return dir.UP;
@@ -973,7 +976,7 @@ var World = function(map) {
 	}
 
 	this.addMessage = function (string) {
-		this.messages.unshift({msg:string, age:0});
+		this.messages.push({msg:string, age:0});
 	}
 
 	this.setTriggers = function (newTriggers) {
@@ -1096,6 +1099,13 @@ var World = function(map) {
 		}
 
 		updateDangerMap.call(this); //ewww javascript.
+
+		this.messages.forEach(function(m) {
+			m.age++;
+		});
+		while (this.messages.length > 3 && this.messages[0].age > messageTextDelay) {
+			this.messages.shift();
+		}
 
 		this.enemies.forEach(function(e) {
 			e.update(world);
@@ -1316,6 +1326,7 @@ var render = function (world, camera, assets) {
 	ctx.font = '16px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
 	for (var i = 0; i < 3; i++) {
 		if (world.messages[i]) {
+			ctx.fillStyle = (world.messages[i].age < messageTextDelay) ? "white" : "rgb(255, 255, 200)";
 			ctx.fillText(world.messages[i].msg, 15, screen.height * screen.tileSize - 60 + i * 20);
 		}
 	}
