@@ -26,6 +26,20 @@ body {
 	padding: 20px;
 }
 
+#briefing div {
+	margin-bottom: 20px;
+}
+
+button {
+	display: block;
+	margin: auto;
+	width: 600px;
+	height: 40px;
+	font-size: 32px;
+	font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+	margin: 20px;
+}
+
 .red {
 	color: red;
 }

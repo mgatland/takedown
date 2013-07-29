@@ -908,20 +908,42 @@ var World = function(map) {
 	//TODO: move to separate Briefing class
 	var briefingPage = 0;
 	var missionText = [];
+	var missionButtons = [];
 
-	this.setBriefing = function (newMissionText) {
+	this.setBriefing = function (newMissionText, newMissionButtons) {
 		missionText = newMissionText;
-		document.getElementById("briefingText").innerHTML = missionText[briefingPage];
+		missionButtons = newMissionButtons;
+		this.updateBriefingDisplay();
 	}
 
-	this.advanceBriefing = function () {
-		briefingPage++;
+	this.updateBriefingDisplay = function () {
 		if (briefingPage == missionText.length || missionText[briefingPage].length == 0) {
 			document.getElementById("briefing").style.display = "none";
 		} else {
 			document.getElementById("briefingText").innerHTML = missionText[briefingPage];
+			if (missionButtons[briefingPage].length == 0) {
+				document.getElementById("continueButton").style.display = null;
+				document.getElementById("option0").style.display = "none";
+				document.getElementById("option1").style.display = "none";
+			} else {
+				document.getElementById("option0").innerHTML = missionButtons[briefingPage][0].label;
+				document.getElementById("option1").innerHTML = missionButtons[briefingPage][1].label;
+
+				document.getElementById("continueButton").style.display = "none";
+				document.getElementById("option0").style.display = null;
+				document.getElementById("option1").style.display = null;
+			}
 		}
-	}
+	};
+
+	this.advanceBriefing = function (option) {
+		if (option !== undefined) {
+			var flag = missionButtons[briefingPage][option].flag;
+			console.log("Setting flag " + flag);
+		}
+		briefingPage++;
+		this.updateBriefingDisplay();
+	};
 
 	//
 
@@ -1090,9 +1112,20 @@ var start = function () {
 	}, 40);
 
 	document.getElementById("continueButton").onclick = function () {
-		console.log('click');
 		if (world) {
 			world.advanceBriefing();
+		}
+	};
+
+	document.getElementById("option0").onclick = function () {
+		if (world) {
+			world.advanceBriefing(0);
+		}
+	};
+
+	document.getElementById("option1").onclick = function () {
+		if (world) {
+			world.advanceBriefing(1);
 		}
 	};
 };

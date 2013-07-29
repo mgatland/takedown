@@ -55,16 +55,16 @@ function CampaignLoader() {
           }
         }
         console.log("ground type: " + lines[i]);
-        var groundType = parseInt(lines[i]);
+        var groundType = parseInt(lines[i], 10);
         i++;
         var unusedBlankLine = lines[i];
         i++;
         console.log("player position: " + lines[i]);
         var pPos = CSVToArray(lines[i]);
         i++;
-        var pX = parseInt(pPos[0]);
-        var pY = parseInt(pPos[1]);
-        var pFace = parseInt(pPos[2]);
+        var pX = parseInt(pPos[0], 10);
+        var pY = parseInt(pPos[1], 10);
+        var pFace = parseInt(pPos[2], 10);
 
         var enemies = [];
         i = findSection("[enemy]", lines, i);
@@ -102,40 +102,55 @@ function CampaignLoader() {
         i = findSection("[brief]", lines, i);
         var rawMissionText = CSVToArray(lines[i]);
         i++;
-        var healAmount = parseInt(lines[i]); //unused for now
+        var healAmount = parseInt(lines[i], 10); //unused for now
         i++;
 
         var missionText = [];
+        var missionButtons = [];
         for (var j = 0; j < rawMissionText.length; j++) {
+          missionButtons[j] = [];
           var text = rawMissionText[j];
           if (text === undefined || text === null) continue; //hack, I don't know why this is needed
+
+          //We have to process buttons first, otherwise the <br> filter corrupts them.
+          while (text.lastIndexOf("^[") >= 0) {
+            var buttonText = text.match(/\^\[.*?\]/)[0];
+            text = text.replace(/\^\[.*?\]/, '');
+
+            var index = parseInt(buttonText.substring(2,3), 10);
+            var flag = parseInt(buttonText.substring(buttonText.length - 3, buttonText.length - 1), 10);
+            var label = buttonText.substring(3, buttonText.length - 4);
+            console.log(label);
+            missionButtons[j][index] = { flag: flag, label: label};
+          }
+
+
           text = text.replace(/\^1/g, '<br>');
           text = text.replace(/\^2/g, '<br><br>');
 
           //white is the default, so this white command does nothing
           text = text.replace(/\^w/g, '');
 
-          if (text.lastIndexOf("^r", 0) === 0) {
+          if (text.lastIndexOf("^r", 0) >= 0) {
             text = "<span class='red'>" + text + "</span>";
             text = text.replace(/\^r/g, '');
           }
 
-          if (text.lastIndexOf("^g", 0) === 0) {
+          if (text.lastIndexOf("^g", 0) >= 0) {
             text = "<span class='green'>" + text + "</span>";
             text = text.replace(/\^g/g, '');
           }
 
-          if (text.lastIndexOf("^b", 0) === 0) {
+          if (text.lastIndexOf("^b", 0) >= 0) {
             text = "<span class='blue'>" + text + "</span>";
             text = text.replace(/\^b/g, '');
           }
-
           missionText.push(text);
         }
 
         //now initialize the world and call the callback
         var world = new World(createGrid(width, height));
-        world.setBriefing(missionText);
+        world.setBriefing(missionText, missionButtons);
         world.map.forEach(function (pos, value) {
           var tile = terrain[pos.x + ":" + pos.y];
           world.map.set(pos, tile);
