@@ -922,9 +922,12 @@ var World = function(map) {
 	var missionButtons = [];
 
 	this.setBriefing = function (briefing) {
-		missionText = briefing.text;
-		missionButtons = briefing.buttons;
-		briefingPage = 0;
+		missionText = missionText.concat(briefing.text);
+		missionButtons = missionButtons.concat(briefing.buttons);
+		if (briefingPage == null) {
+			briefingPage = 0;
+		}
+
 		this.updateBriefingDisplay();
 	}
 
@@ -932,6 +935,8 @@ var World = function(map) {
 		if (briefingPage == missionText.length || missionText[briefingPage].length == 0) {
 			document.getElementById("briefing").style.display = "none";
 			briefingPage = null;
+			missionText = [];
+			missionButtons = [];
 		} else {
 			document.getElementById("briefing").style.display = null;
 			document.getElementById("briefingText").innerHTML = missionText[briefingPage];
