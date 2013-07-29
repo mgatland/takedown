@@ -906,19 +906,21 @@ var World = function(map) {
 	var dangerMap = make2DArray(map.width, map.height, 0);
 
 	//TODO: move to separate Briefing class
-	var briefingPage = 0;
+	var briefingPage = null;
 	var missionText = [];
 	var missionButtons = [];
 
 	this.setBriefing = function (newMissionText, newMissionButtons) {
 		missionText = newMissionText;
 		missionButtons = newMissionButtons;
+		briefingPage = 0;
 		this.updateBriefingDisplay();
 	}
 
 	this.updateBriefingDisplay = function () {
 		if (briefingPage == missionText.length || missionText[briefingPage].length == 0) {
 			document.getElementById("briefing").style.display = "none";
+			briefingPage = null;
 		} else {
 			document.getElementById("briefingText").innerHTML = missionText[briefingPage];
 			if (missionButtons[briefingPage].length == 0) {
@@ -937,6 +939,7 @@ var World = function(map) {
 	};
 
 	this.advanceBriefing = function (option) {
+		if (briefingPage == null) return;
 		if (option !== undefined) {
 			var flag = missionButtons[briefingPage][option].flag;
 			console.log("Setting flag " + flag);
