@@ -752,7 +752,7 @@ Person.prototype.fire = function (mode, world) {
 	}
 };
 
-Person.prototype.hurt = function (audio, damage) {
+Person.prototype.hurt = function (audio, damage, world) {
 	if (!this.live || this.health <= 0) return;
 	this.health -= damage;
 	if (this.health <= 0) {
@@ -764,6 +764,7 @@ Person.prototype.hurt = function (audio, damage) {
 			audio.play(audio.music, 1) //lose sound
 		} else {
 			audio.play(audio.dead);
+			if (this.goalDie) world.kills++;
 		}
 	} else {
 		if (this.isLocalPlayer) {
@@ -860,7 +861,7 @@ Shot.prototype._checkHitPeople = function(people, world) {
 	people.forEach(function (e) {
 		if (that.live === false) return; //we can only hit one person per turn
 		if (e.pos.equals(that.pos) && e.live === true && e.health > 0 && e.team != that.team) {
-			e.hurt(world.audio, that.type.damage);
+			e.hurt(world.audio, that.type.damage, world);
 			that.live = false;
 			hit = true;
 			that.explode(world, false);
@@ -897,12 +898,16 @@ Shot.prototype.update = function(world) {
 
 var World = function(map) {
 
+	this.kills = 0;
+
 	this.shots = [];
 	this.enemies = [];
 	this.explosions = [];
 	this.decorations = [];
 	this.p = null;
 	this.map = map;
+	var flags = [];
+	var scripting = new Scripting(flags);
 	var dangerMap = make2DArray(map.width, map.height, 0);
 
 	//TODO: move to separate Briefing class
@@ -942,13 +947,21 @@ var World = function(map) {
 		if (briefingPage == null) return;
 		if (option !== undefined) {
 			var flag = missionButtons[briefingPage][option].flag;
-			console.log("Setting flag " + flag);
+			flags[flag] = !flags[flag];
 		}
 		briefingPage++;
 		this.updateBriefingDisplay();
 	};
 
 	//
+
+	this.setTriggers = function (newTriggers) {
+		scripting.setTriggers(newTriggers);
+	}
+
+	this.win = function () {
+		scripting.win(this);
+	}
 
 	this.createDecoration = function (pos, type, live) {
 		new Decoration(pos, type, this, live);
@@ -959,10 +972,11 @@ var World = function(map) {
 		var shot = new Shot(typeIndex, pos, face, team, ownerIndex, this);
 	}
 
-	this.createEnemy = function (pos, type, state) {
+	this.createEnemy = function (pos, type, state, goalDie) {
 		var e = new Person(pos, dir.random(), new AI(), enemyTypes[type]);
 		e.team = 1;
 		e.index = this.enemies.length;
+		e.goalDie = goalDie;
 		//set state
 		this.enemies.push(e);
 		return e;
@@ -1031,8 +1045,20 @@ var World = function(map) {
 		});
 	}
 
+	var firstFrame = true;
+
 	this.update = function () {
+
+		if (briefingPage != null) return; //pause while briefing is displayed
+
 		var world = this;
+
+		if (firstFrame) {
+			scripting.newLev(this);
+			firstFrame = false;
+		} else {
+			scripting.update(this);
+		}
 
 		updateDangerMap.call(this); //ewww javascript.
 
@@ -1107,7 +1133,7 @@ var start = function () {
 		});
 
 		if (world && !world.enemies.some(function (e) {return e.live && e.team != 0;})) {
-			console.log("You win!");
+			world.win();
 			level++;
 			loadMission();
 		}

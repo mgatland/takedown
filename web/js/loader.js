@@ -80,12 +80,49 @@ function CampaignLoader() {
           var y = parseInt(enemyLine[2], 10);
           var type = parseInt(enemyLine[3], 10);
           var state = enemyLine[4];
-          enemies.push({x:x, y:y, type:type, state: state});
+          var goalDie = enemyLine[5] ? true : false;
+          enemies.push({x:x, y:y, type:type, state: state, goalDie: goalDie});
           console.log(enemies[enemies.length - 1]);
           i++;
         }
 
+        var triggers = [];
         i = findSection("[trigger]", lines, i);
+        while (lines[i] != "[]") {
+          if (lines.length === 0 || lines[i].substring(0,1) === "'") {
+            i++;
+            continue; //ignore comments and blanks
+          }
+          var line = CSVToArray(lines[i]);
+          i++;
+
+          var trigger = {};
+          trigger.live = true;
+          trigger.repeating = line[1] > 0 ? true: false;
+          trigger.actWhen = line[2];
+          trigger.cond = [];
+          for (var j = 0; j < 2; j++) {
+            var cond = {};
+            cond.type = line[3+j*4];
+            cond.val = [];
+            cond.val[0] = line[4+j*4];
+            cond.val[1] = line[5+j*4];
+            cond.val[2] = line[6+j*4];
+            trigger.cond[j] = cond;
+          }
+          trigger.act = [];
+          for (var j = 0; j < 2; j++) {
+            var act = {};
+            act.type = line[11+j*4];
+            act.val = [];
+            act.val[0] = line[12+j*4];
+            act.val[1] = line[13+j*4];
+            act.val[2] = line[14+j*4];
+            trigger.act[j] = act;
+          }
+          triggers.push(trigger);
+        }
+        console.log(triggers);
 
         var decs = [];
         i = findSection("[misc]", lines, i);
@@ -120,7 +157,6 @@ function CampaignLoader() {
             var index = parseInt(buttonText.substring(2,3), 10);
             var flag = parseInt(buttonText.substring(buttonText.length - 3, buttonText.length - 1), 10);
             var label = buttonText.substring(3, buttonText.length - 4);
-            console.log(label);
             missionButtons[j][index] = { flag: flag, label: label};
           }
 
@@ -151,13 +187,14 @@ function CampaignLoader() {
         //now initialize the world and call the callback
         var world = new World(createGrid(width, height));
         world.setBriefing(missionText, missionButtons);
+        world.setTriggers(triggers);
         world.map.forEach(function (pos, value) {
           var tile = terrain[pos.x + ":" + pos.y];
           world.map.set(pos, tile);
         });
         world.createPlayer(new Pos(pX, pY), pFace);
         enemies.forEach(function (e) {
-          world.createEnemy(new Pos(e.x, e.y), e.type, e.state);
+          world.createEnemy(new Pos(e.x, e.y), e.type, e.state, e.goalDie);
         });
         decs.forEach(function (d) {
           world.createDecoration(new Pos(d.x, d.y), d.type, d.live ? true : false);
