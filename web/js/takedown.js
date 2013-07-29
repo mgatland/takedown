@@ -309,7 +309,7 @@ var Startled = function () {
 	var timer = 0;
 	this.update = function (ai, owner, world, target) {
 		timer++;
-		if (timer > 25 - owner.type.skill / 10) {
+		if (timer > 17 - owner.type.skill / 10) {
 			ai.setState(new Pursuing());
 		}
 	}
