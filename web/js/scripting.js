@@ -34,9 +34,16 @@ var Scripting = function (flags) {
 		var countRequired = toInt(cond.val[2]);
 		if (group != "any") console.log("WARNING: We don't support awareness mode of " + group + " yet");
 		var awareCount = world.enemies.filter(function (e) {
-			return (e != world.p && e.ai.isAwareOfAnyone(world));
+			return (e != world.p && e.live && e.ai.isAwareOfAnyone(world));
 		}).length;
 		return awareCount >= countRequired;
+	}
+
+	var delayCondition = function (cond) {
+		cond[0]--; //this was the start time, we decrement it every frame
+		//Note that this condition is altered every time it's checked...
+		//this is not ideal, should move to an update method instead.
+		return (cond[0] <= 0);
 	}
 
 	var checkAllTriggers = function (scriptEvent, world) {
@@ -58,6 +65,8 @@ var Scripting = function (flags) {
 			case "aware":
 				result = awareCondition(cond, world);
 				break;
+			case "delay":
+				result = delayCondition(cond);
 			case "true":
 				result = true;
 				break;
@@ -130,10 +139,23 @@ var Scripting = function (flags) {
 
 	var fireTrigger = function (trigger, i, world) {
 		console.log("Firing trigger (" + trigger.cond[0].type + "," + trigger.cond[1].type + ")");
+
 		trigger.act.forEach(function (action) {
 			processAction(action, world);
 		});
-		if (!trigger.repeating) trigger.live = false;
+		if (!trigger.repeating) {
+			trigger.live = false;
+		} else {
+			//update the delay conditions
+			//This behaviour is never used in the main campaign
+			trigger.cond.forEach(function (cond) {
+				if (cond.type == "delay") {
+					//value 0 is the delay
+					//value 1 is the delay to insert between repeats
+					cond.val[0] = cond.val[1];
+				}
+			});
+		}
 	}
 
 	this.setTriggers = function (newTriggers) {
