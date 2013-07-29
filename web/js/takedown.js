@@ -986,23 +986,30 @@ var start = function () {
 	ctx = canvas.getContext("2d");
 	canvas.width = screen.width * screen.tileSize;
 	canvas.height = screen.height * screen.tileSize;
+
 	var keyboard = createKeyboard();
 	var audio = createAudio();
+	var assets = new Assets();
 
 	var world = null;
 	var camera = null;
 
-	var assets = new Assets(audio);
 	var campaignLoader = new CampaignLoader();
 	var level = 1;
 
-	//once all assets have loaded, load the campaign. Once that has loaded, set the world and camera.
+	var loadMission = function () {
+		world = campaignLoader.loadMission(level);
+		world.audio = audio;
+		camera = new Camera(world.p.pos, world.map.width, world.map.height);
+		world.audio.playMusic(world.audio.music0);
+	};
+
+	//Load the art assets, then the campaign, then the sounds, then start.
 	assets.load(function () {
 		campaignLoader.load("./res/01.tdm", function () {
-			world = campaignLoader.loadMission(level);
-			world.audio = audio;
-			camera = new Camera(world.p.pos, world.map.width, world.map.height);
-			world.audio.playMusic(world.audio.music0);
+			audio.load(function () {
+				loadMission();
+			});
 		});
 	});
 
@@ -1020,10 +1027,7 @@ var start = function () {
 		if (world && !world.enemies.some(function (e) {return e.live && e.team != 0;})) {
 			console.log("You win!");
 			level++;
-			world = campaignLoader.loadMission(level);
-			world.audio = audio;
-			camera = new Camera(world.p.pos, world.map.width, world.map.height);
-			world.audio.playMusic(world.audio.music0);
+			loadMission();
 		}
 
 	}, 40);
@@ -1090,7 +1094,14 @@ var tryMove = function (o, face, world, allowOffScreen, allowThroughPeople) {
 
 // Draw everything
 var render = function (world, camera, assets) {
-	if (world === null) return;
+	if (world === null) {
+		ctx.fillStyle = "black";
+		ctx.fillRect(0,0, screen.width * screen.tileSize, screen.height * screen.tileSize);
+		ctx.fillStyle = "white";
+		ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
+		ctx.fillText("Loading…", 40, screen.height * screen.tileSize - 32);
+		return;
+	}
 
 	//draw grass everywhere
 	var groundType = 3;

@@ -17,23 +17,6 @@ function createAudio() {
 	  }
 	};
 
-	var onLoadError = function () {
-		console.log("Error loading sound");
-	}
-
-	function loadSound(name, url) {
-	  var request = new XMLHttpRequest();
-	  request.open('GET', url, true);
-	  request.responseType = 'arraybuffer';
-	  // Decode asynchronously
-	  request.onload = function() {
-	    context.decodeAudioData(request.response, function(buffer) {
-	      audio[name] = buffer;
-	    }, onLoadError);
-	  }
-	  request.send();
-	}
-
 	function playSound(buffer, loop, volume) {
 	  if (buffer === undefined) {
 	  	console.log("Error: attempt to play sound which hasn't loaded");
@@ -58,7 +41,38 @@ function createAudio() {
 
 	var context = init();
 
-    audio.loadSoundFiles = function () {
+    audio.load = function (callback) {
+
+    	var soundsToLoad = 0;
+
+    	var checkIfAllHaveLoaded = function () {
+    		if (soundsToLoad == 0) {
+				callback();
+    		}
+    	};
+
+		var onLoadError = function () {
+			console.log("Error loading sound");
+			soundsToLoad--;
+			checkIfAllHaveLoaded();
+		}
+
+		var loadSound = function (name, url) {
+		  soundsToLoad++;
+		  var request = new XMLHttpRequest();
+		  request.open('GET', url, true);
+		  request.responseType = 'arraybuffer';
+		  // Decode asynchronously
+		  request.onload = function() {
+		    context.decodeAudioData(request.response, function(buffer) {
+		      audio[name] = buffer;
+		      soundsToLoad--;
+		      checkIfAllHaveLoaded();
+		    }, onLoadError);
+		  }
+		  request.send();
+		}
+
 		for (var i = 0; i < 5; i++) {
 			loadSound("shot" + i, "res/snd/shot" + i + ".wav");
 		}
@@ -97,6 +111,5 @@ function createAudio() {
 		}
 	}
 
-	audio.loadSoundFiles();
 	return audio;
 };
