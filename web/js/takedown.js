@@ -304,6 +304,7 @@ var Waiting = function () {
 var Startled = function () {
 	this.name = "Startled";
 	this.disableShooting = true;
+	this.disableMoving = true;
 
 	var timer = 0;
 	this.update = function (ai, owner, world, target) {
@@ -563,7 +564,7 @@ var AI = function () {
 
 	this.move = function(world) {
 		var plannedMove = state.move(this, owner, world, world.p);
-
+		if (state.disableMoving) return dir.NONE;
 		//based on danger, we might decide not to use our planned move.
 		var bestMove = 0;
 		var bestScore = -999;
