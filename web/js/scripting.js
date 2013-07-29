@@ -94,6 +94,8 @@ var Scripting = function (flags) {
 				//ignore the other parameters
 				world.endMission(timeDelay);
 				break;
+			case "null": //noop
+				break;
 			case "dec":
 				var decNum = toInt(action.val[0]);
 				var rawDecValue = toInt(action.val[1]);

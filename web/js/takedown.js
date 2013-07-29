@@ -1062,9 +1062,13 @@ var World = function(map) {
 
 	var firstFrame = true;
 
+	this.isPaused = function () {
+		return (briefingPage != null);
+	}
+
 	this.update = function () {
 
-		if (briefingPage != null) return; //pause while briefing is displayed
+		if (this.isPaused()) return; //pause while briefing is displayed
 
 		if (missionIsEnding) {
 			endMissionTimer--;
@@ -1079,6 +1083,8 @@ var World = function(map) {
 		if (firstFrame) {
 			scripting.newLev(this);
 			firstFrame = false;
+		} else if (this.hasEnded == true) {
+			world.callWinMissionTriggers();
 		} else {
 			scripting.update(this);
 		}
@@ -1155,8 +1161,7 @@ var start = function () {
 			render(world, camera, assets);
 		});
 
-		if (world && world.hasEnded) {
-			world.callWinMissionTriggers();
+		if (world && world.hasEnded && !world.isPaused()) {
 			level++;
 			loadMission();
 		}
