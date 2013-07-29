@@ -1,6 +1,6 @@
 "use strict";
 
-//global
+//globals
 var createBriefing = function (rawMissionText) {
   var missionText = [];
   var missionButtons = [];
@@ -14,8 +14,8 @@ var createBriefing = function (rawMissionText) {
       var buttonText = text.match(/\^\[.*?\]/)[0];
       text = text.replace(/\^\[.*?\]/, '');
 
-      var index = parseInt(buttonText.substring(2,3), 10);
-      var flag = parseInt(buttonText.substring(buttonText.length - 3, buttonText.length - 1), 10);
+      var index = toInt(buttonText.substring(2,3));
+      var flag = toInt(buttonText.substring(buttonText.length - 3, buttonText.length - 1));
       var label = buttonText.substring(3, buttonText.length - 4);
       missionButtons[j][index] = { flag: flag, label: label};
     }
@@ -46,6 +46,10 @@ var createBriefing = function (rawMissionText) {
   return {text: missionText, buttons: missionButtons};
 }
 
+var toInt = function (string) {
+  return parseInt(string, 10);
+}
+
 function CampaignLoader() {
 
   var lines = [];
@@ -73,8 +77,8 @@ function CampaignLoader() {
         console.log("Level " + level);
         console.log("Size: " + lines[i])
         var sizes = CSVToArray(lines[i]); //size string e.g. "23,45"
-        var width = parseInt(sizes[0], 10) + 1; //yep, it's inclusive.
-        var height = parseInt(sizes[1], 10) + 1; //
+        var width = toInt(sizes[0]) + 1; //yep, it's inclusive.
+        var height = toInt(sizes[1]) + 1; //
         i++;
         //load all the terrain
         console.log("Terrain: ");
@@ -101,16 +105,16 @@ function CampaignLoader() {
           }
         }
         console.log("ground type: " + lines[i]);
-        var groundType = parseInt(lines[i], 10);
+        var groundType = toInt(lines[i]);
         i++;
         var unusedBlankLine = lines[i];
         i++;
         console.log("player position: " + lines[i]);
         var pPos = CSVToArray(lines[i]);
         i++;
-        var pX = parseInt(pPos[0], 10);
-        var pY = parseInt(pPos[1], 10);
-        var pFace = parseInt(pPos[2], 10);
+        var pX = toInt(pPos[0]);
+        var pY = toInt(pPos[1]);
+        var pFace = toInt(pPos[2]);
 
         var enemies = [];
         i = findSection("[enemy]", lines, i);
@@ -122,9 +126,9 @@ function CampaignLoader() {
             continue; //ignore comments and blanks
           }
           var enemyLine = CSVToArray(lines[i]); //values are: index, x, y, type, state, goaldie, tag
-          var x = parseInt(enemyLine[1], 10);
-          var y = parseInt(enemyLine[2], 10);
-          var type = parseInt(enemyLine[3], 10);
+          var x = toInt(enemyLine[1]);
+          var y = toInt(enemyLine[2]);
+          var type = toInt(enemyLine[3]);
           var state = enemyLine[4];
           var goalDie = enemyLine[5] ? true : false;
           enemies.push({x:x, y:y, type:type, state: state, goalDie: goalDie});
@@ -185,7 +189,7 @@ function CampaignLoader() {
         i = findSection("[brief]", lines, i);
         var rawMissionText = CSVToArray(lines[i]);
         i++;
-        var healAmount = parseInt(lines[i], 10); //unused for now
+        var healAmount = toInt(lines[i]); //unused for now
         i++;
 
         var briefing = createBriefing(rawMissionText);

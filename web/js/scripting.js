@@ -57,11 +57,11 @@ var Scripting = function (flags) {
 				result = flagCondition(cond);
 				break;
 			case "kills":
-				result = (world.kills >= parseInt(cond.val[0], 10));
+				result = (world.kills >= toInt(cond.val[0]));
 				break;
 			case "playerxy":
-				result = (world.p.pos.x == parseInt(cond.val[0], 10)
-					&& world.p.pos.y == parseInt(cond.val[1], 10));
+				result = (world.p.pos.x == toInt(cond.val[0])
+					&& world.p.pos.y == toInt(cond.val[1]));
 				break;
 			default:
 				console.log("Unsupported condition " + cond.type);
@@ -75,8 +75,8 @@ var Scripting = function (flags) {
 				console.log("Update mission text...");
 				break;
 			case "flag_setval":
-				var flagNumber = parseInt(action.val[0], 10);
-				var flagValue = parseInt(action.val[1], 10);
+				var flagNumber = toInt(action.val[0]);
+				var flagValue = toInt(action.val[1]);
 				flags[flagNumber] = flagValue;
 				break;
 			case "briefing":
@@ -84,8 +84,8 @@ var Scripting = function (flags) {
 				world.setBriefing(briefing);
 				break;
 			case "dec":
-				var decNum = parseInt(action.val[0]);
-				var rawDecValue = parseInt(action.val[1]);
+				var decNum = toInt(action.val[0]);
+				var rawDecValue = toInt(action.val[1]);
 				var decValue = rawDecValue == 1 ? true: false;
 				//-1 is meant to toggle but it's not used in the main campaign so i don't support it
 				if (rawDecValue != 0 && rawDecValue != 1) console.log("WARNING: we do not support a 'dec' action with a value of " + rawDecValue);
