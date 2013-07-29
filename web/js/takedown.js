@@ -1243,6 +1243,8 @@ var update = function (world, keyboard, camera) {
 		if (keyboard.isKeyDown(KeyEvent.DOM_VK_M)) {
 			world.audio.toggleMusic();
 			optionsTimer = 24;
+		} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_P)) {
+			world.hasEnded = true;
 		}
 	} else {
 		optionsTimer--;

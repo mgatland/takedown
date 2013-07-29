@@ -40,10 +40,11 @@ var Scripting = function (flags) {
 	}
 
 	var delayCondition = function (cond) {
-		cond[0]--; //this was the start time, we decrement it every frame
-		//Note that this condition is altered every time it's checked...
-		//this is not ideal, should move to an update method instead.
-		return (cond[0] <= 0);
+		if (cond.timer == undefined) {
+			cond.timer = toInt(cond.val[0]);
+		}
+		cond.timer--;
+		return (cond.timer <= 0);
 	}
 
 	var checkAllTriggers = function (scriptEvent, world) {
@@ -67,6 +68,7 @@ var Scripting = function (flags) {
 				break;
 			case "delay":
 				result = delayCondition(cond);
+				break;
 			case "true":
 				result = true;
 				break;
@@ -150,9 +152,7 @@ var Scripting = function (flags) {
 			//This behaviour is never used in the main campaign
 			trigger.cond.forEach(function (cond) {
 				if (cond.type == "delay") {
-					//value 0 is the delay
-					//value 1 is the delay to insert between repeats
-					cond.val[0] = cond.val[1];
+					cond.timer = toInt(cond.val[1]);
 				}
 			});
 		}
