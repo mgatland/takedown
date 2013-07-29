@@ -988,15 +988,17 @@ var World = function(map) {
 			keyboardDelay--;
 			return;
 		}
-		if (keyboard.isKeyDown(KeyEvent.DOM_VK_UP) ||
-			keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN)) {
-			if (document.activeElement == option0) {
+		if (keyboard.isKeyDown(KeyEvent.DOM_VK_UP)
+			|| keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN)) {
+
+			if (continueButton.style.display != "none") {
+				focusOn(continueButton);
+			} else if (document.activeElement == option0) {
 				focusOn(option1);
-				keyboardDelay = 10;
-			} else if (document.activeElement == option1) {
+			} else {
 				focusOn(option0);
-				keyboardDelay = 10;
 			}
+			keyboardDelay = 5;
 		}
 	}
 
