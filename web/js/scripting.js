@@ -28,6 +28,17 @@ var Scripting = function (flags) {
 		return (matches == 2);
 	}
 
+	var awareCondition = function (cond, world) {
+		var group = cond.val[0];
+		//val[1] is ignored, it's the name of the group when in group mode
+		var countRequired = toInt(cond.val[2]);
+		if (group != "any") console.log("WARNING: We don't support awareness mode of " + group + " yet");
+		var awareCount = world.enemies.filter(function (e) {
+			return (e != world.p && e.ai.isAwareOfAnyone(world));
+		}).length;
+		return awareCount >= countRequired;
+	}
+
 	var checkAllTriggers = function (scriptEvent, world) {
 		triggers.forEach(function (trigger, triggerIndex) {
 			if (!trigger.live) return;
@@ -44,6 +55,9 @@ var Scripting = function (flags) {
 	var checkCondition = function (cond, scriptEvent, world) {
 		var result;
 		switch (cond.type) {
+			case "aware":
+				result = awareCondition(cond, world);
+				break;
 			case "true":
 				result = true;
 				break;
@@ -55,6 +69,11 @@ var Scripting = function (flags) {
 				break;
 			case "flag":
 				result = flagCondition(cond);
+				break;
+			case "playerhealth":
+				var lowerBound = toInt(cond.val[0]);
+				var upperOrEqualBound = toInt(cond.val[1]);
+				result = (world.p.health > lowerBound && world.p.health <= upperOrEqualBound);
 				break;
 			case "kills":
 				result = (world.kills >= toInt(cond.val[0]));

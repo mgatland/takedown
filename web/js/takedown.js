@@ -455,6 +455,7 @@ var AI = function () {
 
 	//methods used by AI states
 
+	//am I aware of any of my enemies
 	this.isAwareOfAnyone = function (world) {
 		var anyAware = false;
 		var myEnemies = world.enemies.filter(function (e, i) { return e.live === true && e.team != owner.team});
