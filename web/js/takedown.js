@@ -847,7 +847,10 @@ Shot.prototype.explode = function (world, hitWall) {
 			case dir.DOWN: pos.y += 0.5; break;
 		};
 	}
-	var explosion = new Explosion(this.type.skin, pos, this.ownerIndex, world);
+	var explosion = new Explosion(this.type.skin, pos.clone(), this.ownerIndex, world);
+	pos.x += Math.random() * 0.2 - 0.1;
+	pos.y += Math.random() * 0.2 - 0.1;
+	new Decoration(pos, 15 + Math.floor(Math.random() * 3), world, true);
 	world.audio.play(world.audio.explosion, this.typeIndex);
 }
 
