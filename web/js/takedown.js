@@ -292,6 +292,7 @@ var Waiting = function () {
 	this.update = function (ai, owner, world, target) {
 		if (ai.isAwareOfAnyone(world)) {
 			ai.setState(new Startled());
+			world.audio.playVoice(world.audio.seen);
 		}
 	}
 
@@ -735,13 +736,13 @@ Person.prototype.update = function (world) {
 Person.prototype.fire = function (mode, world) {
 	if (this.heat >= 100) {
 		this.shot = 10;
-		if (this.isLocalPlayer) world.audio.play(world.audio.overheat0);
+		if (this.isLocalPlayer) world.audio.play(world.audio.overheat);
 	} else {
 		//mode is ignored
 		var shot = world.createShot(this.type.shotType, this.pos, this.face, this.team, this.index);
 		if (shot !== null) {
 			//set up shot stealth, special
-			world.audio.play(world.audio["shot" + this.type.shotType]);
+			world.audio.play(world.audio.shot, this.type.shotType);
 		}
 		this.heat += heatOnFiring;
 		this.shot = refireRate;
@@ -760,23 +761,23 @@ Person.prototype.hurt = function (audio, damage) {
 
 		if (this.isLocalPlayer) {
 			audio.stopMusic();
-			audio.play(audio.music1) //lose sound
+			audio.play(audio.music, 1) //lose sound
 		} else {
-			audio.play(audio.dead0);
+			audio.play(audio.dead);
 		}
 	} else {
 		if (this.isLocalPlayer) {
-			audio.play(audio.thud1);
+			audio.play(audio.thud, 1);
 			//change to danger music
 			if (this.health <= 6 && this.health + damage > 6) {
-				audio.playMusic(audio.music3);
+				audio.playMusic(audio.music, 3);
 			}
 			//change to extreme danger music
 			if (this.health <= 2 && this.health + damage > 2) {
-				audio.playMusic(audio.music4);
+				audio.playMusic(audio.music, 4);
 			}
 		} else {
-			audio.play(audio.thud0);
+			audio.play(audio.thud, 0);
 		}
 
 	}
@@ -840,7 +841,7 @@ Shot.prototype.explode = function (world, hitWall) {
 		};
 	}
 	var explosion = new Explosion(this.type.skin, pos, this.ownerIndex, world);
-	world.audio.play(world.audio["explosion" + this.typeIndex]);
+	world.audio.play(world.audio.explosion, this.typeIndex);
 }
 
 Shot.prototype._checkHitPeople = function(people, world) {
@@ -1021,7 +1022,7 @@ var start = function () {
 		world = campaignLoader.loadMission(level);
 		world.audio = audio;
 		camera = new Camera(world.p.pos, world.map.width, world.map.height);
-		world.audio.playMusic(world.audio.music0);
+		world.audio.playMusic(world.audio.music, 0);
 	};
 
 	//Load the art assets, then the campaign, then the sounds, then start.
