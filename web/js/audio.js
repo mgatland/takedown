@@ -77,7 +77,7 @@ function createAudio() {
 		//music3 is danger
 		//music4 is extreme danger
 		for (var i = 0; i < 5; i++) {
-			loadSound("music" + i, "res/snd/music" + i + ".wav");
+			loadSound("music" + i, "res/snd/music" + i + ".ogg");
 		}
     };
 
