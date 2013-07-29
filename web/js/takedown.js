@@ -932,26 +932,49 @@ var World = function(map) {
 		this.updateBriefingDisplay();
 	}
 
+	var briefingWindow = document.getElementById("briefing");
+	var briefingText = document.getElementById("briefingText");
+	var continueButton = document.getElementById("continueButton");
+	var option0 = document.getElementById("option0");
+	var option1 = document.getElementById("option1");
+
+	var hideElement = function (el) {
+		el.style.display = "none";
+	}
+
+	var showElement = function (el) {
+		el.style.display = null;
+	}
+
+	var setText = function (el, text) {
+		el.innerHTML = text;
+	}
+
+	var focusOn = function (el) {
+		el.focus();
+	}
+
 	this.updateBriefingDisplay = function () {
 		if (briefingPage == missionText.length || missionText[briefingPage].length == 0) {
-			document.getElementById("briefing").style.display = "none";
+			hideElement(briefing);
 			briefingPage = null;
 			missionText = [];
 			missionButtons = [];
 		} else {
-			document.getElementById("briefing").style.display = null;
-			document.getElementById("briefingText").innerHTML = missionText[briefingPage];
+			showElement(briefingWindow);
+			setText(briefingText, missionText[briefingPage]);
 			if (missionButtons[briefingPage].length == 0) {
-				document.getElementById("continueButton").style.display = null;
-				document.getElementById("option0").style.display = "none";
-				document.getElementById("option1").style.display = "none";
+				showElement(continueButton);
+				focusOn(continueButton);
+				hideElement(option0);
+				hideElement(option1);
 			} else {
-				document.getElementById("option0").innerHTML = missionButtons[briefingPage][0].label;
-				document.getElementById("option1").innerHTML = missionButtons[briefingPage][1].label;
-
-				document.getElementById("continueButton").style.display = "none";
-				document.getElementById("option0").style.display = null;
-				document.getElementById("option1").style.display = null;
+				setText(option0, missionButtons[briefingPage][0].label);
+				setText(option1, missionButtons[briefingPage][1].label);
+				hideElement(continueButton);
+				showElement(option0);
+				showElement(option1);
+				focusOn(option0);
 			}
 		}
 	};
