@@ -1128,6 +1128,8 @@ var World = function(map) {
 			if (endMissionTimer <= 0) {
 				missionIsEnding = false;
 				this.hasEnded = true;
+				this.audio.stopMusic();
+				this.audio.play(this.audio.music, 2);
 			}
 		}
 
@@ -1213,8 +1215,6 @@ var start = function () {
 		});
 
 		if (world && world.hasEnded && !world.isPaused()) {
-			world.audio.stopMusic();
-			world.audio.play(world.audio.music, 2);
 			level++;
 			loadMission();
 		}
