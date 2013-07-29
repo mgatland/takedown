@@ -774,12 +774,10 @@ Person.prototype.hurt = function (audio, damage, world) {
 		if (this.isLocalPlayer) {
 			audio.play(audio.thud, 1);
 			//change to danger music
-			if (this.health <= 6 && this.health + damage > 6) {
-				audio.playMusic(audio.music, 3);
-			}
-			//change to extreme danger music
-			if (this.health <= 2 && this.health + damage > 2) {
-				audio.playMusic(audio.music, 4);
+			var oldMusic = audio.getMusicIndexForHealth(this.health + damage);
+			var newMusic = audio.getMusicIndexForHealth(this.health);
+			if (oldMusic != newMusic) {
+				audio.playMusic(audio.music, newMusic);
 			}
 		} else {
 			audio.play(audio.thud, 0);
@@ -1090,6 +1088,8 @@ var World = function(map) {
 		var world = this;
 
 		if (firstFrame) {
+			var musicIndex = this.audio.getMusicIndexForHealth(this.p.health);
+			this.audio.playMusic(this.audio.music, musicIndex);
 			scripting.newLev(this);
 			firstFrame = false;
 		} else if (this.hasEnded == true) {
@@ -1143,7 +1143,6 @@ var start = function () {
 		world = campaignLoader.loadMission(level);
 		world.audio = audio;
 		camera = new Camera(world.p.pos, world.map.width, world.map.height);
-		world.audio.playMusic(world.audio.music, 0);
 		document.getElementById("briefing").style.display = null;
 	};
 
@@ -1168,6 +1167,8 @@ var start = function () {
 		});
 
 		if (world && world.hasEnded && !world.isPaused()) {
+			world.audio.stopMusic();
+			world.audio.play(world.audio.music, 2);
 			level++;
 			loadMission();
 		}

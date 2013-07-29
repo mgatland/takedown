@@ -143,5 +143,11 @@ function createAudio() {
 		}
 	}
 
+	audio.getMusicIndexForHealth = function(health) {
+		if (health <= 2) return 4;
+		if (health <= 6) return 3;
+		return 0;
+	}
+
 	return audio;
 };
