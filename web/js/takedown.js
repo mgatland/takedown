@@ -1121,16 +1121,6 @@ var World = function(map) {
 
 	}
 
-	//Delete this if it remains unused
-	this.getRandomPos = function () {
-		var pos = null;
-		while (pos === null || this.map.canMove(pos)===false) {
-			var x = Math.floor(Math.random() * this.map.width);
-			var y = Math.floor(Math.random() * this.map.height);
-			pos = new Pos(x, y);
-		}
-		return pos;
-	}
 };
 
 var start = function () {
