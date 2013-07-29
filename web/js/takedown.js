@@ -90,7 +90,6 @@ var canvas;
 var ctx;
 
 var heatOnFiring = 20;
-var refireRate = 10;
 var gunKick = 0;
 
 var Pos = function (x, y) {
@@ -746,7 +745,7 @@ Person.prototype.fire = function (mode, world) {
 			world.audio.play(world.audio.shot, this.type.shotType);
 		}
 		this.heat += heatOnFiring;
-		this.shot = refireRate;
+		this.shot = this.type.shootSpeed;
 		if (this.moved < gunKick) {
 			this.moved = gunKick;
 		}
