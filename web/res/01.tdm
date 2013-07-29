@@ -190,8 +190,8 @@ dec,21,12,3,0
 [trigger]
 0,0,and,newlev,0,0,0,true,0,0,0,flag_setval,0,0,0,null,0,0,0
 1,0,and,kills,4,0,0,true,0,0,0,endmission,50,1,0,null,0,0,0
-2,0,and,win,0,0,0,playerhealth,40,100,0,briefing,"^wOk, good work, lets get going. I want you to clean out one more outpost before we head deeper into STALL territory.","","",null,0,0,0
-3,0,and,win,0,0,0,playerhealth,0,40,0,briefing,"^wOk, That wasn't too bad, but you cut it a little close. Lets get going. I want you to clean out one more outpost before we head deeper into STALL territory.","","",null,0,0,0
+2,0,and,win,0,0,0,playerhealth,4,10,0,briefing,"^wOk, good work, lets get going. I want you to clean out one more outpost before we head deeper into STALL territory.","","",null,0,0,0
+3,0,and,win,0,0,0,playerhealth,0,4,0,briefing,"^wOk, That wasn't too bad, but you cut it a little close. Lets get going. I want you to clean out one more outpost before we head deeper into STALL territory.","","",null,0,0,0
 4,0,and,win,0,0,0,flag,0,0,+?,briefing,"^wOne other thing: In that battle several enemies became aware of you at one time. You should try to take on the enemies one at a time, without alerting the others.","","",null,"","",""
 5,0,and,aware,any,0,3,true,0,0,0,flag_setval,0,1,0,null,0,0,0
 []
