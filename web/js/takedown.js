@@ -922,6 +922,14 @@ var World = function(map) {
 	var missionText = [];
 	var missionButtons = [];
 
+	var briefingWindow = document.getElementById("briefing");
+	var briefingText = document.getElementById("briefingText");
+	var continueButton = document.getElementById("continueButton");
+	var option0 = document.getElementById("option0");
+	var option1 = document.getElementById("option1");
+
+	var keyboardDelay = 0;
+
 	this.setBriefing = function (briefing) {
 		missionText = missionText.concat(briefing.text);
 		missionButtons = missionButtons.concat(briefing.buttons);
@@ -932,11 +940,7 @@ var World = function(map) {
 		this.updateBriefingDisplay();
 	}
 
-	var briefingWindow = document.getElementById("briefing");
-	var briefingText = document.getElementById("briefingText");
-	var continueButton = document.getElementById("continueButton");
-	var option0 = document.getElementById("option0");
-	var option1 = document.getElementById("option1");
+
 
 	var hideElement = function (el) {
 		el.style.display = "none";
@@ -978,6 +982,23 @@ var World = function(map) {
 			}
 		}
 	};
+
+	this.updateBriefing = function (keyboard) {
+		if (keyboardDelay > 0) {
+			keyboardDelay--;
+			return;
+		}
+		if (keyboard.isKeyDown(KeyEvent.DOM_VK_UP) ||
+			keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN)) {
+			if (document.activeElement == option0) {
+				focusOn(option1);
+				keyboardDelay = 10;
+			} else if (document.activeElement == option1) {
+				focusOn(option0);
+				keyboardDelay = 10;
+			}
+		}
+	}
 
 	this.advanceBriefing = function (option) {
 		if (briefingPage == null) return;
@@ -1275,6 +1296,7 @@ var update = function (world, keyboard, camera) {
 	}
 
 	updatePlayerInput(keyboard, world.p.ai);
+	world.updateBriefing(keyboard);
 	world.update();
 	camera.update(world.p.pos);
 };
