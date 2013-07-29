@@ -5,6 +5,9 @@ function createAudio() {
 	var audio = {};
 	var music = null;
 
+	var defaultMusicVolume = 0.5;
+	var musicEnabled = true;
+
 	var init = function () {
 	  try {
 	    // Fix up for prefixing
@@ -17,7 +20,7 @@ function createAudio() {
 	  }
 	};
 
-	function playSound(set, index, loop, volume) {
+	function playSound(set, index, loop) {
 	  var buffer;
 	  if (set.length === 1) {
 	  	buffer = set[0];
@@ -33,12 +36,8 @@ function createAudio() {
 
 	  var source = context.createBufferSource();
 	  source.buffer = buffer;
-	  if (volume) {
-	  	//add a volume node
-	  	var volumeNode = context.createGain();
-	  	source.connect(volumeNode);
-	  	volumeNode.connect(context.destination);
-	  	volumeNode.gain.value = volume;
+	  if (loop) {
+	  	source.connect(musicVolumeNode);
 	  } else {
 	  	source.connect(context.destination);
 	  }
@@ -49,6 +48,9 @@ function createAudio() {
 	}
 
 	var context = init();
+ 	var musicVolumeNode = context.createGain();
+	musicVolumeNode.connect(context.destination);
+	musicVolumeNode.gain.value = defaultMusicVolume;
 
     audio.load = function (callback) {
 
@@ -121,13 +123,22 @@ function createAudio() {
 
 	audio.playMusic = function (set, index) {
 		this.stopMusic();
-		music = playSound(set, index, true, 0.5);
+		music = playSound(set, index, true);
 	};
 
 	audio.stopMusic = function () {
 		if (music != null) {
 			music.stop(0);
 			music = null;
+		}
+	}
+
+	audio.toggleMusic = function () {
+		musicEnabled = !musicEnabled;
+		if (musicEnabled) {
+			musicVolumeNode.gain.value = defaultMusicVolume;
+		} else {
+			musicVolumeNode.gain.value = 0;
 		}
 	}
 

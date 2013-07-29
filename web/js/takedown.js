@@ -1109,7 +1109,19 @@ var updatePlayerInput = function (keyboard, playerAI) {
 	}
 }
 
+var optionsTimer = 0;
+
 var update = function (world, keyboard, camera) {
+
+	if (optionsTimer == 0) {
+		if (keyboard.isKeyDown(KeyEvent.DOM_VK_M)) {
+			world.audio.toggleMusic();
+			optionsTimer = 24;
+		}
+	} else {
+		optionsTimer--;
+	}
+
 	if (world === null) return;
 	updatePlayerInput(keyboard, world.p.ai);
 	world.update();
