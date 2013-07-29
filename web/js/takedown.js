@@ -905,6 +905,26 @@ var World = function(map) {
 	this.map = map;
 	var dangerMap = make2DArray(map.width, map.height, 0);
 
+	//TODO: move to separate Briefing class
+	var briefingPage = 0;
+	var missionText = [];
+
+	this.setBriefing = function (newMissionText) {
+		missionText = newMissionText;
+		document.getElementById("briefingText").innerHTML = missionText[briefingPage];
+	}
+
+	this.advanceBriefing = function () {
+		briefingPage++;
+		if (briefingPage == missionText.length || missionText[briefingPage].length == 0) {
+			document.getElementById("briefing").style.display = "none";
+		} else {
+			document.getElementById("briefingText").innerHTML = missionText[briefingPage];
+		}
+	}
+
+	//
+
 	this.createDecoration = function (pos, type, live) {
 		new Decoration(pos, type, this, live);
 	}
@@ -1038,6 +1058,7 @@ var start = function () {
 		world.audio = audio;
 		camera = new Camera(world.p.pos, world.map.width, world.map.height);
 		world.audio.playMusic(world.audio.music, 0);
+		document.getElementById("briefing").style.display = null;
 	};
 
 	//Load the art assets, then the campaign, then the sounds, then start.
@@ -1067,6 +1088,13 @@ var start = function () {
 		}
 
 	}, 40);
+
+	document.getElementById("continueButton").onclick = function () {
+		console.log('click');
+		if (world) {
+			world.advanceBriefing();
+		}
+	};
 };
 
 var updatePlayerInput = function (keyboard, playerAI) {

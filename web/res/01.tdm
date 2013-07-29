@@ -154,7 +154,7 @@ MISSION STYLES:
 dec,21,12,3,0
 []
 [brief]
-"^wThis is Andrew Lambed, the new Supervisor that has been assigned to you. I'm here to keep you on track down there and provide a link with UNITY.^2I'm just testing out your communications - Things are a bit jittery with the jamming around here. Check that this text is a white font - a black screen with white font is a message directly from me, and can always be trusted." ,"^wMake sure you fimiliarize yourself with the most recent modificatons to your combat suit before approaching any enemy troopers.^2There are two Stall soldiers in this area for you to dispatch. We'll be watching your vital signs as you fight, making sure you do not experience any nausia while killed the troopers. You should have no trouble.", "^gDo you want to activate the tutorial for this mission to explain how to play TakeDown?^[0Yes - use tutorial^00]^[1No - I know how to do this!^01]"
+"^wThis is Andrew Lambed, the new Supervisor that has been assigned to you. I'm here to keep you on track down there and provide a link with UNITY.^2I'm just testing out your communications - Things are a bit jittery with the jamming around here. Check that this text is a white font - a black screen with white font is a message directly from me, and can always be trusted." ,"^wMake sure you fimiliarize yourself with the most recent modificatons to your combat suit before approaching any enemy troopers.^2There are two Stall soldiers in this area for you to dispatch. We'll be watching your vital signs as you fight, making sure you do not experience any nausia while killed the troopers. You should have no trouble.","^gDo you want to activate the tutorial for this mission to explain how to play TakeDown?^[0Yes - use tutorial^00]^[1No - I know how to do this!^01]"
 100
 []
 
@@ -241,7 +241,7 @@ dec,21,12,3,0
 dec,19,14,3,0
 []
 [brief]
-"^wThere are four troopers here. Once again, try to avoid alerting too many enemies to your presence at one time, because they are more dangerous in groups.","^gPay attention to bottlenecks. If you are trapped between two walls, you are unable to dodge. Try to avoid being pinned down and try to force your enemies through bottlenecks so they are easier to hit.", ""
+"^wThere are four troopers here. Once again, try to avoid alerting too many enemies to your presence at one time, because they are more dangerous in groups.","^gPay attention to bottlenecks. If you are trapped between two walls, you are unable to dodge. Try to avoid being pinned down and try to force your enemies through bottlenecks so they are easier to hit.",""
 100
 []
 

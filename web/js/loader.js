@@ -100,9 +100,42 @@ function CampaignLoader() {
         }
 
         i = findSection("[brief]", lines, i);
+        var rawMissionText = CSVToArray(lines[i]);
+        i++;
+        var healAmount = parseInt(lines[i]); //unused for now
+        i++;
+
+        var missionText = [];
+        for (var j = 0; j < rawMissionText.length; j++) {
+          var text = rawMissionText[j];
+          if (text === undefined || text === null) continue; //hack, I don't know why this is needed
+          text = text.replace(/\^1/g, '<br>');
+          text = text.replace(/\^2/g, '<br><br>');
+
+          //white is the default, so this white command does nothing
+          text = text.replace(/\^w/g, '');
+
+          if (text.lastIndexOf("^r", 0) === 0) {
+            text = "<span class='red'>" + text + "</span>";
+            text = text.replace(/\^r/g, '');
+          }
+
+          if (text.lastIndexOf("^g", 0) === 0) {
+            text = "<span class='green'>" + text + "</span>";
+            text = text.replace(/\^g/g, '');
+          }
+
+          if (text.lastIndexOf("^b", 0) === 0) {
+            text = "<span class='blue'>" + text + "</span>";
+            text = text.replace(/\^b/g, '');
+          }
+
+          missionText.push(text);
+        }
 
         //now initialize the world and call the callback
         var world = new World(createGrid(width, height));
+        world.setBriefing(missionText);
         world.map.forEach(function (pos, value) {
           var tile = terrain[pos.x + ":" + pos.y];
           world.map.set(pos, tile);

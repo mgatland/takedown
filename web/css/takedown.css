@@ -1,0 +1,39 @@
+body {
+	background-color: black;
+	color: white;
+	font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+	font-size: 24px;
+}
+
+#gamecontainer {
+	position: relative;
+	width:750px;
+	height:510px;
+}
+
+#gamescreen {
+	position: absolute;
+}
+
+#briefing {
+	width: 660px;
+	height: 360px;
+	border: solid 2px white;
+	background-color: black;
+	position: absolute;
+	margin-left: 25px;
+	margin-top: 35px;
+	padding: 20px;
+}
+
+.red {
+	color: red;
+}
+
+.green {
+	color: lightgreen;
+}
+
+.blue {
+	color: lightblue;
+}
