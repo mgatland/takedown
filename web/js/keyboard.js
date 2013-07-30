@@ -19,6 +19,7 @@ if (typeof KeyEvent == "undefined") {
         DOM_VK_D: 68,
 
         DOM_VK_M: 77,
+        DOM_VK_X: 88,
 
         DOM_VK_P: 80
     }

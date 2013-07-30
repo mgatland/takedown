@@ -15,9 +15,9 @@ body {
 	position: absolute;
 }
 
-#briefing {
+.popover {
 	width: 660px;
-	height: 360px;
+	height: 390px;
 	border: solid 2px white;
 	background-color: black;
 	position: absolute;
@@ -26,14 +26,17 @@ body {
 	padding: 20px;
 }
 
-#briefing div {
+.popover div {
 	margin-bottom: 20px;
 }
 
-button {
+#briefing button {
+	width: 600px;
 	display: block;
 	margin: auto;
-	width: 600px;
+}
+
+button {
 	height: 40px;
 	font-size: 32px;
 	font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;

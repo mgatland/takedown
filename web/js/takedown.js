@@ -917,6 +917,37 @@ var World = function(map) {
 	var endMissionTimer = 0;
 	var missionIsEnding = false;
 
+
+	//TOOD: move to separate Notes class
+	var notesAreOpen = false;
+	var currentNote = 0;
+	var notes = [];
+
+	var notesWindow = document.getElementById("notes");
+	var notesText= document.getElementById("notesText");
+	var forwardButton = document.getElementById("forward");
+	var backButton = document.getElementById("back");
+	var closeButton = document.getElementById("close");
+
+	this.toggleNotes = function () {
+		notesAreOpen = !notesAreOpen;
+		if (notesAreOpen) {
+			showElement(notesWindow);
+		} else {
+			hideElement(notesWindow);
+		}
+	};
+
+	this.nextNote = function () {
+		setText(notesText, "Hello! Let's go forwards.");
+	}
+
+	this.previousNote = function () {
+		setText(notesText, "Hello! Let's go backwards.");
+	}
+
+	//
+
 	//TODO: move to separate Briefing class
 	var briefingPage = null;
 	var missionText = [];
@@ -1116,7 +1147,7 @@ var World = function(map) {
 	var firstFrame = true;
 
 	this.isPaused = function () {
-		return (briefingPage != null);
+		return (briefingPage != null || notesAreOpen);
 	}
 
 	this.update = function () {
@@ -1221,6 +1252,8 @@ var start = function () {
 
 	}, 40);
 
+	//Briefing buttons:
+
 	document.getElementById("continueButton").onclick = function () {
 		if (world) {
 			world.advanceBriefing();
@@ -1238,6 +1271,27 @@ var start = function () {
 			world.advanceBriefing(1);
 		}
 	};
+
+	//Notes buttons
+
+	document.getElementById("close").onclick = function () {
+		if (world) {
+			world.toggleNotes();
+		}
+	};
+
+	document.getElementById("forward").onclick = function () {
+		if (world) {
+			world.nextNote();
+		}
+	};
+
+	document.getElementById("back").onclick = function () {
+		if (world) {
+			world.previousNote();
+		}
+	};
+
 };
 
 var updatePlayerInput = function (keyboard, playerAI) {
@@ -1289,7 +1343,10 @@ var update = function (world, keyboard, camera) {
 	if (optionsTimer == 0) {
 		if (keyboard.isKeyDown(KeyEvent.DOM_VK_M)) {
 			world.audio.toggleMusic();
-			optionsTimer = 24;
+			optionsTimer = 12;
+		} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_X)) {
+			world.toggleNotes();
+			optionsTimer = 12;
 		} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_P)) {
 			world.hasEnded = true;
 		}
