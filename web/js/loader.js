@@ -1,6 +1,32 @@
 "use strict";
 
 //globals
+
+var formatBriefingString = function (raw) {
+  if (raw === undefined) return "";
+  var text = raw.replace(/\^1/g, '<br>');
+  text = text.replace(/\^2/g, '<br><br>');
+
+  //white is the default, so this white command does nothing
+  text = text.replace(/\^w/g, '');
+
+  if (text.lastIndexOf("^r", 0) >= 0) {
+    text = "<span class='red'>" + text + "</span>";
+    text = text.replace(/\^r/g, '');
+  }
+
+  if (text.lastIndexOf("^g", 0) >= 0) {
+    text = "<span class='green'>" + text + "</span>";
+    text = text.replace(/\^g/g, '');
+  }
+
+  if (text.lastIndexOf("^b", 0) >= 0) {
+    text = "<span class='blue'>" + text + "</span>";
+    text = text.replace(/\^b/g, '');
+  }
+  return text;
+}
+
 var createBriefing = function (rawMissionText) {
   var missionText = [];
   var missionButtons = [];
@@ -20,27 +46,7 @@ var createBriefing = function (rawMissionText) {
       missionButtons[j][index] = { flag: flag, label: label};
     }
 
-
-    text = text.replace(/\^1/g, '<br>');
-    text = text.replace(/\^2/g, '<br><br>');
-
-    //white is the default, so this white command does nothing
-    text = text.replace(/\^w/g, '');
-
-    if (text.lastIndexOf("^r", 0) >= 0) {
-      text = "<span class='red'>" + text + "</span>";
-      text = text.replace(/\^r/g, '');
-    }
-
-    if (text.lastIndexOf("^g", 0) >= 0) {
-      text = "<span class='green'>" + text + "</span>";
-      text = text.replace(/\^g/g, '');
-    }
-
-    if (text.lastIndexOf("^b", 0) >= 0) {
-      text = "<span class='blue'>" + text + "</span>";
-      text = text.replace(/\^b/g, '');
-    }
+    text = formatBriefingString(text);
     missionText.push(text);
   }
   return {text: missionText, buttons: missionButtons};
@@ -64,6 +70,21 @@ function CampaignLoader() {
     console.log("Section " + startTag);
     return i+1;
   }
+
+  this.loadNotes = function () {
+    var notes = [];
+    var i = findSection("[notes]", lines, 0);
+    while (lines[i] != "[]") {
+      if (lines.length === 0 || lines[i].substring(0,1) === "'") {
+        i++;
+        continue; //ignore comments and blanks
+      }
+      var text = CSVToArray(lines[i])[0];
+      notes.push({text:formatBriefingString(text), live: false});
+      i++;
+    }
+    return notes;
+  };
 
   this.loadMission = function (level) {
     var mission = 0;

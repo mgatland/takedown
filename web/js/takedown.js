@@ -929,21 +929,56 @@ var World = function(map) {
 	var backButton = document.getElementById("back");
 	var closeButton = document.getElementById("close");
 
+	//dir - the direction to move if the current note isn't found
+	var validateCurrentNote = function (dir) {
+		if (!notes.some(function (note) {
+			return note.live;
+		})) {
+			currentNote = 0;
+			setText(notesText, "There are no notes to display");
+			return;
+		}
+		while (currentNote >= notes.length || currentNote < 0 || notes[currentNote].live === false) {
+			currentNote += dir;
+			if (currentNote >= notes.length) currentNote = 0;
+			if (currentNote < 0) currentNote = notes.length - 1;
+		}
+		setText(notesText, notes[currentNote].text);
+	}
+
+	this.setNotes = function (newNotes) {
+		notes = newNotes;
+	};
+
+	this.enableNote = function (i) {
+		notes[i].live = true;
+		currentNote = i;
+		validateCurrentNote(1);
+	};
+
+	this.disableNote = function(i) {
+		notes[i].live = false;
+		validateCurrentNote(1);
+	};
+
 	this.toggleNotes = function () {
 		notesAreOpen = !notesAreOpen;
 		if (notesAreOpen) {
 			showElement(notesWindow);
+			validateCurrentNote(1);
 		} else {
 			hideElement(notesWindow);
 		}
 	};
 
 	this.nextNote = function () {
-		setText(notesText, "Hello! Let's go forwards.");
+		currentNote++;
+		validateCurrentNote(1);
 	}
 
 	this.previousNote = function () {
-		setText(notesText, "Hello! Let's go backwards.");
+		currentNote--;
+		validateCurrentNote(-1);
 	}
 
 	//
@@ -1214,6 +1249,7 @@ var start = function () {
 
 	var world = null;
 	var camera = null;
+	var notes = null; //TODO: this persists between levels, store it in a special persistent store
 
 	var campaignLoader = new CampaignLoader();
 	var level = 1;
@@ -1229,7 +1265,9 @@ var start = function () {
 	assets.load(function () {
 		campaignLoader.load("./res/01.tdm", function () {
 			audio.load(function () {
+				notes = campaignLoader.loadNotes();
 				loadMission();
+				world.setNotes(notes);
 			});
 		});
 	});
@@ -1248,6 +1286,7 @@ var start = function () {
 		if (world && world.hasEnded && !world.isPaused()) {
 			level++;
 			loadMission();
+			world.setNotes(notes);
 		}
 
 	}, 40);

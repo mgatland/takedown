@@ -102,7 +102,13 @@ var Scripting = function (flags) {
 	var processAction = function (action, world) {
 		switch (action.type) {
 			case "mistxt":
-				console.log("Update mission text...");
+				var notePage = toInt(action.val[0]);
+				var noteValue = toInt(action.val[1]);
+				if (noteValue >= 0) {
+					world.enableNote(notePage);
+				} else {
+					world.disableNote(notePage);
+				}
 				break;
 			case "flag_setval":
 				var flagNumber = toInt(action.val[0]);
