@@ -8,6 +8,8 @@ function createAudio() {
 	var defaultMusicVolume = 0.5;
 	var musicEnabled = true;
 
+	var voiceChannelAvailableTime = 0;
+
 	var init = function () {
 	  try {
 	    // Fix up for prefixing
@@ -20,7 +22,7 @@ function createAudio() {
 	  }
 	};
 
-	function playSound(set, index, loop) {
+	function playSound(set, index, loop, voice) {
 	  var buffer;
 	  if (set.length === 1) {
 	  	buffer = set[0];
@@ -43,7 +45,15 @@ function createAudio() {
 	  }
 
 	  if (loop) source.loop = true;
-	  source.start(0);
+
+	  if (voice) { //don't let voices overlap
+	  	var currentTime = context.currentTime;
+	  	if (voiceChannelAvailableTime < currentTime) voiceChannelAvailableTime = currentTime;
+	  	source.start(voiceChannelAvailableTime);
+	  	voiceChannelAvailableTime += buffer.duration;
+	  } else {
+	  	source.start(0);
+	  }
 	  return source;
 	}
 
@@ -111,6 +121,9 @@ function createAudio() {
 		for (var i = 0; i < 2; i++) {
 			loadSound("seen", i, "res/snd/seen" + i + ".wav");
 		}
+		for (var i = 0; i < 2; i++) {
+			loadSound("mis", i, "res/snd/mis" + i + ".wav");
+		}
 
     };
 
@@ -119,7 +132,7 @@ function createAudio() {
 	};
 
 	audio.playVoice = function (set, index) {
-		playSound(set, index);
+		playSound(set, index, false, true);
 	}
 
 	audio.playMusic = function (set, index) {

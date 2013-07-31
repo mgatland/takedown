@@ -154,6 +154,11 @@ var Scripting = function (flags) {
 				//the third argument, the state to enter when we arrive, is ignored.
 				world.enemies[enemyIndex].ai.patrolTo(keySquare.pos);
 				break;
+			case "speech":
+				var speaker = toInt(action.val[0]); //unused
+				var soundNumber = toInt(action.val[1]);
+				world.audio.playVoice(world.audio.mis, soundNumber);
+				break;
 			case "timer_set":
 				var timerIndex = toInt(action.val[0]);
 				var startValue = toInt(action.val[1]);

@@ -308,7 +308,7 @@ var Waiting = function () {
 	this.update = function (ai, owner, world, target) {
 		if (ai.isAwareOfEnemies(world)) {
 			ai.setState(new Startled());
-			world.audio.playVoice(world.audio.seen);
+			if (!ai.isAllAware()) world.audio.playVoice(world.audio.seen);
 		}
 	}
 
@@ -494,6 +494,9 @@ var AI = function () {
 	}
 
 	//methods used by AI states
+	this.isAllAware = function () {
+		return allAware;
+	}
 
 	//am I aware of any of my enemies
 	this.isAwareOfEnemies = function (world) {
