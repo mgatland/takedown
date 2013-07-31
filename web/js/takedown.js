@@ -938,6 +938,7 @@ var World = function(map) {
 	var endMissionTimer = 0;
 	var missionIsEnding = false;
 
+	this.enemyTemplates = [];
 
 	//TOOD: move to separate Notes class
 	var notesAreOpen = false;
@@ -1128,12 +1129,21 @@ var World = function(map) {
 	}
 
 	this.createEnemy = function (pos, type, state, goalDie) {
+
+		//legacy hacks: offscreen enemies turn into templates for copy & paste
+		if (pos.x < 0 || pos.y < 0) {
+			this.enemyTemplates.push({type: type, state:state, goalDie: goalDie});
+			return;
+		}
+
+
 		var e = new Person(pos, dir.random(), new AI(), enemyTypes[type]);
 		e.team = 1;
 		e.index = this.enemies.length;
 		e.goalDie = goalDie;
 		//set state
 		this.enemies.push(e);
+
 		return e;
 	};
 

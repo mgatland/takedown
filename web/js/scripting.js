@@ -1,6 +1,10 @@
 var Scripting = function (flags) {
 	var triggers = [];
 
+	var spawnEnemy = function (eIndex, pos, world) {
+		var template = world.enemyTemplates[eIndex];
+		world.createEnemy(pos, template.type, template.state, template.goalDie);
+	}
 
 	// flag1, flag2, rule
 	// The rule is a 2 character string that specifies the required state of each flag
@@ -109,6 +113,12 @@ var Scripting = function (flags) {
 				} else {
 					world.disableNote(notePage);
 				}
+				break;
+			case "enemy":
+				var enemyNum = toInt(action.val[0]);
+				var x = toInt(action.val[1]);
+				var y = toInt(action.val[2]);
+				spawnEnemy(enemyNum, new Pos(x, y), world);
 				break;
 			case "flag_setval":
 				var flagNumber = toInt(action.val[0]);
