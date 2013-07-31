@@ -319,7 +319,7 @@ dec,19,14,3,0
 [enemy]
 0,-1,-1,7,seeking,1,arrive
 1,1,11,3,standing,1,def
-2,21,3,3,standing,1,def
+2,20,12,3,standing,1,def
 3,5,8,3,standing,1,def
 4,11,8,3,standing,1,def
 []
