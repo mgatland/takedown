@@ -1178,11 +1178,11 @@ var World = function(map) {
 		var shot = new Shot(typeIndex, pos, face, team, ownerIndex, targetIndex, this);
 	}
 
-	this.createEnemy = function (pos, type, state, goalDie) {
+	this.createEnemy = function (pos, type, state, goalDie, tag) {
 
 		//legacy hacks: offscreen enemies turn into templates for copy & paste
 		if (pos.x < 0 || pos.y < 0) {
-			this.enemyTemplates.push({type: type, state:state, goalDie: goalDie});
+			this.enemyTemplates.push({type: type, state:state, goalDie: goalDie, tag:tag});
 			return;
 		}
 
@@ -1191,6 +1191,7 @@ var World = function(map) {
 		e.team = 1;
 		e.index = this.enemies.length;
 		e.goalDie = goalDie;
+		e.tag = tag;
 		//states are "standing", "waiting" and "seeking"
 		//ignore "standing" and "waiting", but "seeking" makes them aware of everyone
 		if (state === "seeking") {

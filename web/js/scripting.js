@@ -46,13 +46,24 @@ var Scripting = function (flags) {
 		return (matches == 2);
 	}
 
-	var awareCondition = function (cond, world) {
+	var enemyLivesCondition = function (cond, world) {
 		var group = cond.val[0];
-		//val[1] is ignored, it's the name of the group when in group mode
+		var countRequired =toInt(cond.val[1]);
+		var liveCount = world.enemies.filter(function (e) {
+			console.log(e.tag + ":" + group);
+			return (e != world.p && e.live && (group === "any" || e.tag === group));
+		}).length;
+		return liveCount >= countRequired;
+	}
+
+	var awareCondition = function (cond, world) {
+		var mode = cond.val[0];
+		var group = cond.val[1]; //only if mode is "group"
 		var countRequired = toInt(cond.val[2]);
-		if (group != "any") console.log("WARNING: We don't support awareness mode of " + group + " yet");
+		if (mode != "any" && mode != "group") console.log("WARNING: We don't support awareness mode of " + group + " yet");
 		var awareCount = world.enemies.filter(function (e) {
-			return (e != world.p && e.live && e.ai.isAwareOfEnemies(world));
+			return (e != world.p && e.live && (mode === "any" || e.tag === group)
+				&& e.ai.isAwareOfEnemies(world));
 		}).length;
 		return awareCount >= countRequired;
 	}
@@ -74,6 +85,8 @@ var Scripting = function (flags) {
 			});
 			if (trigger.actWhen === "and") {
 				if (condsTrue[0] && condsTrue[1]) fireTrigger(trigger, triggerIndex, world);
+			} else if (trigger.actWhen === "+-") {
+				if (condsTrue[0] && !condsTrue[1]) fireTrigger(trigger, triggerIndex, world);
 			}
 		});
 	}
@@ -91,6 +104,9 @@ var Scripting = function (flags) {
 				break;
 			case "delay":
 				result = delayCondition(cond);
+				break;
+			case "enemylives":
+				result = enemyLivesCondition(cond, world);
 				break;
 			case "false":
 				result = false;

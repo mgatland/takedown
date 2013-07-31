@@ -151,8 +151,9 @@ function CampaignLoader() {
           var y = toInt(enemyLine[2]);
           var type = toInt(enemyLine[3]);
           var state = enemyLine[4];
-          var goalDie = enemyLine[5] ? true : false;
-          enemies.push({x:x, y:y, type:type, state: state, goalDie: goalDie});
+          var goalDie = toInt(enemyLine[5]) > 0 ? true : false;
+          var tag = enemyLine[6];
+          enemies.push({x:x, y:y, type:type, state: state, goalDie: goalDie, tag: tag});
           console.log(enemies[enemies.length - 1]);
           i++;
         }
@@ -230,7 +231,7 @@ function CampaignLoader() {
         });
         world.createPlayer(new Pos(pX, pY), pFace);
         enemies.forEach(function (e) {
-          world.createEnemy(new Pos(e.x, e.y), e.type, e.state, e.goalDie);
+          world.createEnemy(new Pos(e.x, e.y), e.type, e.state, e.goalDie, e.tag);
         });
         decs.forEach(function (d) {
           world.createDecoration(new Pos(d.x, d.y), d.type, d.live ? true : false);
