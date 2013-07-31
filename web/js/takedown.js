@@ -292,7 +292,7 @@ If line of sight is lost, any combat state transitions to Pursuing
 var Waiting = function () {
 	this.name = "Waiting";
 	this.update = function (ai, owner, world, target) {
-		if (ai.isAwareOfAnyone(world)) {
+		if (ai.isAwareOfEnemies(world)) {
 			ai.setState(new Startled());
 			world.audio.playVoice(world.audio.seen);
 		}
@@ -459,7 +459,7 @@ var AI = function () {
 	//methods used by AI states
 
 	//am I aware of any of my enemies
-	this.isAwareOfAnyone = function (world) {
+	this.isAwareOfEnemies = function (world) {
 		var anyAware = false;
 		var myEnemies = world.enemies.filter(function (e, i) { return e.live === true && e.team != owner.team});
 		myEnemies.forEach(function (e) {
@@ -477,8 +477,9 @@ var AI = function () {
 
 	var addSuspicion = function(amount, i) {
 		suspicion[i] += amount;
-		if (suspicion[i] >= 300) {
+		if (suspicion[i] >= 300 && aware[i] === false) {
 			aware[i] = true;
+			if (owner.targetIndex === null) owner.targetIndex = i;
 		}
 	}
 
@@ -505,15 +506,17 @@ var AI = function () {
 
 		var that = this;
 
-		//for each enemy who's not me, and who's not on my team...
-		var myEnemies = world.enemies.filter(function (e, i) { return e.live === true && e.team != owner.team});
-		myEnemies.forEach(function (e) {
+		//for each enemy who's not me
+		var people = world.enemies.filter(function (e, i) { return e.live === true && e != owner});
+		people.forEach(function (e) {
 			var i = e.index;
 			//TODO: perf: only initialize once, then never do this check again.
 			if (iCanSee[i] === undefined) {
 				iCanSee[i] = 0;
 				suspicion[i] = 0;
 				aware[i] = false;
+				//we are always aware of teammates
+				if (e.team === owner.team) aware[i] = true;
 			}
 
 			//update canSee
@@ -524,12 +527,18 @@ var AI = function () {
 				if (iCanSee[i] > 0) iCanSee[i] -= 1;
 			}
 
-			//update suspicion, unless we're already aware of them.
+			//update suspicion, unless we're already aware of them
 			if (aware[i] === false) {
 				if (canSeeNow) {
 					that.seeSuspiciousThing(e.pos, 6, i);
 				} else {
 					reduceSuspicion(1, i);
+				}
+			} else { //we are aware of them; are we aware of their target?
+				if (e.targetIndex != null && aware[e.targetIndex] === false) {
+					if (canSeeNow) {
+						that.seeSuspiciousThing(e.pos, 6, e.targetIndex);
+					}
 				}
 			}
 		});
@@ -562,16 +571,18 @@ var AI = function () {
 			}
 		});
 
-		state.update(this, owner, world, world.p);
+		var myTarget = getMyTarget(world);
+		state.update(this, owner, world, myTarget);
 	}
 
 	this.move = function(world) {
-		var plannedMove = state.move(this, owner, world, world.p);
+		var myTarget = getMyTarget(world);
+		var plannedMove = state.move(this, owner, world, myTarget);
 		if (state.disableMoving) return dir.NONE;
 		//based on danger, we might decide not to use our planned move.
 		var bestMove = 0;
 		var bestScore = -999;
-		var clumsy = (this.isAwareOfAnyone(world) === false) || (Math.random() * 110 > owner.type.skill);
+		var clumsy = (this.isAwareOfEnemies(world) === false) || (Math.random() * 110 > owner.type.skill);
 		for (var i = 0; i <= 4; i++) {
 			var movedPos = owner.pos.clone().moveInDir(i, 1);
 			if (!world.map.canMove(movedPos) || (world.personAt(movedPos) && !movedPos.equals(owner.pos))) continue; //can't move here
@@ -593,12 +604,15 @@ var AI = function () {
 
 	var NO_SHOOT = {dir: dir.NONE, mode: -1};
 
+	var getMyTarget = function (world) {
+		return owner.targetIndex === null ? null : world.enemies[owner.targetIndex];
+	}
+
 	this.shoot = function(world) {
+		var myTarget = getMyTarget(world);
+		if (myTarget === null || myTarget.live === false) return NO_SHOOT;
 
-		if (awareOf(world.p.index) == false) return NO_SHOOT;
-
-		if (world.p.live === false) return NO_SHOOT;
-		var shootDir = owner.pos.dirTowards(world.p.pos, false);
+		var shootDir = owner.pos.dirTowards(myTarget.pos, false);
 		if (shootDir == dir.NONE) return NO_SHOOT;
 
 		//From now on, even if we don't shoot, we'll face the right way
@@ -609,28 +623,28 @@ var AI = function () {
 		//1. Is there a clear shot? Is there a straight or L-shaped path from me to the player?
 		if (shootDir == dir.LEFT || shootDir == dir.RIGHT) {
 			var startX = owner.pos.x;
-			var endX = world.p.pos.x;
+			var endX = myTarget.pos.x;
 			var startPos = new Pos(startX, owner.pos.y);
 			var midPos = new Pos(endX, owner.pos.y);
 		} else {
 			var startY = owner.pos.y;
-			var endY = world.p.pos.y;
+			var endY = myTarget.pos.y;
 			var startPos = new Pos(owner.pos.x, startY);
 			var midPos = new Pos(owner.pos.x, endY);
 		}
 		var canSee1 = world.map.canSee(startPos, midPos);
-		var canSee2 = world.map.canSee(midPos, world.p.pos)
+		var canSee2 = world.map.canSee(midPos, myTarget.pos)
 		if (!canSee1 || !canSee2) {
 			//Cosmetic - we face the player if we can see them but otherwise look where we're going
-			if (iCanSee[world.p.index] < 5) {
+			if (iCanSee[myTarget.index] < 5) {
 				return NO_SHOOT;
 			}
 			return aimButDontShoot;
 		}
 
 		//2. Is this shot close enough? Either straight, or the player might walk sideways into it?
-		var xDist = Math.abs(owner.pos.x - world.p.pos.x);
-		var yDist = Math.abs(owner.pos.y - world.p.pos.y);
+		var xDist = Math.abs(owner.pos.x - myTarget.pos.x);
+		var yDist = Math.abs(owner.pos.y - myTarget.pos.y);
 		if (shootDir == dir.LEFT || shootDir == dir.RIGHT) {
 			var dist = xDist;
 			var missAmount = yDist;
@@ -681,6 +695,7 @@ var Person = function (pos, face, ai, type) {
 	this.health = type.health;
 	this.ai = ai;
 	this.index = null;
+	this.targetIndex = null;
 	ai.setOwner(this);
 	ai.setState(new Waiting());
 	this.deadTimer = 0;

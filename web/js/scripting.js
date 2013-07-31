@@ -34,7 +34,7 @@ var Scripting = function (flags) {
 		var countRequired = toInt(cond.val[2]);
 		if (group != "any") console.log("WARNING: We don't support awareness mode of " + group + " yet");
 		var awareCount = world.enemies.filter(function (e) {
-			return (e != world.p && e.live && e.ai.isAwareOfAnyone(world));
+			return (e != world.p && e.live && e.ai.isAwareOfEnemies(world));
 		}).length;
 		return awareCount >= countRequired;
 	}
