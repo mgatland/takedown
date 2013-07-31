@@ -92,6 +92,9 @@ var Scripting = function (flags) {
 			case "delay":
 				result = delayCondition(cond);
 				break;
+			case "false":
+				result = false;
+				break;
 			case "true":
 				result = true;
 				break;
