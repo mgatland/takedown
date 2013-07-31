@@ -144,6 +144,11 @@ var Pos = function (x, y) {
 
 	//next step in the walkable path from here to there
 	this.dirOnPathTowardsAvoiding = function(other, map, avoidPos, dangerDistance) {
+
+		if (this.equals(other)) {
+			return dir.NONE;
+		};
+
 		//ok, here goes... calculate the cost to walk from every square to the other pos
 		var thisStep = [];
 		var nextStep = [];
@@ -289,7 +294,11 @@ If line of sight is lost, any combat state transitions to Pursuing
 
 */
 
+//Waiting now includes patrolling as well...
 var Waiting = function () {
+
+	var patrolPos = null;
+
 	this.name = "Waiting";
 	this.update = function (ai, owner, world, target) {
 		if (ai.isAwareOfEnemies(world)) {
@@ -298,8 +307,19 @@ var Waiting = function () {
 		}
 	}
 
-	this.move = function (ai, world, target) {
-		return dir.NONE;
+	this.move = function (ai, owner, world, target) {
+		if (patrolPos && patrolPos.equals(owner.pos)) {
+			patrolPos = null;
+		}
+		if (patrolPos === null) {
+			return dir.NONE;
+		}
+		return owner.pos.dirOnPathTowards(patrolPos, world.map);
+	}
+
+	//only for Waiting state
+	this.patrolTo = function (pos) {
+		patrolPos = pos;
 	}
 }
 
@@ -446,6 +466,13 @@ var AI = function () {
 
 	var state = null; //must be set by Person
 	var allAware = false;
+
+	//called by scripting
+	this.patrolTo = function (pos) {
+		if (state.patrolTo) {
+			state.patrolTo(pos);
+		}
+	}
 
 	this.setState = function (newState) {
 		console.log("new state: " + newState.name);
@@ -846,10 +873,10 @@ var Decoration = function (pos, type, world, live) {
 	world.decorations.push(this);
 }
 
-var KeySquare = function (pos, name, world) {
+var KeySquare = function (pos, name, keySquares) {
 	this.pos = pos;
 	this.name = name
-	world.keySquares.push(this);
+	keySquares.push(this);
 }
 
 var Shot = function (typeIndex, pos, face, team, ownerIndex, targetIndex, world) {
@@ -941,7 +968,7 @@ var World = function(map) {
 	this.enemies = [];
 	this.explosions = [];
 	this.decorations = [];
-	this.keySquares = [];
+	var keySquares = [];
 	this.p = null;
 	this.map = map;
 	var flags = [];
@@ -1137,7 +1164,13 @@ var World = function(map) {
 	}
 
 	this.createKeySquare = function (pos, name) {
-		new KeySquare(pos, name, this);
+		new KeySquare(pos, name, keySquares);
+	}
+
+	this.getKeySquare = function (name) {
+		return keySquares.filter(function (keySquare) {
+			return keySquare.name === name;
+		})[0];
 	}
 
 	this.createShot = function(typeIndex, pos, face, team, ownerIndex, targetIndex) {

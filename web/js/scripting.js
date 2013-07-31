@@ -124,6 +124,12 @@ var Scripting = function (flags) {
 
 	var processAction = function (action, world) {
 		switch (action.type) {
+			case "e_patrolto":
+				var enemyIndex = toInt(action.val[0]);
+				var keySquare = world.getKeySquare(action.val[1]);
+				//the third argument, the state to enter when we arrive, is ignored.
+				world.enemies[enemyIndex].ai.patrolTo(keySquare.pos);
+				break;
 			case "timer_set":
 				var timerIndex = toInt(action.val[0]);
 				var startValue = toInt(action.val[1]);

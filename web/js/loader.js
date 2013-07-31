@@ -205,9 +205,9 @@ function CampaignLoader() {
           }
           var miscLine = CSVToArray(lines[i]);
           if (miscLine[0] === "dec") {
-            decs.push({x: miscLine[1], y:miscLine[2], type:miscLine[3], live:miscLine[4] >= 0});
+            decs.push({x: toInt(miscLine[1]), y:toInt(miscLine[2]), type:miscLine[3], live:miscLine[4] >= 0});
           } else if (miscLine[0] === "keysq") {
-            keySquares.push({x: miscLine[1], y:miscLine[2], name:miscLine[3]});
+            keySquares.push({x: toInt(miscLine[1]), y:toInt(miscLine[2]), name:miscLine[3]});
           }
           i++;
         }
