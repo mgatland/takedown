@@ -50,7 +50,6 @@ var Scripting = function (flags) {
 		var group = cond.val[0];
 		var countRequired =toInt(cond.val[1]);
 		var liveCount = world.enemies.filter(function (e) {
-			console.log(e.tag + ":" + group);
 			return (e != world.p && e.live && (group === "any" || e.tag === group));
 		}).length;
 		return liveCount >= countRequired;
