@@ -1,5 +1,19 @@
 var Scripting = function (flags) {
 	var triggers = [];
+	var timers = [];
+
+	var updateTimers = function () {
+		timers.forEach(function (timer) {
+			timer.value--;
+		});
+	};
+
+	var isTimerBelow = function (index, value) {
+		var timer = timers[index];
+		if (timer) {
+			return (timer.value <= value);
+		}
+	}
 
 	var spawnEnemy = function (eIndex, pos, world) {
 		var template = world.enemyTemplates[eIndex];
@@ -70,6 +84,11 @@ var Scripting = function (flags) {
 			case "aware":
 				result = awareCondition(cond, world);
 				break;
+			case "timer_ch":
+				var timerIndex = toInt(cond.val[0]);
+				var value = toInt(cond.val[1]);
+				result = isTimerBelow(timerIndex, value);
+				break;
 			case "delay":
 				result = delayCondition(cond);
 				break;
@@ -105,6 +124,13 @@ var Scripting = function (flags) {
 
 	var processAction = function (action, world) {
 		switch (action.type) {
+			case "timer_set":
+				var timerIndex = toInt(action.val[0]);
+				var startValue = toInt(action.val[1]);
+				var type = action.val[2];
+				if (type != "down") console.log("WARNING: timer_set must use 'down' as the type, you used " + type);
+				timers[timerIndex] = {value: startValue};
+				break;
 			case "mistxt":
 				var notePage = toInt(action.val[0]);
 				var noteValue = toInt(action.val[1]);
@@ -187,6 +213,7 @@ var Scripting = function (flags) {
 	}
 
 	this.update = function (world) {
+		updateTimers();
 		checkAllTriggers("tick", world);
 	}
 }
