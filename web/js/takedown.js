@@ -946,6 +946,22 @@ Shot.prototype._checkHitPeople = function(people, world) {
 	return hit;
 }
 
+//called by shot.update only
+Shot.prototype.shotTryMove = function(world) {
+	var moved = tryMove(this, this.face, world, true, true);
+	if (moved===false) {
+		this.explode(world, true);
+		this.live = false;
+	}
+	//if it moved off screen
+	if (!world.map.isValid(this.pos)) {
+		this.live = false;
+	}
+
+	//we check again after moving
+	this._checkHitPeople(world.enemies, world);
+}
+
 Shot.prototype.update = function(world) {
 	if (this.live === false) return;
 
@@ -958,18 +974,13 @@ Shot.prototype.update = function(world) {
 	if (this.moved > 0) {
 		this.moved--;
 	} else {
-		var moved = tryMove(this, this.face, world, true, true);
-		if (moved===false) {
-			this.explode(world, true);
-			this.live = false;
-		}
-		//if it moved off screen
-		if (!world.map.isValid(this.pos)) {
-			this.live = false;
+		this.shotTryMove(world);
+
+		//instant hit weapons (negative movespeed) keep moving until they hit something
+		while (this.type.moveSpeed < 0 && this.live) {
+			this.shotTryMove(world);
 		}
 	}
-	//we check again after moving
-	this._checkHitPeople(world.enemies, world);
 }
 
 var World = function(map) {
