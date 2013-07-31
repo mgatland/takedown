@@ -253,6 +253,10 @@ var Camera = function (startPos, mapWidth, mapHeight) {
 		return Math.floor(yOff * screen.tileSize);
 	};
 
+	this.setPos = function(target) {
+		pos = target.clone();
+	}
+
 	this.update = function(target) {
 		var xDist = Math.abs(pos.x - target.x);
 		var xSpeed = scrollSpeed(xDist);
@@ -1297,6 +1301,9 @@ var World = function(map) {
 
 		var world = this;
 
+		//done before scripting so scripting can override it
+		this.camera.update(this.p.pos);
+
 		if (firstFrame) {
 			var musicIndex = this.audio.getMusicIndexForHealth(this.p.health);
 			this.audio.playMusic(this.audio.music, musicIndex);
@@ -1354,6 +1361,7 @@ var start = function () {
 		world = campaignLoader.loadMission(level);
 		world.audio = audio;
 		camera = new Camera(world.p.pos, world.map.width, world.map.height);
+		world.camera = camera;
 		document.getElementById("briefing").style.display = null;
 	};
 
@@ -1492,7 +1500,6 @@ var update = function (world, keyboard, camera) {
 	updatePlayerInput(keyboard, world.p.ai);
 	world.updateBriefing(keyboard);
 	world.update();
-	camera.update(world.p.pos);
 };
 
 //global...

@@ -150,6 +150,11 @@ var Scripting = function (flags) {
 					e.ai.makeAllAware();
 				});
 				break;
+			case "screenxy":
+				var x = toInt(action.val[0]);
+				var y = toInt(action.val[1]);
+				world.camera.setPos(new Pos(x, y));
+				break;
 			case "e_patrolto":
 				var enemyIndex = toInt(action.val[0]);
 				var keySquare = world.getKeySquare(action.val[1]);
