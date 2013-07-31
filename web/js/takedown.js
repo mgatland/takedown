@@ -445,6 +445,7 @@ var AI = function () {
 	var aware = []; // Awareness type
 
 	var state = null; //must be set by Person
+	var allAware = false;
 
 	this.setState = function (newState) {
 		console.log("new state: " + newState.name);
@@ -456,6 +457,10 @@ var AI = function () {
 		owner = o;
 	}
 
+	this.makeAllAware = function () {
+		allAware = true;
+	}
+
 	//methods used by AI states
 
 	//am I aware of any of my enemies
@@ -464,7 +469,7 @@ var AI = function () {
 		var myEnemies = world.enemies.filter(function (e, i) { return e.live === true && e.team != owner.team});
 		myEnemies.forEach(function (e) {
 			var i = e.index;
-			if (aware[i] === true) anyAware = true;
+			if (awareOf(i)) anyAware = true;
 		});
 		return anyAware;
 	}
@@ -517,6 +522,7 @@ var AI = function () {
 				aware[i] = false;
 				//we are always aware of teammates
 				if (e.team === owner.team) aware[i] = true;
+				if (allAware) addSuspicion(999, i); //instantly become aware
 			}
 
 			//update canSee
@@ -1141,7 +1147,11 @@ var World = function(map) {
 		e.team = 1;
 		e.index = this.enemies.length;
 		e.goalDie = goalDie;
-		//set state
+		//states are "standing", "waiting" and "seeking"
+		//ignore "standing" and "waiting", but "seeking" makes them aware of everyone
+		if (state === "seeking") {
+			e.ai.makeAllAware();
+		}
 		this.enemies.push(e);
 
 		return e;
