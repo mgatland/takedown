@@ -86,6 +86,8 @@ var Scripting = function (flags) {
 				if (condsTrue[0] && condsTrue[1]) fireTrigger(trigger, triggerIndex, world);
 			} else if (trigger.actWhen === "+-") {
 				if (condsTrue[0] && !condsTrue[1]) fireTrigger(trigger, triggerIndex, world);
+			} else if (trigger.actWhen === "none") {
+				if (!condsTrue[0] && !condsTrue[1]) fireTrigger(trigger, triggerIndex, world);
 			}
 		});
 	}
