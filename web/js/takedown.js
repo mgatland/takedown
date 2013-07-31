@@ -476,6 +476,25 @@ var AI = function () {
 	var state = null; //must be set by Person
 	var allAware = false;
 
+	var updateMyTarget = function (world) {
+
+		var myEnemies = world.enemies.filter(function (e, i) { return e.live === true && e.team != owner.team && awareOf(i)});
+		var bestDist = null;
+		var bestNewTargetIndex = null;
+		myEnemies.forEach(function (e, index) {
+			var dist = owner.pos.trueDistanceTo(e.pos);
+			//if it's our current target, it gets a selection bonus
+			if (owner.targetIndex != null && owner.targetIndex == e.index) dist -= 4;
+			//bonus for enemies we can see
+			if (iCanSee[index] > 0) dist -= 4;
+			if (bestDist == null || dist < bestDist) {
+				bestDist = dist;
+				bestNewTargetIndex = index;
+			}
+		});
+		owner.targetIndex = bestNewTargetIndex;
+	}
+
 	//called by scripting
 	this.patrolTo = function (pos) {
 		if (state.patrolTo) {
@@ -523,7 +542,6 @@ var AI = function () {
 		suspicion[i] += amount;
 		if (suspicion[i] >= 300 && aware[i] === false) {
 			aware[i] = true;
-			if (owner.targetIndex === null) owner.targetIndex = i;
 		}
 	}
 
@@ -621,6 +639,8 @@ var AI = function () {
 				if (e.targetIndex != null) addSuspicion(Math.floor(amount), e.targetIndex);
 			}
 		});
+
+		updateMyTarget(world);
 
 		var myTarget = getMyTarget(world);
 		state.update(this, owner, world, myTarget);
@@ -721,18 +741,20 @@ shotTypes[3] = {damage: 6, moveSpeed: 0, skin: 1}; // unused
 shotTypes[4] = {damage: 2, moveSpeed: -1, skin: 2}; // instant hit enemy shot
 
 //player
-var playerType = {health: 10, shootSpeed: 14, moveSpeed: 4, skin: 0, shotType: 0, skill: 99, fightDistMax: 10, fightDistMin: 3};
+var playerType = {health: 10, shootSpeed: 14, moveSpeed: 4, skin: 0, shotType: 0, skill: 99, fightDistMax: 10, fightDistMin: 3, team: 0};
 //player guns:
 // 0 - heatInc: 20, projType: 0, sspeed: 14
 // 1 - heatInc: 35, kick: 15, projType: 2, sspeed: 22
 
 var enemyTypes = [];
-enemyTypes[1] = {health:  4, shootSpeed: 40, moveSpeed: 8, skin: 1, shotType: 1, skill: 50, fightDistMax: 7, fightDistMin: 2 }; //grunt
-enemyTypes[3] = {health: 10, shootSpeed: 40, moveSpeed: 8, skin: 2, shotType: 1, skill: 50, fightDistMax: 7, fightDistMin: 2 }; //armoured
-enemyTypes[5] = {health:  4, shootSpeed: 15, moveSpeed: 8, skin: 3, shotType: 1, skill: 50, fightDistMax: 7, fightDistMin: 2 }; //rapid fire
-enemyTypes[7] = {health: 10, shootSpeed: 30, moveSpeed: 8, skin: 4, shotType: 0, skill: 70, fightDistMax: 9, fightDistMin: 2 }; //commando
-enemyTypes[9] = {health: 12, shootSpeed: 20, moveSpeed: 4, skin: 5, shotType: 2, skill: 85, fightDistMax: 10, fightDistMin: 3}; //elite commando
-enemyTypes[11] = {health: 5, shootSpeed: 20, moveSpeed: 8, skin: 6, shotType: 4, skill: 65, fightDistMax: 20, fightDistMin: 4}; //sniper
+enemyTypes[1] = {health:  4, shootSpeed: 40, moveSpeed: 8, skin: 1, shotType: 1, skill: 50, fightDistMax: 7, fightDistMin: 2, team: 1 }; //grunt
+enemyTypes[3] = {health: 10, shootSpeed: 40, moveSpeed: 8, skin: 2, shotType: 1, skill: 50, fightDistMax: 7, fightDistMin: 2, team: 1 }; //armoured
+enemyTypes[5] = {health:  4, shootSpeed: 15, moveSpeed: 8, skin: 3, shotType: 1, skill: 50, fightDistMax: 7, fightDistMin: 2, team: 1 }; //rapid fire
+enemyTypes[7] = {health: 10, shootSpeed: 30, moveSpeed: 8, skin: 4, shotType: 0, skill: 70, fightDistMax: 9, fightDistMin: 2, team: 1 }; //commando
+enemyTypes[9] = {health: 12, shootSpeed: 20, moveSpeed: 4, skin: 5, shotType: 2, skill: 85, fightDistMax: 10, fightDistMin: 3, team: 1}; //elite commando
+enemyTypes[11] = {health: 5, shootSpeed: 20, moveSpeed: 8, skin: 6, shotType: 4, skill: 65, fightDistMax: 20, fightDistMin: 4, team: 1}; //sniper
+//teammate
+enemyTypes[13] = {health: 10, shootSpeed: 30, moveSpeed: 8, skin: 8, shotType: 0, skill: 100, fightDistMax: 9, fightDistMin: 2, team: 0};
 
 var Person = function (pos, face, ai, type) {
 	this.type = type;
@@ -744,6 +766,7 @@ var Person = function (pos, face, ai, type) {
 	this.pos = pos.clone();
 	this.live = true;
 	this.health = type.health;
+	this.team = type.team;
 	this.ai = ai;
 	this.index = null;
 	this.targetIndex = null;
@@ -1213,7 +1236,6 @@ var World = function(map) {
 
 
 		var e = new Person(pos, dir.random(), new AI(), enemyTypes[type]);
-		e.team = 1;
 		e.index = this.enemies.length;
 		e.goalDie = goalDie;
 		e.tag = tag;
@@ -1229,7 +1251,6 @@ var World = function(map) {
 
 	this.createPlayer = function (pos, face) {
 		this.p = new Person(pos, face, new PlayerAI(), playerType);
-		this.p.team = 0;
 		this.p.isLocalPlayer = true;
 		this.p.index = this.enemies.length;
 		this.enemies.push(this.p);
