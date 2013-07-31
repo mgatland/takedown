@@ -142,6 +142,12 @@ var Scripting = function (flags) {
 
 	var processAction = function (action, world) {
 		switch (action.type) {
+			case "alarm":
+				console.log("an alarm goes off");
+				world.enemies.forEach(function (e) {
+					e.ai.makeAllAware();
+				});
+				break;
 			case "e_patrolto":
 				var enemyIndex = toInt(action.val[0]);
 				var keySquare = world.getKeySquare(action.val[1]);

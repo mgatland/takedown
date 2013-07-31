@@ -278,6 +278,7 @@ var PlayerAI = function () {
 	this.setOwner = function () {}; //ignore
 	this.update = function () {}; //ignore
 	this.setState = function () {}; //ignore
+	this.makeAllAware = function () {};
 }
 
 /* AT States:
@@ -549,7 +550,6 @@ var AI = function () {
 				aware[i] = false;
 				//we are always aware of teammates
 				if (e.team === owner.team) aware[i] = true;
-				if (allAware) addSuspicion(999, i); //instantly become aware
 			}
 
 			//update canSee
@@ -562,6 +562,9 @@ var AI = function () {
 
 			//update suspicion, unless we're already aware of them
 			if (!awareOf(i)) {
+
+				if (allAware) addSuspicion(999, i); //instant awareness.
+
 				if (canSeeNow) {
 					that.seeSuspiciousThing(e.pos, 6, i);
 				} else {
