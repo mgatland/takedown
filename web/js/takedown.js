@@ -846,6 +846,12 @@ var Decoration = function (pos, type, world, live) {
 	world.decorations.push(this);
 }
 
+var KeySquare = function (pos, name, world) {
+	this.pos = pos;
+	this.name = name
+	world.keySquares.push(this);
+}
+
 var Shot = function (typeIndex, pos, face, team, ownerIndex, targetIndex, world) {
 	this.live = true;
 	this.type = shotTypes[typeIndex];
@@ -935,6 +941,7 @@ var World = function(map) {
 	this.enemies = [];
 	this.explosions = [];
 	this.decorations = [];
+	this.keySquares = [];
 	this.p = null;
 	this.map = map;
 	var flags = [];
@@ -1127,6 +1134,10 @@ var World = function(map) {
 
 	this.createDecoration = function (pos, type, live) {
 		new Decoration(pos, type, this, live);
+	}
+
+	this.createKeySquare = function (pos, name) {
+		new KeySquare(pos, name, this);
 	}
 
 	this.createShot = function(typeIndex, pos, face, team, ownerIndex, targetIndex) {

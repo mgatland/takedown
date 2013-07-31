@@ -196,14 +196,19 @@ function CampaignLoader() {
         console.log(triggers);
 
         var decs = [];
+        var keySquares = [];
         i = findSection("[misc]", lines, i);
         while (lines[i] != "[]") {
           if (lines.length === 0 || lines[i].substring(0,1) === "'") {
             i++;
             continue; //ignore comments and blanks
           }
-          var decLine = CSVToArray(lines[i]);
-          decs.push({x: decLine[1], y:decLine[2], type:decLine[3], live:decLine[4] >= 0});
+          var miscLine = CSVToArray(lines[i]);
+          if (miscLine[0] === "dec") {
+            decs.push({x: miscLine[1], y:miscLine[2], type:miscLine[3], live:miscLine[4] >= 0});
+          } else if (miscLine[0] === "keysq") {
+            keySquares.push({x: miscLine[1], y:miscLine[2], name:miscLine[3]});
+          }
           i++;
         }
 
@@ -229,6 +234,9 @@ function CampaignLoader() {
         });
         decs.forEach(function (d) {
           world.createDecoration(new Pos(d.x, d.y), d.type, d.live ? true : false);
+        });
+        keySquares.forEach(function (ks) {
+          world.createKeySquare(new Pos(ks.x, ks.y), ks.name);
         });
         return world;
       } else {
