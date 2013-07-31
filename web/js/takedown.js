@@ -1019,8 +1019,8 @@ var World = function(map) {
 	var keySquares = [];
 	this.p = null;
 	this.map = map;
-	var flags = [];
-	var scripting = new Scripting(flags);
+	var scripting = new Scripting();
+	var flags;
 	var dangerMap = []; //one for each team.
 	dangerMap[0] = make2DArray(map.width, map.height, 0);
 	dangerMap[1] = make2DArray(map.width, map.height, 0);
@@ -1040,6 +1040,11 @@ var World = function(map) {
 	var forwardButton = document.getElementById("forward");
 	var backButton = document.getElementById("back");
 	var closeButton = document.getElementById("close");
+
+	this.setFlags = function (newFlags) {
+		flags = newFlags;
+		scripting.setFlags(flags);
+	}
 
 	//dir - the direction to move if the current note isn't found
 	var validateCurrentNote = function (dir) {
@@ -1398,12 +1403,14 @@ var start = function () {
 	var world = null;
 	var camera = null;
 	var notes = null; //TODO: this persists between levels, store it in a special persistent store
+	var flags = []; //TODO: store in persisted store
 
 	var campaignLoader = new CampaignLoader();
 	var level = 1;
 
 	var loadMission = function () {
 		world = campaignLoader.loadMission(level);
+		world.setFlags(flags);
 		world.audio = audio;
 		camera = new Camera(world.p.pos, world.map.width, world.map.height);
 		world.camera = camera;

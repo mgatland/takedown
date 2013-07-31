@@ -1,6 +1,11 @@
-var Scripting = function (flags) {
+var Scripting = function () {
 	var triggers = [];
 	var timers = [];
+	var flags;
+
+	this.setFlags = function (newFlags) {
+		flags = newFlags;
+	}
 
 	var updateTimers = function () {
 		timers.forEach(function (timer) {
