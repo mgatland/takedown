@@ -528,7 +528,7 @@ var AI = function () {
 			}
 
 			//update suspicion, unless we're already aware of them
-			if (aware[i] === false) {
+			if (!awareOf(i)) {
 				if (canSeeNow) {
 					that.seeSuspiciousThing(e.pos, 6, i);
 				} else {
@@ -546,18 +546,21 @@ var AI = function () {
 		world.shots.forEach(function (s) {
 			if (s.live === false) return;
 			if (s.ownerIndex === owner.index) return;
-			if (awareOf(s.ownerIndex)) return;
 
-			var canSee = world.map.canSee(owner.pos, s.pos);
-			if (canSee) {
-				that.seeSuspiciousThing(s.pos, 50, s.ownerIndex);
+			//this if condition is just for performance
+			if (!awareOf(s.ownerIndex) || s.targetIndex != null && !awareOf(s.targetIndex)) {
+				var canSee = world.map.canSee(owner.pos, s.pos);
+				if (canSee) {
+					that.seeSuspiciousThing(s.pos, 50, s.ownerIndex);
+					if (s.targetIndex != null) that.seeSuspiciousThing(s.pos, 50, s.targetIndex);
+				}
 			}
 		});
 
 		world.explosions.forEach(function (e) {
 			if (e.live === false) return;
 			if (e.ownerIndex === owner.index) return;
-			if (awareOf(e.ownerIndex)) return;
+			if (awareOf(e.ownerIndex) && (e.targetIndex == null || awareOf(e.targetIndex))) return;
 
 			var canSee = world.map.canSee(owner.pos, e.pos);
 			if (canSee) {
@@ -568,6 +571,7 @@ var AI = function () {
 				var dist = owner.pos.trueDistanceTo(e.pos);
 				var amount = Math.max(3.5 - dist, 0) * 210;
 				addSuspicion(Math.floor(amount), e.ownerIndex);
+				if (e.targetIndex != null) addSuspicion(Math.floor(amount), e.targetIndex);
 			}
 		});
 
@@ -758,7 +762,7 @@ Person.prototype.fire = function (mode, world) {
 		if (this.isLocalPlayer) world.audio.play(world.audio.overheat);
 	} else {
 		//mode is ignored
-		var shot = world.createShot(this.type.shotType, this.pos, this.face, this.team, this.index);
+		var shot = world.createShot(this.type.shotType, this.pos, this.face, this.team, this.index, this.targetIndex);
 		if (shot !== null) {
 			//set up shot stealth, special
 			world.audio.play(world.audio.shot, this.type.shotType);
@@ -805,7 +809,7 @@ Person.prototype.hurt = function (audio, damage, world) {
 var explosionFrameRate = 1; //how many frames each image is shown for
 var explosionFrames = 5; //how many frames of animation there are
 
-var Explosion = function (skin, pos, ownerIndex, world) {
+var Explosion = function (skin, pos, ownerIndex, targetIndex, world) {
 	this.live = true;
 	this.skin = skin;
 	//hack because art is out of order
@@ -813,6 +817,7 @@ var Explosion = function (skin, pos, ownerIndex, world) {
 	this.renderPos = pos.clone();
 	this.pos = pos.clone().floor();
 	this.ownerIndex = ownerIndex;
+	this.targetIndex = targetIndex;
 	world.explosions.push(this);
 	this.age = -1; //hack: We're spawned and then updated in the same tick, before we're drawn
 					//starting this from -1 means we are at frame 0 when we're first drawn.
@@ -835,7 +840,7 @@ var Decoration = function (pos, type, world, live) {
 	world.decorations.push(this);
 }
 
-var Shot = function (typeIndex, pos, face, team, ownerIndex, world) {
+var Shot = function (typeIndex, pos, face, team, ownerIndex, targetIndex, world) {
 	this.live = true;
 	this.type = shotTypes[typeIndex];
 	this.typeIndex = typeIndex; //hack, used for sound effect
@@ -843,6 +848,7 @@ var Shot = function (typeIndex, pos, face, team, ownerIndex, world) {
 	this.face = face;
 	this.team = team;
 	this.ownerIndex = ownerIndex;
+	this.targetIndex = targetIndex;
 	this.moved = 0;
 	world.shots.push(this);
 };
@@ -865,7 +871,7 @@ Shot.prototype.explode = function (world, hitWall) {
 			case dir.DOWN: pos.y += 0.5; break;
 		};
 	}
-	var explosion = new Explosion(this.type.skin, pos.clone(), this.ownerIndex, world);
+	var explosion = new Explosion(this.type.skin, pos.clone(), this.ownerIndex, this.targetIndex, world);
 	pos.x += Math.random() * 0.2 - 0.1;
 	pos.y += Math.random() * 0.2 - 0.1;
 	new Decoration(pos, 15 + Math.floor(Math.random() * 3), world, true);
@@ -1116,9 +1122,9 @@ var World = function(map) {
 		new Decoration(pos, type, this, live);
 	}
 
-	this.createShot = function(typeIndex, pos, face, team, ownerIndex) {
+	this.createShot = function(typeIndex, pos, face, team, ownerIndex, targetIndex) {
 		console.log("shot!");
-		var shot = new Shot(typeIndex, pos, face, team, ownerIndex, this);
+		var shot = new Shot(typeIndex, pos, face, team, ownerIndex, targetIndex, this);
 	}
 
 	this.createEnemy = function (pos, type, state, goalDie) {
