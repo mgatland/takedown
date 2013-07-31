@@ -155,7 +155,8 @@ var Pos = function (x, y) {
 		var closed = [];
 		thisStep.push(other);
 		var cost = 0;
-		while (thisStep.length > 0 || nextStep.length > 0) {
+		var finished = false;
+		while (!finished && (thisStep.length > 0 || nextStep.length > 0)) {
 			if (thisStep.length === 0) {
 				thisStep = nextStep;
 				nextStep = [];
@@ -172,6 +173,9 @@ var Pos = function (x, y) {
 					nextStep.push(new Pos(next.x, next.y + 1));
 					nextStep.push(new Pos(next.x, next.y - 1));
 				}
+			}
+			if (next.equals(this)) {
+				finished = true; //we have found the shortest path.
 			}
 		}
 		//now we have our path, which of our possible moves is the best?
