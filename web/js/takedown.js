@@ -478,18 +478,18 @@ var AI = function () {
 
 	var updateMyTarget = function (world) {
 
-		var myEnemies = world.enemies.filter(function (e, i) { return e.live === true && e.team != owner.team && awareOf(i)});
+		var myEnemies = world.enemies.filter(function (e) { return e.live === true && e.team != owner.team && awareOf(e.index)});
 		var bestDist = null;
 		var bestNewTargetIndex = null;
-		myEnemies.forEach(function (e, index) {
+		myEnemies.forEach(function (e) {
 			var dist = owner.pos.trueDistanceTo(e.pos);
 			//if it's our current target, it gets a selection bonus
 			if (owner.targetIndex != null && owner.targetIndex == e.index) dist -= 4;
 			//bonus for enemies we can see
-			if (iCanSee[index] > 0) dist -= 4;
+			if (iCanSee[e.index] > 0) dist -= 4;
 			if (bestDist == null || dist < bestDist) {
 				bestDist = dist;
-				bestNewTargetIndex = index;
+				bestNewTargetIndex = e.index;
 			}
 		});
 		owner.targetIndex = bestNewTargetIndex;
@@ -660,7 +660,7 @@ var AI = function () {
 			var moveScore = 0;
 			if (i === dir.NONE && i != plannedMove) moveScore += 0.5; // standing still usually beats pointless movement.
 			if (i === plannedMove) moveScore += 4;
-			if (!clumsy) moveScore -= world.getDangerAt(movedPos); //I usually spot danger, but occasionally forget to look
+			if (!clumsy) moveScore -= world.getDangerAt(owner.team, movedPos); //I usually spot danger, but occasionally forget to look
 
 			//random variation
 			moveScore += Math.random() * 1.0;
@@ -1021,7 +1021,9 @@ var World = function(map) {
 	this.map = map;
 	var flags = [];
 	var scripting = new Scripting(flags);
-	var dangerMap = make2DArray(map.width, map.height, 0);
+	var dangerMap = []; //one for each team.
+	dangerMap[0] = make2DArray(map.width, map.height, 0);
+	dangerMap[1] = make2DArray(map.width, map.height, 0);
 
 	var endMissionTimer = 0;
 	var missionIsEnding = false;
@@ -1256,50 +1258,61 @@ var World = function(map) {
 		this.enemies.push(this.p);
 	};
 
-	var setDangerAt = function (pos, value) {
+	var setDangerAt = function (team, pos, value) {
 		if (map.isValid(pos)) {
-			if (dangerMap[pos.x][pos.y] < value) {
-				dangerMap[pos.x][pos.y] = value;
+			if (dangerMap[team][pos.x][pos.y] < value) {
+				dangerMap[team][pos.x][pos.y] = value;
 			}
 		}
 	}
 
+	//assumes only 2 teams
+	var otherTeam = function (team) {
+		if (team === 0) return 1;
+		return 0;
+	}
+
 	var updateDangerMap = function () {
+
 		this.map.forEach(function (pos, value) {
-			dangerMap[pos.x][pos.y] = 0;
+			//assumes only 2 teams.
+			dangerMap[0][pos.x][pos.y] = 0;
+			dangerMap[1][pos.x][pos.y] = 0;
 		});
 
 		//Danger around the player
-		if (this.p.live === true) {
-			var pos = this.p.pos;
-			setDangerAt(pos.clone().moveInDir(dir.UP, 1), 2);
-			setDangerAt(pos.clone().moveInDir(dir.DOWN, 1), 2);
-			setDangerAt(pos.clone().moveInDir(dir.LEFT, 1), 2);
-			setDangerAt(pos.clone().moveInDir(dir.RIGHT, 1), 2);
+		this.enemies.forEach(function (e) {
+			if (e.live == false) return;
+			var pos = e.pos;
+			var team = otherTeam(e.team);
+			setDangerAt(team, pos.clone().moveInDir(dir.UP, 1), 2);
+			setDangerAt(team, pos.clone().moveInDir(dir.DOWN, 1), 2);
+			setDangerAt(team, pos.clone().moveInDir(dir.LEFT, 1), 2);
+			setDangerAt(team, pos.clone().moveInDir(dir.RIGHT, 1), 2);
 
-			setDangerAt(pos.clone().moveInDir(dir.UP, 2), 1);
-			setDangerAt(pos.clone().moveInDir(dir.DOWN, 2), 1);
-			setDangerAt(pos.clone().moveInDir(dir.LEFT, 2), 1);
-			setDangerAt(pos.clone().moveInDir(dir.RIGHT, 2), 1);
-		}
+			setDangerAt(team, pos.clone().moveInDir(dir.UP, 2), 1);
+			setDangerAt(team, pos.clone().moveInDir(dir.DOWN, 2), 1);
+			setDangerAt(team, pos.clone().moveInDir(dir.LEFT, 2), 1);
+			setDangerAt(team, pos.clone().moveInDir(dir.RIGHT, 2), 1);
+		});
 
 		//Danger in front of shots that can hurt enemies
 		this.shots.forEach(function (s) {
 			if (s.live === false) return;
-			if (s.team === 1) return; //ignore my own shots
+			var team = otherTeam(s.team);
 			var pos = s.pos.clone();
 			var danger = 100;
 			while (map.isValid(pos) && danger > 0) {
-				setDangerAt(pos, danger);
+				setDangerAt(team, pos, danger);
 				pos.moveInDir(s.face, 1);
 				danger -= 8;
 			}
 		});
 	};
 
-	this.getDangerAt = function (pos) {
+	this.getDangerAt = function (team, pos) {
 		if (map.isValid(pos)) {
-			return dangerMap[pos.x][pos.y];
+			return dangerMap[team][pos.x][pos.y];
 		} else {
 			return 0;
 		}
