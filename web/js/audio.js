@@ -1,12 +1,11 @@
 "use strict";
 
 //mostly from http://www.html5rocks.com/en/tutorials/webaudio/intro/
-function createAudio() {
+function createAudio(saves) {
 	var audio = {};
 	var music = null;
 
 	var defaultMusicVolume = 0.5;
-	var musicEnabled = true;
 
 	var voiceChannelAvailableTime = 0;
 
@@ -61,6 +60,11 @@ function createAudio() {
  	var musicVolumeNode = context.createGain();
 	musicVolumeNode.connect(context.destination);
 	musicVolumeNode.gain.value = defaultMusicVolume;
+
+
+	var settings = saves.loadSettings();
+	settings.musicDisabled = settings.musicDisabled ? true : false;
+	if (settings.musicDisabled) musicVolumeNode.gain.value = 0;
 
     audio.load = function (callback) {
 
@@ -148,11 +152,12 @@ function createAudio() {
 	}
 
 	audio.toggleMusic = function () {
-		musicEnabled = !musicEnabled;
-		if (musicEnabled) {
-			musicVolumeNode.gain.value = defaultMusicVolume;
-		} else {
+		settings.musicDisabled = !settings.musicDisabled;
+		saves.saveSettings(settings);
+		if (settings.musicDisabled) {
 			musicVolumeNode.gain.value = 0;
+		} else {
+			musicVolumeNode.gain.value = defaultMusicVolume;
 		}
 	}
 

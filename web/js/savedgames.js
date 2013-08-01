@@ -13,7 +13,6 @@ var SavedGames = function () {
 		this.flags = [];
 		this.notesCollected = [];
 		this.playerHealth = playerType.health;
-		this.musicEnabled = true;
 	}
 
 	this.newGame = function () {
@@ -24,6 +23,8 @@ var SavedGames = function () {
 		alert("Your browser doesn't support saving your game, so your progress will be lost if you refresh the page.");
 		this.load = function () { return this.newGame();};
 		this.save = function () { console.log("cannot save")};
+		this.loadSettings = function () { return {}};
+		this.saveSettings = function () {};
 		return;
 	}
 
@@ -37,5 +38,15 @@ var SavedGames = function () {
 
 	this.save = function (savedGame) {
 		localStorage.setItem("takedown_save0", JSON.stringify(savedGame));
+	}
+
+	this.loadSettings = function () {
+		var settings = localStorage.getItem("takedown_settings");
+		if (settings == null) return {};
+		return JSON.parse(settings);
+	}
+
+	this.saveSettings = function (settings) {
+		localStorage.setItem("takedown_settings", JSON.stringify(settings));
 	}
 }

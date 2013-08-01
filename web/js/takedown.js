@@ -18,6 +18,14 @@ var dir = {
 
 var messageTextDelay = 50;
 
+var hideElement = function (el) {
+	el.style.display = "none";
+}
+
+var showElement = function (el) {
+	el.style.display = null;
+}
+
 dir.random = function () {
 	switch (Math.floor(Math.random() * 4)) {
 		case 0: return dir.UP;
@@ -1144,16 +1152,6 @@ var World = function(map) {
 		this.updateBriefingDisplay();
 	}
 
-
-
-	var hideElement = function (el) {
-		el.style.display = "none";
-	}
-
-	var showElement = function (el) {
-		el.style.display = null;
-	}
-
 	var setText = function (el, text) {
 		el.innerHTML = text;
 	}
@@ -1421,7 +1419,8 @@ var start = function () {
 	canvas.height = screen.height * screen.tileSize + screen.hudHeight;
 
 	var keyboard = createKeyboard();
-	var audio = createAudio();
+	var saves = new SavedGames();
+	var audio = createAudio(saves);
 	var assets = new Assets();
 
 	var world = null;
@@ -1429,13 +1428,22 @@ var start = function () {
 
 	var notes = null;
 
-	var saves = new SavedGames();
 	var savedGame = saves.load();
-
-	if (!savedGame.musicEnabled) audio.toggleMusic();
 
 	var campaignLoader = new CampaignLoader();
 
+	var mainMenuShowing = false;
+	var mainMenu = document.getElementById("mainmenu");
+
+	var showMainMenu = function () {
+		mainMenuShowing = true;
+		showElement(mainMenu);
+	}
+
+	var hideMainMenu = function () {
+		mainMenuShowing = false;
+		hideElement(mainMenu);
+	}
 
 	var loadMission = function () {
 		world = campaignLoader.loadMission(savedGame.level);
@@ -1453,8 +1461,7 @@ var start = function () {
 			audio.load(function () {
 				//first load
 				notes = campaignLoader.loadNotes();
-				loadMission();
-				world.p.health = savedGame.playerHealth;
+				showMainMenu();
 			});
 		});
 	});
@@ -1524,6 +1531,13 @@ var start = function () {
 		}
 	};
 
+	//main menu buttons
+	document.getElementById("mainmenu_newgame").onclick = function () {
+		savedGame = saves.newGame();
+		loadMission();
+		world.p.health = savedGame.playerHealth;
+		hideMainMenu();
+	}
 };
 
 var updatePlayerInput = function (keyboard, playerAI) {
@@ -1575,7 +1589,6 @@ var update = function (world, keyboard, camera, savedGame) {
 	if (optionsTimer == 0) {
 		if (keyboard.isKeyDown(KeyEvent.DOM_VK_M)) {
 			world.audio.toggleMusic();
-			savedGame.musicEnabled = !savedGame.musicEnabled; //hacky, could get out of sync
 			optionsTimer = 12;
 		} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_X)) {
 			world.toggleNotes();
