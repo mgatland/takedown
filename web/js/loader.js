@@ -216,7 +216,7 @@ function CampaignLoader() {
         i = findSection("[brief]", lines, i);
         var rawMissionText = CSVToArray(lines[i]);
         i++;
-        var healAmount = toInt(lines[i]); //unused for now
+        var healAmount = toInt(lines[i]);
         i++;
 
         var briefing = createBriefing(rawMissionText);
@@ -224,6 +224,7 @@ function CampaignLoader() {
         //now initialize the world and call the callback
         var world = new World(createGrid(width, height));
         world.groundType = groundType;
+        world.healAmount = healAmount;
         world.setBriefing(briefing);
         world.setTriggers(triggers);
         world.map.forEach(function (pos, value) {

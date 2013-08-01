@@ -1402,8 +1402,12 @@ var start = function () {
 
 	var world = null;
 	var camera = null;
-	var notes = null; //TODO: this persists between levels, store it in a special persistent store
-	var flags = []; //TODO: store in persisted store
+
+	//Persisted things:
+	var notes = null;
+	var flags = [];
+	var playerHealth = playerType.health;
+	var previousPlayerHealth = playerType.health;
 
 	var campaignLoader = new CampaignLoader();
 	var level = 1;
@@ -1415,6 +1419,10 @@ var start = function () {
 		camera = new Camera(world.p.pos, world.map.width, world.map.height);
 		world.camera = camera;
 		document.getElementById("briefing").style.display = null;
+
+		//heal the player
+		world.p.health = previousPlayerHealth + world.healAmount;
+		if (world.p.health > playerType.health) world.p.health = playerType.health;
 	};
 
 	//Load the art assets, then the campaign, then the sounds, then start.
@@ -1441,6 +1449,9 @@ var start = function () {
 
 		if (world && world.hasEnded && !world.isPaused()) {
 			level++;
+
+			previousPlayerHealth = world.p.health;
+
 			loadMission();
 			world.setNotes(notes);
 		}

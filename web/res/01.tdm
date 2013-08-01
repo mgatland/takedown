@@ -155,7 +155,7 @@ dec,21,12,3,0
 []
 [brief]
 "^wThis is Andrew Lambed, the new Supervisor that has been assigned to you. I'm here to keep you on track down there and provide a link with UNITY.^2I'm just testing out your communications - Things are a bit jittery with the jamming around here. Check that this text is a white font - a black screen with white font is a message directly from me, and can always be trusted." ,"^wMake sure you fimiliarize yourself with the most recent modificatons to your combat suit before approaching any enemy troopers.^2There are two Stall soldiers in this area for you to dispatch. We'll be watching your vital signs as you fight, making sure you do not experience any nausia while killed the troopers. You should have no trouble.","^gDo you want to activate the tutorial for this mission to explain how to play TakeDown?^[0Yes - use tutorial^00]^[1No - I know how to do this!^01]"
-100
+10
 []
 
 "Here we teach the player to sneak - 18 - May 4, 2170?"
@@ -199,7 +199,7 @@ dec,21,12,3,0
 []
 [brief]
 "^wUNITY has just finished with the results from your first battle. You're well within all the safety thresholds, and seem totally desensitized to the idea of killing. Apart from minor equipment checks, you and your equipment are working exactly as planned. Considering how long it's been since we last used soldiers, it's amazing that we've so quickly redeveloped the concept.^2You've now arrived at a small camp of Stall troopers. I want you to take them all out. Because they're spread out, you should be able to take them down one at a time if you use a stealthy approach.^wTry not to fire stray shots where other enemies will see them.^2Good luck.","^gTo avoid detection, stay out of sight. If you must move past an enemy, wait until he is facing directly away from you.","^gUse the X key to open your digital notes. Important information will be added to your notes when you discover it."
-100
+10
 []
 
 "Revise sneaking and teach the player about bottlenecks and campers - 18 - May 4, 2170?"
@@ -242,7 +242,7 @@ dec,19,14,3,0
 []
 [brief]
 "^wThere are four troopers here. Once again, try to avoid alerting too many enemies to your presence at one time, because they are more dangerous in groups.","^gPay attention to bottlenecks. If you are trapped between two walls, you are unable to dodge. Try to avoid being pinned down and try to force your enemies through bottlenecks so they are easier to hit.",""
-100
+10
 []
 
 " - HARD Teach the player about enemy reinforcements - 17/18 - plot development - May 4, 2170? or 5"
@@ -289,7 +289,7 @@ dec,19,14,3,0
 []
 [brief]
 "^wSeveral Stall troopers are travelling through this area to reach Sector 17, where Peacekeeper 2 is working. His repair unit is out, so he needs to be kept safe until it's working again.^2Kill the troopers as they arrive.","^gWhen fighting at long range, use your rifle (N) to pick off opponents. At closer range, you will have to use your pistol (M) as the rifle's kickback will prevent you from dodging attacks.^2Try to snipe the enemies as soon as they enter your area, if possible.",""
-100
+10
 []
 
 
@@ -385,7 +385,7 @@ keysq,5,9,leftcourt
 []
 [brief]
 "^wThis is one of the temporary bases that Stall technical crews seem to use. UNITY reports that one of the consoles here directly controls Stall fuel supplies.^2Find that control panel and I'll unload a virus onto it. Then return to the blue marker and I can recall you.^2Crippling the fuel distribution will help us split Stall up and prevent central communication.","^wTry to avoid combat. There are a lot of troopers around this area.^2Sneak past the guards without detection.","^gPress X to check your digital notes. You can use the Next and Previous buttons to cycle through the different pages."
-100
+10
 []
 
 "flag 0: Commander is dead - a flag shouldn't be used her, fix it later" - - May 5, 2170?
@@ -440,7 +440,7 @@ dec,35,17,4,0
 []
 [brief]
 "^wReports have shown that Stall is devoting most of its resources to the development of combat technology. UNITY has located a commander who has been fitted with new prototype equpiment. You are to investigate the capabilities of this equipment by killing the commander.","^wI will be ready to recall you - just head back to the blue marker. UNITY doesn't need you to kill all of the troopers at the base. If possibly, just take out the commander and leave.","^gIf you overheat, try to break out of combat and cool down under cover. Stall weapons do not overheat, so you lose your advantage in sustained combat. Be prepared to retreat if you have to."
-100
+10
 []
 
 "snipers                             - - May 7, 2170?"
@@ -479,7 +479,7 @@ dec,35,17,4,0
 []
 [brief]
 "^wA taskforce of Stall troopers armed with experimental weapons have started heading towards sector 17. They may have been attempting to find and kill Peacekeeper 2, who is still heavily damaged. However, they've now spotted our approach and are approaching your position.^2Be careful - we don't know what kind of weapons these guys might have.","",""
-100
+10
 []
 
 "For some relaxation, try to fend off unrelenting attackers!                  - - May 7, 2170?"
@@ -598,7 +598,7 @@ dec,16,31,16,0
 []
 [brief]
 "^wStall abandoned this fort recently. UNITY suspects that they may have left important information. Explore the fort and look for records.","",""
-100
+10
 []
 
 "Rescue on May 7 2170 - sector 14 (thick undergrowth) - set flag 27 (pk2 is alive) to true"
@@ -646,7 +646,7 @@ dec,16,31,16,0
 []
 [brief]
 "^rTransmission:^2I need backup! I can't take this much fire! ","^wDraw fire away from Peacekeeper 2 and help him kill the troopers. Keep him alive.",""
-100
+10
 []
 
 "- May 8, 2170 - sector 14 (thick undergrowth)  - kill arriving enemies with PK2  - (flag 27 = PK2 is alive)"
@@ -703,7 +703,7 @@ dec,16,31,16,0
 []
 [brief]
 "^wWe've got enemies approaching all over the place. Fight them off.^2UNITY is having trouble calculating a course of action. Stall isn't following any recorded behaviour pattern. Their movements seem totally unpredictable.","^wNumber two managed to access some upgrade technology during his mission. Now that we've got that info, he's expendable. Try to keep him alive while you can.^2We've got resources to give you a one-off upgrade, and we should be able to do more soon. Choose an upgrade from the list.",""
-50
+5
 []
 
 "- May 8, 2170 - sector 14 (thick undergrowth) but indoors - Stealth - (flag 27 = PK2 is alive)"
@@ -758,6 +758,6 @@ dec,16,31,16,0
 []
 [brief]
 "^wWe will need intelligence before we can safely move. I'm dropping you into a building that may have terminal access to maps showing Stall's forces. Because of the UNITY's radio jamming, everything will be stored locally. You should have no trouble retrieving the information.^2Go back to the blue beacon when you've finished.","",""
-50
+5
 []
 
