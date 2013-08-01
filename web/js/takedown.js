@@ -1578,9 +1578,8 @@ var render = function (world, camera, assets) {
 	}
 
 	//draw grass everywhere
-	var groundType = 3;
 	world.map.forEach(function (pos, tile) {
-		drawTile(assets.groundImage, pos, groundType, 0, camera);
+		drawTile(assets.groundImage, pos, world.groundType, 0, camera);
 	});
 
 	//draw tiles

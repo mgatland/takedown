@@ -223,6 +223,7 @@ function CampaignLoader() {
 
         //now initialize the world and call the callback
         var world = new World(createGrid(width, height));
+        world.groundType = groundType;
         world.setBriefing(briefing);
         world.setTriggers(triggers);
         world.map.forEach(function (pos, value) {
