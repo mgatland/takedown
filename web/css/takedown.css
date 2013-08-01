@@ -2,7 +2,7 @@ body {
 	background-color: black;
 	color: white;
 	font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
-	font-size: 20px;
+	font-size: 18px;
 }
 
 #gamecontainer {
@@ -17,12 +17,12 @@ body {
 
 .popover {
 	width: 660px;
-	height: 390px;
+	height: 490px;
 	border: solid 2px white;
 	background-color: black;
 	position: absolute;
 	margin-left: 25px;
-	margin-top: 35px;
+	margin-top: 20px;
 	padding: 20px;
 }
 
@@ -30,17 +30,42 @@ body {
 	margin-bottom: 20px;
 }
 
-#briefing button {
-	width: 600px;
-	display: block;
-	margin: auto;
-}
-
 button {
 	height: 40px;
 	font-size: 32px;
 	font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
 	margin: 20px;
+}
+
+.option {
+	width: 600px;
+	display: block;
+	margin: auto;
+	margin-top: 20px;
+}
+
+#continueButton {
+	position: absolute;
+	top: 455px;
+	left: 0px;	
+}
+
+#back {
+	position: absolute;
+	top: 455px;
+	left: 0px;
+}
+
+#forward {
+	position: absolute;
+	top: 455px;
+	left: 130px;
+}
+
+#close {
+	position: absolute;
+	top: 455px;
+	left: 350px;
 }
 
 .red {
