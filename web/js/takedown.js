@@ -507,7 +507,6 @@ var AI = function () {
 	}
 
 	this.setState = function (newState) {
-		console.log("new state: " + newState.name);
 		state = newState;
 	}
 
@@ -673,7 +672,7 @@ var AI = function () {
 				bestMove = i;
 			}
 		}
-		if (bestMove != plannedMove) console.log("dodged!");
+		//if (bestMove != plannedMove) console.log("dodged!");
 		return bestMove;
 	}
 
@@ -1251,7 +1250,6 @@ var World = function(map) {
 	}
 
 	this.createShot = function(typeIndex, pos, face, team, ownerIndex, targetIndex) {
-		console.log("shot!");
 		var shot = new Shot(typeIndex, pos, face, team, ownerIndex, targetIndex, this);
 	}
 

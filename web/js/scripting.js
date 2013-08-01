@@ -229,7 +229,7 @@ var Scripting = function () {
 	}
 
 	var fireTrigger = function (trigger, i, world) {
-		console.log("Firing trigger (" + trigger.cond[0].type + "," + trigger.cond[1].type + ")");
+		console.log("Firing trigger (" + trigger.cond[0].type + "," + trigger.cond[1].type + " -- " + trigger.act[0].type + "," + trigger.act[1].type + ")");
 
 		trigger.act.forEach(function (action) {
 			processAction(action, world);
