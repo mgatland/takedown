@@ -1456,6 +1456,8 @@ var start = function () {
 	var mainMenuShowing = false;
 	var mainMenu = document.getElementById("mainmenu");
 	var helpScreen = document.getElementById("helpscreen");
+	var optionsScreen = document.getElementById("optionsscreen");
+	var musicCheckbox = document.getElementById("musicCheckbox");
 
 	var showMainMenu = function () {
 		mainMenuShowing = true;
@@ -1594,27 +1596,47 @@ var start = function () {
 		hideElement(helpScreen);
 	}
 
-	var optionsTimer = 0;
+	var updateOptionsMenu = function () {
+		musicCheckbox.checked = !saves.loadSettings().musicDisabled;
+	}
+
+	document.getElementById("mainmenu_options").onclick = function () {
+		mainMenu.style.display = "none"; //hacky, hide it but don't let the game know it's hidden
+		//the above is so you can't tab to it.
+		updateOptionsMenu();
+		showElement(optionsScreen);
+	}
+
+	document.getElementById("closeOptions").onclick = function () {
+		mainMenu.style.display = "block"; //hacky
+		hideElement(optionsScreen);
+	}
+
+	musicCheckbox.onclick = function () {
+		var settings = saves.loadSettings();
+		audio.setMusicEnabled(musicCheckbox.checked);
+		saves.saveSettings(settings);
+	}
+
 
 	var update = function (world, keyboard, camera, savedGame) {
 
 		if (world === null) return;
 
-		if (optionsTimer == 0) {
-			if (keyboard.isKeyHit(KeyEvent.DOM_VK_M)) {
-				world.audio.toggleMusic();
-			} else if (keyboard.isKeyHit(KeyEvent.DOM_VK_X)) {
+		if (keyboard.isKeyHit(KeyEvent.DOM_VK_M)) {
+			world.audio.toggleMusic();
+			updateOptionsMenu();
+		} else if (keyboard.isKeyHit(KeyEvent.DOM_VK_X)) {
+			world.toggleNotes();
+		} else if (keyboard.isKeyHit(KeyEvent.DOM_VK_L) && keyboard.isKeyDown(KeyEvent.DOM_VK_Q)) {
+			world.hasEnded = true;
+		} else if (keyboard.isKeyHit(KeyEvent.DOM_VK_ESCAPE)) {
+			if (world.notesAreOpen()) {
 				world.toggleNotes();
-			} else if (keyboard.isKeyHit(KeyEvent.DOM_VK_L) && keyboard.isKeyDown(KeyEvent.DOM_VK_Q)) {
-				world.hasEnded = true;
-			} else if (keyboard.isKeyHit(KeyEvent.DOM_VK_ESCAPE)) {
-				if (world.notesAreOpen()) {
-					world.toggleNotes();
-				} else if (!mainMenuShowing) {
-					showMainMenu();
-				} else {
-					continueGame(); //hide main menu
-				}
+			} else if (!mainMenuShowing) {
+				showMainMenu();
+			} else {
+				continueGame(); //hide main menu
 			}
 		}
 		updatePlayerInput(keyboard, world.p.ai);

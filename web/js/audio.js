@@ -151,14 +151,18 @@ function createAudio(saves) {
 		}
 	}
 
-	audio.toggleMusic = function () {
-		settings.musicDisabled = !settings.musicDisabled;
+	audio.setMusicEnabled = function (state) {
+		settings.musicDisabled = !state;
 		saves.saveSettings(settings);
 		if (settings.musicDisabled) {
 			musicVolumeNode.gain.value = 0;
 		} else {
 			musicVolumeNode.gain.value = defaultMusicVolume;
 		}
+	}
+
+	audio.toggleMusic = function () {
+		this.setMusicEnabled(settings.musicDisabled);
 	}
 
 	audio.getMusicIndexForHealth = function(health) {

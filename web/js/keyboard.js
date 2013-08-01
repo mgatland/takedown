@@ -56,9 +56,6 @@ function createKeyboard() {
     }
 
     keyboard.isKeyHit = function (keyCode) {
-        if (keysHit[keyCode]) {
-            console.log("Key hit !" + keyCode);
-        }
         return keysHit[keyCode];
     }
 
