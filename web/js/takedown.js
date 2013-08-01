@@ -1054,6 +1054,7 @@ var World = function(map) {
 
 	var endMissionTimer = 0;
 	var missionIsEnding = false;
+	var forceLose = false;
 
 	this.enemyTemplates = [];
 
@@ -1083,7 +1084,7 @@ var World = function(map) {
 	}
 
 	this.hasLost = function () {
-		if (this.p.health <= 0) return true;
+		if (forceLose) return true;
 		return false;
 	}
 
@@ -1229,6 +1230,11 @@ var World = function(map) {
 	this.endMission = function (timeDelay) {
 		missionIsEnding = true;
 		endMissionTimer = timeDelay;
+	}
+
+	this.loseMission = function (timeDelay) {
+		forceLose = true;
+		this.endMission(timeDelay);
 	}
 
 	this.addMessage = function (string) {
@@ -1382,13 +1388,19 @@ var World = function(map) {
 
 		if (this.isPaused()) return; //pause while briefing is displayed
 
+		if (this.p.health <= 0 && !this.hasLost()) {
+			this.loseMission(100);
+		}
+
 		if (missionIsEnding) {
 			endMissionTimer--;
 			if (endMissionTimer <= 0) {
 				missionIsEnding = false;
 				this.hasEnded = true;
 				this.audio.stopMusic();
-				this.audio.play(this.audio.music, 2);
+				if (!this.hasLost()) {
+					this.audio.play(this.audio.music, 2);
+				}
 			}
 		}
 
@@ -1402,7 +1414,7 @@ var World = function(map) {
 			this.audio.playMusic(this.audio.music, musicIndex);
 			scripting.newLev(this);
 			firstFrame = false;
-		} else if (this.hasEnded == true) {
+		} else if (this.hasEnded == true && !this.hasLost()) {
 			world.callWinMissionTriggers();
 		} else {
 			scripting.update(this);
@@ -1504,23 +1516,28 @@ var start = function () {
 		});
 
 		if (world && world.hasEnded && !world.isPaused()) {
-			savedGame.level++;
-			//heal the player
-			var endingHealth = world.p.health;
 
-			savedGame.notesCollected = world.getNotesCollected();
-			savedGame.flags = world.getFlags();
+			if (world.hasLost()) {
+				//restart
+				loadMission();
+				world.p.health = savedGame.playerHealth;
+			} else {
+				savedGame.level++;
+				//heal the player
+				var endingHealth = world.p.health;
 
-			loadMission();
+				savedGame.notesCollected = world.getNotesCollected();
+				savedGame.flags = world.getFlags();
 
-			savedGame.health = endingHealth + world.healAmount;
-			if (savedGame.health > playerType.health) savedGame.health = playerType.health;
+				loadMission();
 
-			saves.save(savedGame);
+				savedGame.health = endingHealth + world.healAmount;
+				if (savedGame.health > playerType.health) savedGame.health = playerType.health;
 
-			world.p.health = savedGame.health;
+				saves.save(savedGame);
 
-
+				world.p.health = savedGame.health;
+			}
 		}
 
 	}, 40);

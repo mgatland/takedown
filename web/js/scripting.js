@@ -218,6 +218,11 @@ var Scripting = function () {
 				//ignore the other parameters
 				world.endMission(timeDelay);
 				break;
+			case "losemission":
+				if (world.hasLost()) return;
+				var timeDelay = parseInt(action.val[0]);
+				world.loseMission(timeDelay);
+				break;
 			case "null": //noop
 				break;
 			case "dec":
