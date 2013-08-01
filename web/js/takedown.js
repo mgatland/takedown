@@ -1593,7 +1593,7 @@ var update = function (world, keyboard, camera, savedGame) {
 		} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_X)) {
 			world.toggleNotes();
 			optionsTimer = 12;
-		} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_P)) {
+		} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_L) && keyboard.isKeyDown(KeyEvent.DOM_VK_Q)) {
 			world.hasEnded = true;
 		}
 	} else {

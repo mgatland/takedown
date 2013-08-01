@@ -7,6 +7,7 @@ if (typeof KeyEvent == "undefined") {
         DOM_VK_ENTER: 14,
         DOM_VK_SPACE: 32,
         DOM_VK_SHIFT: 16,
+        DOM_VK_ESCAPE: 27,
 
         DOM_VK_LEFT: 37,
         DOM_VK_UP: 38,
@@ -17,6 +18,9 @@ if (typeof KeyEvent == "undefined") {
         DOM_VK_A: 65,
         DOM_VK_S: 83,
         DOM_VK_D: 68,
+
+        DOM_VK_Q: 81,
+        DOM_VK_L: 76,
 
         DOM_VK_M: 77,
         DOM_VK_X: 88,
