@@ -1632,14 +1632,12 @@ var render = function (world, camera, assets) {
 	ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
 	ctx.fillText("Heat: " + Math.floor(world.p.heat), screen.width * screen.tileSize - 200, screen.height * screen.tileSize + 42);
 
-	//health bar
-	drawBar(screen.width * screen.tileSize / 2 - 100,screen.height * screen.tileSize + 16,
-		200, 32,
-		"red", "white", 2);
+	//health bar - 45 pixels off center to leave more room for the messages
+	var healthX = screen.width * screen.tileSize / 2 - 100 + 45;
+	var healthY = screen.height * screen.tileSize + 16;
 
-	drawBar(screen.width * screen.tileSize / 2 - 100,screen.height * screen.tileSize + 16,
-	200 * world.healthBarPercent / 100, 32,
-	"green", "white", 2);
+	drawBar(healthX, healthY, 200, 32, "red", "white", 2);
+	drawBar(healthX, healthY, 200 * world.healthBarPercent / 100, 32, "green", "white", 2);
 
 	ctx.font = '16px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
 	for (var i = 0; i < 3; i++) {
