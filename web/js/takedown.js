@@ -1070,8 +1070,16 @@ var World = function(map) {
 	var closeButton = document.getElementById("close");
 
 	this.setFlags = function (newFlags) {
-		flags = newFlags;
+		flags = newFlags.slice(0);;
 		scripting.setFlags(flags);
+	}
+
+	this.getFlags = function () {
+		return flags.slice(0);
+	}
+
+	this.getNotesCollected = function() {
+		return notesCollected.slice(0);
 	}
 
 	this.hasLost = function () {
@@ -1098,7 +1106,7 @@ var World = function(map) {
 
 	this.setNotes = function (newNotes, newNotesCollected) {
 		notes = newNotes;
-		notesCollected = newNotesCollected;
+		notesCollected = newNotesCollected.slice(0);
 	};
 
 	this.enableNote = function (i) {
@@ -1499,12 +1507,20 @@ var start = function () {
 			savedGame.level++;
 			//heal the player
 			var endingHealth = world.p.health;
+
+			savedGame.notesCollected = world.getNotesCollected();
+			savedGame.flags = world.getFlags();
+
 			loadMission();
+
 			savedGame.health = endingHealth + world.healAmount;
 			if (savedGame.health > playerType.health) savedGame.health = playerType.health;
-			world.p.health = savedGame.health;
 
 			saves.save(savedGame);
+
+			world.p.health = savedGame.health;
+
+
 		}
 
 	}, 40);
