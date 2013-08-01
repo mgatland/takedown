@@ -365,6 +365,7 @@ var Pursuing = function () {
 	}
 
 	this.move = function (ai, owner, world, target) {
+		if (target == null) return dir.NONE;
 		return owner.pos.dirOnPathTowards(target.pos, world.map);
 	}
 }
@@ -413,6 +414,7 @@ var Surrounding = function (owner, world, target) {
 	};
 
 	this.move = function (ai, owner, world, target) {
+		if (target == null) return dir.NONE;
 		movesAllowed--;
 		return owner.pos.dirOnPathTowardsAvoiding(destination, world.map, target.pos, 2);
 	};
@@ -458,6 +460,7 @@ var Fighting = function () {
 	};
 
 	this.move = function (ai, owner, world, target) {
+		if (target == null) return dir.NONE;
 		movesUntilTactics--;
 		var dX = Math.abs(owner.pos.x - target.pos.x);
 		var dY = Math.abs(owner.pos.y - target.pos.y);
@@ -1051,6 +1054,7 @@ var World = function(map) {
 	var notesAreOpen = false;
 	var currentNote = 0;
 	var notes = [];
+	var notesCollected = [];
 
 	var notesWindow = document.getElementById("notes");
 	var notesText= document.getElementById("notesText");
@@ -1065,14 +1069,14 @@ var World = function(map) {
 
 	//dir - the direction to move if the current note isn't found
 	var validateCurrentNote = function (dir) {
-		if (!notes.some(function (note) {
-			return note.live;
+		if (!notes.some(function (note, i) {
+			return notesCollected[i] ? true : false;
 		})) {
 			currentNote = 0;
 			setText(notesText, "There are no notes to display");
 			return;
 		}
-		while (currentNote >= notes.length || currentNote < 0 || notes[currentNote].live === false) {
+		while (currentNote >= notes.length || currentNote < 0 || !notesCollected[currentNote]) {
 			currentNote += dir;
 			if (currentNote >= notes.length) currentNote = 0;
 			if (currentNote < 0) currentNote = notes.length - 1;
@@ -1080,18 +1084,19 @@ var World = function(map) {
 		setText(notesText, notes[currentNote].text);
 	}
 
-	this.setNotes = function (newNotes) {
+	this.setNotes = function (newNotes, newNotesCollected) {
 		notes = newNotes;
+		notesCollected = newNotesCollected;
 	};
 
 	this.enableNote = function (i) {
-		notes[i].live = true;
+		notesCollected[i] = true;
 		currentNote = i;
 		validateCurrentNote(1);
 	};
 
 	this.disableNote = function(i) {
-		notes[i].live = false;
+		notesCollected[i] = false;
 		validateCurrentNote(1);
 	};
 
@@ -1424,8 +1429,10 @@ var start = function () {
 	var world = null;
 	var camera = null;
 
-	//Persisted things:
 	var notes = null;
+
+	//Persisted things:
+	var notesCollected = [];
 	var flags = [];
 	var playerHealth = playerType.health;
 	var previousPlayerHealth = playerType.health;
@@ -1436,6 +1443,7 @@ var start = function () {
 	var loadMission = function () {
 		world = campaignLoader.loadMission(level);
 		world.setFlags(flags);
+		world.setNotes(notes, notesCollected);
 		world.audio = audio;
 		camera = new Camera(world.p.pos, world.map.width, world.map.height);
 		world.camera = camera;
@@ -1452,7 +1460,6 @@ var start = function () {
 			audio.load(function () {
 				notes = campaignLoader.loadNotes();
 				loadMission();
-				world.setNotes(notes);
 			});
 		});
 	});
@@ -1470,11 +1477,8 @@ var start = function () {
 
 		if (world && world.hasEnded && !world.isPaused()) {
 			level++;
-
 			previousPlayerHealth = world.p.health;
-
 			loadMission();
-			world.setNotes(notes);
 		}
 
 	}, 40);
