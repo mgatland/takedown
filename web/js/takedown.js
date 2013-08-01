@@ -774,6 +774,8 @@ var Person = function (pos, face, ai, type) {
 	ai.setOwner(this);
 	ai.setState(new Waiting());
 	this.deadTimer = 0;
+
+	this.idleTimer = 0;
 }
 
 Person.prototype.facingAwayFrom = function (pos) {
@@ -823,6 +825,18 @@ Person.prototype.update = function (world) {
 		if (this.heat > this.maxHeat) {
 			this.heat = this.maxHeat;
 		}
+	}
+
+	//enemies who are doing absolutely nothing might randomly face a different direction
+	if (moveDir == dir.NONE && shootAI.dir == dir.NONE && this.moved == 0 && this.shot == 0 && this.targetIndex == null) {
+		this.idleTimer++;
+		if (this.idleTimer > 60 && Math.random() > 0.97) {
+			this.idleTimer = 0;
+			var newFace = dir.adjacentDirs(this.face)[Math.floor(Math.random()*2)];
+			this.face = newFace;
+		}
+	} else {
+		this.idleTimer = 0;
 	}
 };
 
