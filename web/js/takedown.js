@@ -1074,6 +1074,11 @@ var World = function(map) {
 		scripting.setFlags(flags);
 	}
 
+	this.hasLost = function () {
+		if (this.p.health <= 0) return true;
+		return false;
+	}
+
 	//dir - the direction to move if the current note isn't found
 	var validateCurrentNote = function (dir) {
 		if (!notes.some(function (note, i) {
@@ -1348,9 +1353,20 @@ var World = function(map) {
 	}
 
 	var firstFrame = true;
+	var paused = false;
+
+
+	this.pause = function () {
+		paused = true;
+	}
+
+	this.unpause = function () {
+		paused = false;
+		//we can still be paused even if this is false, if we're showing screens we control, like briefings or notes
+	}
 
 	this.isPaused = function () {
-		return (briefingPage != null || notesAreOpen);
+		return (briefingPage != null || notesAreOpen || paused);
 	}
 
 	this.update = function () {
@@ -1437,12 +1453,14 @@ var start = function () {
 
 	var showMainMenu = function () {
 		mainMenuShowing = true;
+		if (world) world.pause();
 		showElement(mainMenu);
 	}
 
 	var hideMainMenu = function () {
 		mainMenuShowing = false;
 		hideElement(mainMenu);
+		if (world) world.unpause();
 	}
 
 	var loadMission = function () {
@@ -1538,6 +1556,51 @@ var start = function () {
 		world.p.health = savedGame.playerHealth;
 		hideMainMenu();
 	}
+
+	var continueGame = function () {
+		if (world == null || world.hasLost()) {
+			loadMission();
+			world.p.health = savedGame.playerHealth;
+			hideMainMenu();
+		} else {
+			hideMainMenu(); //resume currently running game
+		}
+	}
+
+	document.getElementById("mainmenu_continue").onclick = continueGame;
+
+	var optionsTimer = 0;
+
+	var update = function (world, keyboard, camera, savedGame) {
+
+		if (world === null) return;
+
+		if (optionsTimer == 0) {
+			if (keyboard.isKeyDown(KeyEvent.DOM_VK_M)) {
+				world.audio.toggleMusic();
+				optionsTimer = 12;
+			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_X)) {
+				world.toggleNotes();
+				optionsTimer = 12;
+			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_L) && keyboard.isKeyDown(KeyEvent.DOM_VK_Q)) {
+				world.hasEnded = true;
+			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_ESCAPE)) {
+				optionsTimer = 12;
+				if (!mainMenuShowing) {
+					showMainMenu();
+				} else {
+					continueGame();
+				}
+			}
+		} else {
+			optionsTimer--;
+		}
+
+		updatePlayerInput(keyboard, world.p.ai);
+		world.updateBriefing(keyboard);
+		world.update();
+	};
+
 };
 
 var updatePlayerInput = function (keyboard, playerAI) {
@@ -1579,31 +1642,6 @@ var updatePlayerInput = function (keyboard, playerAI) {
 		playerAI.timeSinceFired = 0;
 	}
 }
-
-var optionsTimer = 0;
-
-var update = function (world, keyboard, camera, savedGame) {
-
-	if (world === null) return;
-
-	if (optionsTimer == 0) {
-		if (keyboard.isKeyDown(KeyEvent.DOM_VK_M)) {
-			world.audio.toggleMusic();
-			optionsTimer = 12;
-		} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_X)) {
-			world.toggleNotes();
-			optionsTimer = 12;
-		} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_L) && keyboard.isKeyDown(KeyEvent.DOM_VK_Q)) {
-			world.hasEnded = true;
-		}
-	} else {
-		optionsTimer--;
-	}
-
-	updatePlayerInput(keyboard, world.p.ai);
-	world.updateBriefing(keyboard);
-	world.update();
-};
 
 //global...
 var tryMove = function (o, face, world, allowOffScreen, allowThroughPeople) {

@@ -147,11 +147,6 @@ var Scripting = function () {
 		return result;
 	}
 
-	var hasLost = function (world) {
-		if (world.p.health <= 0) return true;
-		return false;
-	}
-
 	var processAction = function (action, world) {
 		switch (action.type) {
 			case "alarm":
@@ -161,7 +156,7 @@ var Scripting = function () {
 				});
 				break;
 			case "screenxy":
-				if (hasLost(world)) return;
+				if (world.hasLost()) return;
 				var x = toInt(action.val[0]);
 				var y = toInt(action.val[1]);
 				world.camera.setPos(new Pos(x, y));
@@ -185,7 +180,7 @@ var Scripting = function () {
 				timers[timerIndex] = {value: startValue};
 				break;
 			case "mistxt":
-				if (hasLost(world)) return;
+				if (world.hasLost()) return;
 				var notePage = toInt(action.val[0]);
 				var noteValue = toInt(action.val[1]);
 				if (noteValue >= 0) {
@@ -206,19 +201,19 @@ var Scripting = function () {
 				flags[flagNumber] = flagValue;
 				break;
 			case "briefing":
-				if (hasLost(world)) return;
+				if (world.hasLost()) return;
 				var briefing = createBriefing(action.val);
 				world.setBriefing(briefing);
 				break;
 			case "text":
-				if (hasLost(world)) return;
+				if (world.hasLost()) return;
 				world.audio.play(world.audio.msg);
 				action.val.forEach(function (string) {
 					if (string && string.length > 0) world.addMessage(string);
 				});
 				break;
 			case "endmission":
-				if (hasLost(world)) return;
+				if (world.hasLost()) return;
 				var timeDelay = parseInt(action.val[0]);
 				//ignore the other parameters
 				world.endMission(timeDelay);
