@@ -1120,6 +1120,10 @@ var World = function(map) {
 		validateCurrentNote(1);
 	};
 
+	this.notesAreOpen = function () {
+		return notesAreOpen;
+	}
+
 	this.toggleNotes = function () {
 		notesAreOpen = !notesAreOpen;
 		if (notesAreOpen) {
@@ -1152,8 +1156,6 @@ var World = function(map) {
 	var continueButton = document.getElementById("continueButton");
 	var option0 = document.getElementById("option0");
 	var option1 = document.getElementById("option1");
-
-	var keyboardDelay = 0;
 
 	this.setBriefing = function (briefing) {
 		missionText = missionText.concat(briefing.text);
@@ -1199,12 +1201,8 @@ var World = function(map) {
 	};
 
 	this.updateBriefing = function (keyboard) {
-		if (keyboardDelay > 0) {
-			keyboardDelay--;
-			return;
-		}
-		if (keyboard.isKeyDown(KeyEvent.DOM_VK_UP)
-			|| keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN)) {
+		if (keyboard.isKeyHit(KeyEvent.DOM_VK_UP)
+			|| keyboard.isKeyHit(KeyEvent.DOM_VK_DOWN)) {
 
 			if (continueButton.style.display != "none") {
 				focusOn(continueButton);
@@ -1213,7 +1211,6 @@ var World = function(map) {
 			} else {
 				focusOn(option0);
 			}
-			keyboardDelay = 5;
 		}
 	}
 
@@ -1592,29 +1589,26 @@ var start = function () {
 		if (world === null) return;
 
 		if (optionsTimer == 0) {
-			if (keyboard.isKeyDown(KeyEvent.DOM_VK_M)) {
+			if (keyboard.isKeyHit(KeyEvent.DOM_VK_M)) {
 				world.audio.toggleMusic();
-				optionsTimer = 12;
-			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_X)) {
+			} else if (keyboard.isKeyHit(KeyEvent.DOM_VK_X)) {
 				world.toggleNotes();
-				optionsTimer = 12;
-			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_L) && keyboard.isKeyDown(KeyEvent.DOM_VK_Q)) {
+			} else if (keyboard.isKeyHit(KeyEvent.DOM_VK_L) && keyboard.isKeyDown(KeyEvent.DOM_VK_Q)) {
 				world.hasEnded = true;
-			} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_ESCAPE)) {
-				optionsTimer = 12;
-				if (!mainMenuShowing) {
+			} else if (keyboard.isKeyHit(KeyEvent.DOM_VK_ESCAPE)) {
+				if (world.notesAreOpen()) {
+					world.toggleNotes();
+				} else if (!mainMenuShowing) {
 					showMainMenu();
 				} else {
-					continueGame();
+					continueGame(); //hide main menu
 				}
 			}
-		} else {
-			optionsTimer--;
 		}
-
 		updatePlayerInput(keyboard, world.p.ai);
 		world.updateBriefing(keyboard);
 		world.update();
+		keyboard.update();
 	};
 
 };

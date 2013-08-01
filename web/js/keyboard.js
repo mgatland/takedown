@@ -33,9 +33,11 @@ function createKeyboard() {
 
     var keyboard = {};
     var keysDown = {};
+    var keysHit = {};
 
     window.addEventListener("keydown", function (e) {
         keysDown[e.keyCode] = true;
+        keysHit[e.keyCode] = true;
         switch(e.keyCode) {
             case KeyEvent.DOM_VK_DOWN:
             case KeyEvent.DOM_VK_UP:
@@ -52,5 +54,17 @@ function createKeyboard() {
     keyboard.isKeyDown = function (keyCode) {
         return keysDown[keyCode];
     }
+
+    keyboard.isKeyHit = function (keyCode) {
+        if (keysHit[keyCode]) {
+            console.log("Key hit !" + keyCode);
+        }
+        return keysHit[keyCode];
+    }
+
+    keyboard.update = function () {
+        keysHit = {};
+    }
+
     return keyboard;
 }
