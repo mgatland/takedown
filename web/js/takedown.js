@@ -1455,6 +1455,7 @@ var start = function () {
 
 	var mainMenuShowing = false;
 	var mainMenu = document.getElementById("mainmenu");
+	var helpScreen = document.getElementById("helpscreen");
 
 	var showMainMenu = function () {
 		mainMenuShowing = true;
@@ -1581,6 +1582,17 @@ var start = function () {
 	}
 
 	document.getElementById("mainmenu_continue").onclick = continueGame;
+
+	document.getElementById("mainmenu_help").onclick = function () {
+		mainMenu.style.display = "none"; //hacky, hide it but don't let the game know it's hidden
+		//the above is so you can't tab to it.
+		showElement(helpScreen);
+	}
+
+	document.getElementById("closeHelp").onclick = function () {
+		mainMenu.style.display = "block"; //hacky
+		hideElement(helpScreen);
+	}
 
 	var optionsTimer = 0;
 

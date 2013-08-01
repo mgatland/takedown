@@ -102,3 +102,9 @@ button {
 	margin: 15px;
 	font-size: 24px;
 }
+
+.menuCloseButton {
+	position: absolute;
+	top: 455px;
+	left: 0px;
+}
