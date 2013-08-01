@@ -1429,35 +1429,32 @@ var start = function () {
 
 	var notes = null;
 
-	//Persisted things:
-	var notesCollected = [];
-	var flags = [];
-	var playerHealth = playerType.health;
-	var previousPlayerHealth = playerType.health;
+	var saves = new SavedGames();
+	var savedGame = saves.load();
+
+	if (!savedGame.musicEnabled) audio.toggleMusic();
 
 	var campaignLoader = new CampaignLoader();
-	var level = 1;
+
 
 	var loadMission = function () {
-		world = campaignLoader.loadMission(level);
-		world.setFlags(flags);
-		world.setNotes(notes, notesCollected);
+		world = campaignLoader.loadMission(savedGame.level);
+		world.setFlags(savedGame.flags);
+		world.setNotes(notes, savedGame.notesCollected);
 		world.audio = audio;
 		camera = new Camera(world.p.pos, world.map.width, world.map.height);
 		world.camera = camera;
 		document.getElementById("briefing").style.display = null;
-
-		//heal the player
-		world.p.health = previousPlayerHealth + world.healAmount;
-		if (world.p.health > playerType.health) world.p.health = playerType.health;
 	};
 
 	//Load the art assets, then the campaign, then the sounds, then start.
 	assets.load(function () {
 		campaignLoader.load("./res/01.tdm", function () {
 			audio.load(function () {
+				//first load
 				notes = campaignLoader.loadNotes();
 				loadMission();
+				world.p.health = savedGame.playerHealth;
 			});
 		});
 	});
@@ -1474,9 +1471,15 @@ var start = function () {
 		});
 
 		if (world && world.hasEnded && !world.isPaused()) {
-			level++;
-			previousPlayerHealth = world.p.health;
+			savedGame.level++;
+			//heal the player
+			var endingHealth = world.p.health;
 			loadMission();
+			savedGame.health = endingHealth + world.healAmount;
+			if (savedGame.health > playerType.health) savedGame.health = playerType.health;
+			world.p.health = savedGame.health;
+
+			saves.save(savedGame);
 		}
 
 	}, 40);
@@ -1572,6 +1575,7 @@ var update = function (world, keyboard, camera) {
 	if (optionsTimer == 0) {
 		if (keyboard.isKeyDown(KeyEvent.DOM_VK_M)) {
 			world.audio.toggleMusic();
+			savedGame.musicEnabled = !savedGame.musicEnabled; //hacky, could get out of sync
 			optionsTimer = 12;
 		} else if (keyboard.isKeyDown(KeyEvent.DOM_VK_X)) {
 			world.toggleNotes();
