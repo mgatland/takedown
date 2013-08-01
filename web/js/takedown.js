@@ -1465,7 +1465,7 @@ var start = function () {
   	window.requestAnimationFrame = requestAnimationFrame;
 
 	window.setInterval(function () {
-		update(world, keyboard, camera);
+		update(world, keyboard, camera, savedGame);
 		requestAnimationFrame(function() {
 			render(world, camera, assets);
 		});
@@ -1568,7 +1568,7 @@ var updatePlayerInput = function (keyboard, playerAI) {
 
 var optionsTimer = 0;
 
-var update = function (world, keyboard, camera) {
+var update = function (world, keyboard, camera, savedGame) {
 
 	if (world === null) return;
 
