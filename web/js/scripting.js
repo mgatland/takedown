@@ -22,7 +22,7 @@ var Scripting = function () {
 
 	var spawnEnemy = function (eIndex, pos, world) {
 		var template = world.enemyTemplates[eIndex];
-		world.createEnemy(pos, template.type, template.state, template.goalDie);
+		world.createEnemy(pos, template.type, template.state, template.goalDie, template.tag);
 	}
 
 	// flag1, flag2, rule
