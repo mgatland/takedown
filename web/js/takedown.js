@@ -4,7 +4,8 @@
 var screen = {
 	width: 25,
 	height: 17,
-	tileSize: 30
+	tileSize: 30,
+	hudHeight: 64
 };
 
 var dir = {
@@ -1008,6 +1009,8 @@ Shot.prototype.update = function(world) {
 
 var World = function(map) {
 
+	this.healthBarPercent = 0;
+
 	this.kills = 0;
 	this.messages = [];
 	this.hasEnded = false;
@@ -1337,6 +1340,10 @@ var World = function(map) {
 
 	this.update = function () {
 
+		var desiredHealthBar = Math.floor(this.p.health * 100 / playerType.health);
+		if (this.healthBarPercent > desiredHealthBar) this.healthBarPercent--;
+		if (this.healthBarPercent < desiredHealthBar) this.healthBarPercent++;
+
 		if (this.isPaused()) return; //pause while briefing is displayed
 
 		if (missionIsEnding) {
@@ -1394,7 +1401,7 @@ var start = function () {
 	canvas = document.getElementById('gamescreen');
 	ctx = canvas.getContext("2d");
 	canvas.width = screen.width * screen.tileSize;
-	canvas.height = screen.height * screen.tileSize;
+	canvas.height = screen.height * screen.tileSize + screen.hudHeight;
 
 	var keyboard = createKeyboard();
 	var audio = createAudio();
@@ -1616,25 +1623,40 @@ var render = function (world, camera, assets) {
 		drawExplosion(e, camera, assets);
 	});
 
+	//HUD
+	drawBar(0,screen.height * screen.tileSize,
+		screen.width * screen.tileSize, screen.hudHeight,
+		"rgb(30,30,30)", "grey", 2);
+
 	ctx.fillStyle = (world.p.heat < 100)  ? "white" : "red";
 	ctx.font = '32px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
-	ctx.fillText("Heat: " + Math.floor(world.p.heat), 300, screen.height * screen.tileSize - 32);
-	ctx.fillStyle = "white";
-	ctx.fillText("Health: " + world.p.health, screen.width * screen.tileSize - 200, screen.height * screen.tileSize - 32);
+	ctx.fillText("Heat: " + Math.floor(world.p.heat), screen.width * screen.tileSize - 200, screen.height * screen.tileSize + 42);
+
+	//health bar
+	drawBar(screen.width * screen.tileSize / 2 - 100,screen.height * screen.tileSize + 16,
+		200, 32,
+		"red", "white", 2);
+
+	drawBar(screen.width * screen.tileSize / 2 - 100,screen.height * screen.tileSize + 16,
+	200 * world.healthBarPercent / 100, 32,
+	"green", "white", 2);
 
 	ctx.font = '16px Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif';
 	for (var i = 0; i < 3; i++) {
 		if (world.messages[i]) {
 			ctx.fillStyle = (world.messages[i].age < messageTextDelay) ? "white" : "rgb(255, 255, 200)";
-			ctx.fillText(world.messages[i].msg, 15, screen.height * screen.tileSize - 60 + i * 20);
+			ctx.fillText(world.messages[i].msg, 15, screen.height * screen.tileSize + 18 + i * 20);
 		}
 	}
 };
 
-//unused for now
-var drawSquare = function (pos, color, camera) {
-	ctx.fillStyle = color;
-	ctx.fillRect(pos.x*screen.tileSize - camera.xOff(), pos.y*screen.tileSize - camera.yOff(), screen.tileSize, screen.tileSize);
+var drawBar = function (x, y, width, height, color, borderColor, border) {
+	ctx.fillStyle = borderColor;
+	ctx.fillRect(x,y, width, height);
+	if (width > border * 2 && height > border * 2) {
+		ctx.fillStyle = color;
+		ctx.fillRect(x + border,y + border, width - border*2, height - border*2);
+	}
 }
 
 var drawDec = function (dec, camera, assets) {
@@ -1658,9 +1680,15 @@ var drawExplosion = function (exp, camera, assets) {
 }
 
 var drawTile = function (tilesImg, pos, tX, tY, camera) {
+	var screenX = pos.x * screen.tileSize - camera.xOff();
+	var screenY = pos.y * screen.tileSize - camera.yOff();
+	if (screenX < -screen.tileSize) return;
+	if (screenY < -screen.tileSize) return;
+	if (screenX > screen.width * screen.tileSize) return;
+	if (screenY > screen.height * screen.tileSize) return;
     ctx.drawImage(tilesImg, tX*screen.tileSize, tY*screen.tileSize,
     	screen.tileSize, screen.tileSize,
-    	pos.x*screen.tileSize- camera.xOff(),pos.y*screen.tileSize- camera.yOff(),
+    	screenX, screenY,
     	screen.tileSize,screen.tileSize);
 };
 
