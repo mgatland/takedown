@@ -1164,7 +1164,6 @@ var World = function(map) {
 		if (briefingPage == null) {
 			briefingPage = 0;
 		}
-
 		this.updateBriefingDisplay();
 	}
 
@@ -1183,9 +1182,13 @@ var World = function(map) {
 			missionText = [];
 			missionButtons = [];
 		} else {
+			briefingWindow.classList.remove('small');
 			showElement(briefingWindow);
 			setText(briefingText, missionText[briefingPage]);
-			if (missionButtons[briefingPage].length == 0) {
+			if (missionButtons[briefingPage] === "losemission") {
+				briefingWindow.classList.add('small');
+			}
+			if (missionButtons[briefingPage] === "losemission" || missionButtons[briefingPage].length == 0) {
 				showElement(continueButton);
 				focusOn(continueButton);
 				hideElement(option0);
@@ -1389,7 +1392,7 @@ var World = function(map) {
 		if (this.isPaused()) return; //pause while briefing is displayed
 
 		if (this.p.health <= 0 && !this.hasLost()) {
-			this.loseMission(100);
+			this.loseMission(30);
 		}
 
 		if (missionIsEnding) {
@@ -1400,6 +1403,9 @@ var World = function(map) {
 				this.audio.stopMusic();
 				if (!this.hasLost()) {
 					this.audio.play(this.audio.music, 2);
+				} else {
+					var loseBriefing = {text: ["Mission Failed"], buttons: ["losemission"]};
+					this.setBriefing(loseBriefing);
 				}
 			}
 		}

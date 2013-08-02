@@ -108,3 +108,16 @@ button {
 	top: 455px;
 	left: 0px;
 }
+
+.small.popover {
+	width: 706;
+	height: 20;
+	margin-top: 510px;
+	margin-left: 0px;
+}
+
+.small.popover #continueButton {
+	top: 0px;
+	margin-top: 10px;
+	left: 440px;
+}
