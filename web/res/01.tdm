@@ -136,7 +136,7 @@ MISSION STYLES:
 []
 [trigger]
 0,0,and,newlev,0,0,0,flag,0,0,+?,briefing,"^gMOVEMENT^2Use the arrow keys to move.^2Use W, A, S and D to shoot.","","",text,"Movement: arrow keys","Firing: W, A, S, D","Go East when ready"
-1,0,and,playerxy,7,2,0,flag,0,0,+?,briefing,"^gTAKEDOWN HUD^2From the bottom left of the screen:^1Mission information display^1Damage Bar - Damage you have taken.^1Temperature - How hot your systems are.","^gCOMBAT^2Hold Shift while firing to fire a charged shot.^2Standard shots are most versatile and cause less heat. Charged shots stop you from moving and create more heat. However, they move quickly and cause more damage. They are best used at long range.^1You CAN NOT fire while overheated. Firing excessively or taking damage will increase your heat.","",text,"Charged shots - hold shift","Watch your heat indicator","Go South when ready"
+1,0,and,playerxy,7,2,0,flag,0,0,+?,briefing,"^gCOMBAT^2Hold Shift while firing to fire a charged shot.^2Standard shots are most versatile and cause less heat. Charged shots stop you from moving and create more heat. However, they move quickly and cause more damage. They are best used at long range.^1You CAN NOT fire while overheated. Firing excessively or taking damage will increase your heat.","","",text,"Charged shots - hold shift","Watch your heat indicator","Go South when ready"
 2,0,and,playerxy,13,3,0,flag,0,0,+?,briefing,"^gThere is an enemy soldier out here. He does not know that you are near. Because he is boxed in, he will not be able to dodge if you fire at him quickly.","","",text,"-Fire at the enemy and kill him","",""
 3,0,and,kills,1,0,0,flag,0,0,+?,briefing,"^gAfter a fight, check your damage (Green\red bar) and heat (Percentage display). If you take too much damage you will die. If you have been hit or have been firing excessively, you will overheat.^2If your heat is high, wait until you cool before continuing. You cannot fire while your heat is above 100%.","","",text,"-Kill the remaining enemy","",""
 4,0,and,playerxy,3,5,0,flag,0,0,+?,briefing,"^gEnemies are easier to kill when they are not aware of you. Try not to let an enemy see you, any projectiles or other enemies who are already aware of you. Keep behind objects if possible. You are also harder to detect by an enemy who is facing away from you.","","",null,0,0,0
@@ -206,13 +206,13 @@ dec,21,12,3,0
 [MISSION 3]
 24,16
 "  * *         2      3   "
-"   1     * *   *    * *  "
+"  41     * *   *    * *  "
 "    *     4        1     "
-"         *        * *    "
+"         * 21     * *    "
 " *  *      * *           "
-"  3         2    *    *  "
-"   *                 2   "
-"               555       "
+"  3  2      23   *    *  "
+"   * 4               2   "
+"         1     555       "
 " *          * *    *  *  "
 "    * *      555555555   "
 "     2       5       5   "
@@ -226,7 +226,7 @@ dec,21,12,3,0
 
 10,16,1
 [enemy]
-0,8,13,1,standing,1,dude
+0,8,14,1,standing,1,dude
 1,13,13,5,standing,1,dude
 2,21,8,1,waiting,1,dude2
 3,22,8,1,waiting,1,dude2
@@ -248,21 +248,21 @@ dec,19,14,3,0
 " - HARD Teach the player about enemy reinforcements - 17/18 - plot development - May 4, 2170? or 5"
 [MISSION 4]
 24,16
-"        *    *    * *    "
+"        *    *    *2*    "
 " * *     3         1     "
 "  1      4 *    *   *    "
 "   *    * ~    3         "
-"     2          *        "
-"    * *   *          *   "
+"     214        2        "
+"    * *   *      1   *   "
 "     4        *  *       "
 " *   3         1     *   "
 "    * ~        32   4    "
-"      * *     *  *   *   "
+"      * *     *  1   2   "
 "       1    *            "
 "  *    2                 "
-"      * *  ~ *      *  * "
+" 42   * *  ~1*      *  * "
 "         34 2    *   41  "
-" *    * ~  ~ *      *  * "
+" *    * ~  ~ *      2  * "
 "  4                      "
 " * *                     "
 3
@@ -270,7 +270,6 @@ dec,19,14,3,0
 5,16,3
 [enemy]
 0,-1,-1,1,seeking,1,arrive
-1,-1,-1,5,seeking,1,arrive
 []
 [trigger]
 0,0,and,delay,50,-1,0,true,0,0,0,text,"2 enemies approaching from EAST","","",null,0,0,0
@@ -279,9 +278,9 @@ dec,19,14,3,0
 3,0,and,delay,180,-1,0,true,0,0,0,text,"1 enemy approaching from NORTH","","",null,0,0,0
 4,0,and,delay,237,-1,0,true,0,0,0,enemy,0,13,0,null,0,0,0
 5,0,and,delay,300,-1,0,true,0,0,0,text,"2 enemies approaching from NORTH","","",null,0,0,0
-6,0,and,delay,365,-1,0,true,0,0,0,enemy,0,14,0,enemy,1,16,0
+6,0,and,delay,365,-1,0,true,0,0,0,enemy,0,14,0,enemy,0,16,0
 7,0,and,delay,430,-1,0,true,0,0,0,text,"1 enemy approaching from EAST","","",null,0,0,0
-8,0,and,delay,480,-1,0,true,0,0,0,enemy,1,24,8,null,0,0,
+8,0,and,delay,480,-1,0,true,0,0,0,enemy,0,24,8,null,0,0,
 9,0,and,kills,6,0,0,true,0,0,0,endmission,50,1,0,text,"Area Secure","",""
 10,0,and,win,0,0,0,true,0,0,0,briefing,"^wOk, that's all of them for now.^2Peacekeeper 2 is still having trouble so we need to keep an eye out for enemies heading his way.","","",null,0,0,0
 []
@@ -394,28 +393,28 @@ keysq,5,9,leftcourt
 48,18
 "    555555555555555555555555555555555555555555555"
 "    5         5                 5                "
-"* * 5                *         *     *           "
-" 1  5    *   *   *        *     5          *     "
-"* *  *        55  5555555  5555555555555555  5555"
-"              5  *        *     *     *    *     "
-"    5         5                                  "
-"    5         5    *     *      *          *     "
+"* * 5                *  5      *     *       5   "
+" 1  5    *   *5  *      5 *     5          * 5   "
+"* *  *        555 5555555 55555555555555555  5555"
+"              5  *        *   5 *     5    *     "
+"    5         5                      * *         "
+"2   5         5    *     *    5 *     5    *     "
 "    555555555555555  55555555555  555555555  5555"
 "   *  *     *      *      5      *   5     *     "
-"     2                 *  5          5           "
-"*  *      * *         3   5          5           "
-"  1        4         * *  5    *     5           "
-" *            * *         5         * *    *     "
+"     2          1      *  5          5           "
+"*  * 1    * *         3   5          5           "
+"  1        43        * *  5    *     5           "
+" *     4      * *         5         * *    *     "
 "      *        2          5                      "
 "    3                   *  *         5           "
-"    4    *          1     5          5           "
+"    4    *          12    5          5           "
 "   * *        *      *  * 5          5           "
 "                          55555555555555555555555"
 3
 
 18,16,1
 [enemy]
-0,33,1,7,standing,1,commander
+0,35,1,7,standing,1,commander
 1,7,4,1,waiting,0,others
 2,30,14,3,waiting,0,others
 3,27,17,5,waiting,0,others
@@ -447,21 +446,21 @@ dec,35,17,4,0
 [MISSION 7] 
 24,16
 "   * *    *  *        *  "
-" *  4      3    *        "
+" *  43     3    *        "
 "1  *        4       *    "
-"      *      *    *  3   "
-"  *              1    *  "
-"   2              *      "
-"  *   *     *   *        "
-"                  *      "
+"      4      1    * 73   "
+"  *      77      1    *  "
+"   24             *      "
+"  *   65    *   *    34  "
+" 1    57    6     *      "
 "       3         2   *   "
-"        *       * *      "
-"   * *       *           "
-"    2         4          "
+"        *       *1*      "
+"   * *       *       7   "
+"    23        4      7   "
 "   *         * *     *   "
-"     *  *                "
-"      1                  "
-"  *    2   *  *   *      "
+"     *  *      55        "
+"   55 1        55    55  "
+"  *55  2   *  *   *  55  "
 "     *  *   31           "
 5
 
@@ -492,12 +491,12 @@ dec,35,17,4,0
 "   5     5  3   *     *  "
 "   5     5 5        5    "
 "   5     5* 8       5    "
-"   5     5 5        5    "
-"  *   *  5 5    *     *  "
-"   5     2 6        5    "
+"   5     5  6       5    "
+"  *   *  5  5   *     *  "
+"   5     2 65       5    "
 "   5    1  55555555555555"
-"   5     5*     *   5    "
-"5555555555  3       5    "
+"   5    5 *     *   5    "
+"555555555   3       5    "
 "   5 *    *5    *     *  "
 "   5  555555        5    "
 "   52 5     *     555    "
@@ -510,14 +509,14 @@ dec,35,17,4,0
 "   5    3  3        8    "
 "   5   * 4  5       5    "
 "   5    4 *8        5    "
-"*   *    1  4    *    *  "
+"*   *    1 4     *    *  "
 "   5     4 2        5    "
-"   5    1   5       5    "
-"   5     8  5       5    "
-"   555558  5        5    "
-"   5     5* 8     *    * "
-"*  5     5 57      75    "
-"   5    * *5777777775    "
+"   5     5 5        5    "
+"   5     8 5        5    "
+"   555558  5777777775    "
+"   5     5* 877   * 5  * "
+"*  5     5 57777    5    "
+"   5    * *         5    "
 "   5555555 5555555555    "
 5
 
@@ -566,8 +565,8 @@ dec,35,17,4,0
 25,0,and,delay,2000,-1,0,true,0,0,0,text,"Extraction in 20","","",null,0,0,0
 26,0,and,delay,2100,-1,0,true,0,0,0,text,"Extraction in 10","GET IN POSITION","",null,0,0,0
 '
-27,0,and,delay,2200,-1,0,playerxy,6,30,0,briefing,"^wLet's get the hell out of here! Stall hadn't abandoned the fort at all - They've got some kind of stealth. I'm seeing more and more troopers swarm out of nowhere.","Peacekeepers One and Four just broke contact. PK2 is alive, but he's been driven into sector 14. Get ready - we're going to try and pull him out.","",endmission,1,1,0
-29,0,+-,delay,2230,-1,0,playerxy,6,30,0,briefing,"^wWhere the hell were you? I needed you on that blue beacon! There are about fifty troopers swarming in, there's no way I can fly back in there.","^gYour situation is hopeless.^2Mission failed","",losemission,200,0,0
+27,0,and,delay,2200,-1,0,playerxy,19,30,0,briefing,"^wLet's get the hell out of here! Stall hadn't abandoned the fort at all - They've got some kind of stealth. I'm seeing more and more troopers swarm out of nowhere.","Peacekeepers One and Four just broke contact. PK2 is alive, but he's been driven into sector 14. Get ready - we're going to try and pull him out.","",endmission,1,1,0
+29,0,+-,delay,2330,-1,0,playerxy,19,30,0,briefing,"^wWhere the hell were you? I needed you on that blue beacon! There are about fifty troopers swarming in, there's no way I can fly back in there.","^gYour situation is hopeless.^2Mission failed","",losemission,200,0,0
 '
 30,0,and,delay,5,-1,0,true,0,0,0,speech,-1,1,0,null,0,0,0
 '
@@ -583,7 +582,7 @@ dec,35,17,4,0
 39,0,and,playerxy,8,21,0,true,0,0,0,null,0,0,0,mistxt,19,0,0
 []
 [misc]
-dec,6,30,11,-1
+dec,19,30,11,-1
 dec,8,21,3,0
 dec,8,5,15,0
 dec,9,6,16,0
@@ -605,20 +604,20 @@ dec,16,31,16,0
 [MISSION 9] 
 24,16
 "           *      * *    "
-" * *               1     "
-"  1     *       *   *    "
-"   *           3         "
-"     2          *        "
-"    * *   *          *   "
-"                         "
-" *   3        *  *   *   "
+" * *    43         14    "
+"  1     * 2     *   *    "
+"   4           3         "
+"     2          *   32   "
+"  58* *   55   55    *   "
+"  55  1        56        "
+" *   3   2    *  *   *   "
 "    *          2    4    "
-"      * *     *      *   "
-"            *            "
-"  *    3                 "
+"23    * *     *      *   "
+"    55    4 *   12    1  "
+"  * 55 3                 "
 "      * *    *     * *   "
-"            2       1    "
-" *           *     * *   "
+"            277777  1    "
+" *1          *     * *   "
 "  4    *                 "
 " * *                     "
 4
@@ -633,14 +632,14 @@ dec,16,31,16,0
 5,11,11,1,seeking,1,enemy
 6,12,12,1,seeking,1,enemy
 7,13,11,1,seeking,1,enemy
-8,14,13,1,seeking,1,enemy
+8,14,12,1,seeking,1,enemy
 9,15,12,1,seeking,1,enemy
 10,16,11,1,seeking,1,enemy
 []
 [trigger]
 0,0,and,newlev,0,0,0,true,0,0,0,text,"Rescue Peacekeeper 2","","",flag_setval,27,1,0
 1,0,+-,enemylives,friend,1,0,enemylives,enemy,1,0,briefing,"^wStall troopers are rallying to the surrounding area. We better move.","^wI can repare Peacekeeper 2's systems but it'll mean taking a component from yours. Your repair unit will be working at 50% efficiency - you will only be able to repair up to 50% of your total armour between missons.","",endmission,50,1,0
-2,0,+-,true,0,0,0,enemylives,friend,1,0,briefing,"^wHe's dead!","^gMission failed","",losemission,1,0,0
+2,0,+-,true,0,0,0,enemylives,friend,1,0,briefing,"^wHe's dead!","","",losemission,1,0,0
 []
 [misc]
 []
@@ -655,22 +654,22 @@ dec,16,31,16,0
 [MISSION 10]
 24,16
 "   *      *         5    "
-"    3          *    5    "
-"   *      * *       6  * "
-"           2        8    "
-"      4     *       5    "
+"    3    2     12   5    "
+"   * 1    * *       6  * "
+" 1         23       8 4  "
+"      42    *       5    "
 "*   *   *        *  5    "
-" 568      58       56    "
+" 568555   58       56    "
 "*   *    *  *     *  *   "
-"      1                  "
+"      1     3            "
 "          *        3     "
-"               *         "
-"           2             "
-"   *      *     *    *   "
-"                         "
-"       4                 "
-"     *  *      *         "
-"                   1     "
+"  77    55     *5555 555 "
+"  77    55 2    5        "
+"   *      *   1 5    *   "
+"    55       4  5 77     "
+"    55 4        5 77     "
+"  1  *  *      *         "
+"       2           1     "
 4
 
 14,0,3
@@ -678,7 +677,7 @@ dec,16,31,16,0
 0,-1,-1,13,seeking,0,friend
 1,-1,-1,5,seeking,1,arrive
 2,-1,-1,11,seeking,1,arrive
-3,-1,-1,3,seeking,1,arrive
+3,-1,-1,1,seeking,1,arrive
 4,-1,-1,1,seeking,1,arrive
 []
 [trigger]
@@ -702,7 +701,7 @@ dec,16,31,16,0
 [misc]
 []
 [brief]
-"^wWe've got enemies approaching all over the place. Fight them off.^2UNITY is having trouble calculating a course of action. Stall isn't following any recorded behaviour pattern. Their movements seem totally unpredictable.","^wNumber two managed to access some upgrade technology during his mission. Now that we've got that info, he's expendable. Try to keep him alive while you can.^2We've got resources to give you a one-off upgrade, and we should be able to do more soon. Choose an upgrade from the list.",""
+"^wWe've got enemies approaching all over the place. Fight them off.^2UNITY is having trouble calculating a course of action. Stall isn't following any recorded behaviour pattern. Their movements seem totally unpredictable.","^wNumber two managed to access some key information about Stall technology during his mission. Now that we've got that info, he's expendable. Try to keep him alive while you can.",""
 5
 []
 
@@ -728,36 +727,39 @@ dec,16,31,16,0
 "55555555555555555555555555555555555555555555555555"
 0
 
-14,0,3
+14,1,3
 [enemy]
 0,-1,-1,13,seeking,0,friend
-1,-1,-1,5,seeking,1,arrive
-2,-1,-1,11,seeking,1,arrive
-3,-1,-1,3,seeking,1,arrive
-4,-1,-1,1,seeking,1,arrive
+1,4,7,1,waiting,1,none
+2,5,7,1,waiting,1,none
+3,4,11,5,waiting,1,none
+4,4,12,1,waiting,1,none
+5,9,10,1,waiting,1,none
+6,13,14,1,waiting,1,none
+'
+7,18,9,1,waiting,1,none
+8,20,9,1,waiting,1,none
+'
+9,21,5,1,waiting,1,none
+'
+10,27,4,5,waiting,1,none
+'
+11,43,4,1,waiting,1,none
+12,43,11,1,waiting,1,none
+13,44,11,1,waiting,1,none
 []
 [trigger]
-0,0,and,newlev,0,0,0,flag,27,0,+?,enemy,0,13,0,null,0,0,0
+0,0,and,newlev,0,0,0,flag,27,0,+?,enemy,0,13,1,null,0,0,0
 1,0,and,newlev,0,0,0,true,0,0,0,flag_setval,0,0,0,null,0,0,0
 2,0,+-,flag,27,0,+?,enemylives,friend,1,0,flag_setval,27,0,0,briefing,"^gPeacekeeper two is down.^[0Continue game^01]^[1Restart mission^00]","",""
 3,0,and,flag,0,0,+?,true,0,0,0,losemission,1,0,0,null,0,0,0
 '
 4,0,and,newlev,0,0,0,true,0,0,0,upgscreen,0,0,0,null,0,0,0
-5,0,and,delay,50,-1,0,true,0,0,0,text,"4 enemies approaching from SOUTH","","",null,0,0,0
-6,0,and,delay,130,-1,0,true,0,0,0,enemy,1,10,16,null,0,0,0
-7,0,and,delay,153,-1,0,true,0,0,0,enemy,3,12,16,null,0,0,0
-9,0,and,delay,267,-1,0,true,0,0,0,enemy,1,11,16,enemy,4,10,16
-10,0,and,delay,380,-1,0,true,0,0,0,text,"2 enemies approaching from WEST","","",null,0,0,0
-11,0,and,delay,435,-1,0,true,0,0,0,enemy,2,0,9,enemy,4,0,10
-12,0,and,delay,500,-1,0,true,0,0,0,text,"1 enemy approaching from SOUTH","","",null,0,0,0
-13,0,and,delay,580,-1,0,true,0,0,0,enemy,2,9,16,null,0,0,
-14,0,and,kills,7,0,0,flag,0,0,-?,endmission,50,1,0,text,"Area Secure","",""
-15,0,and,win,0,0,0,flag,0,0,-?,briefing,"^wGood work. From here on, there's going to be a significant change of plan. UNITY has run an evaluation and found that somehow Stall is learning of or even anticipating UNITY's decisions.^2The only way we can proceed from here is by breaking contact with the UNITY processor. From here on, there will be no transmissions to or from UNITY. The tracking devices attached to our equipment are being disabled. We will operate independent of any outside influence until such time as the source of Stall's intelligence can be identified and destroyed.^2We are completely on our own from here on in.","","",null,0,0,0
 []
 [misc]
 []
 [brief]
-"^wWe will need intelligence before we can safely move. I'm dropping you into a building that may have terminal access to maps showing Stall's forces. Because of the UNITY's radio jamming, everything will be stored locally. You should have no trouble retrieving the information.^2Go back to the blue beacon when you've finished.","",""
+"^wWe will need intelligence before we can safely move. I'm dropping you into a building that may have terminal access to maps showing Stall's forces. Because of the UNITY's radio jamming, everything will be stored locally. You should have no trouble retrieving the information.^2Go back to the blue beacon when you've finished.","^gThis mission is unfinished, and this is the end of the campaign. Congratulations, you win!^2But you can't win this mission, it has no ending.",""
 5
 []
 
