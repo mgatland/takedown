@@ -57,17 +57,22 @@ function createAudio(saves) {
 	}
 
 	var context = init();
- 	var musicVolumeNode = context.createGain();
-	musicVolumeNode.connect(context.destination);
-	musicVolumeNode.gain.value = defaultMusicVolume;
-
 
 	var settings = saves.loadSettings();
 	settings.musicDisabled = settings.musicDisabled ? true : false;
-	if (settings.musicDisabled) musicVolumeNode.gain.value = 0;
+
+	if (context) {
+	 	var musicVolumeNode = context.createGain();
+		musicVolumeNode.connect(context.destination);
+		musicVolumeNode.gain.value = defaultMusicVolume;
+		if (settings.musicDisabled) musicVolumeNode.gain.value = 0;
+	}
 
     audio.load = function (callback) {
-
+    	if (!context) {
+    		callback(); //just immediately continue
+    		return;
+    	}
     	var soundsToLoad = 0;
 
     	var checkIfAllHaveLoaded = function () {
@@ -132,19 +137,23 @@ function createAudio(saves) {
     };
 
 	audio.play = function (set, index) {
+		if (!context) return;
 		playSound(set, index);
 	};
 
 	audio.playVoice = function (set, index) {
+		if (!context) return;
 		playSound(set, index, false, true);
 	}
 
 	audio.playMusic = function (set, index) {
+		if (!context) return;
 		this.stopMusic();
 		music = playSound(set, index, true);
 	};
 
 	audio.stopMusic = function () {
+		if (!context) return;
 		if (music != null) {
 			music.stop(0);
 			music = null;
@@ -154,6 +163,7 @@ function createAudio(saves) {
 	audio.setMusicEnabled = function (state) {
 		settings.musicDisabled = !state;
 		saves.saveSettings(settings);
+		if (!context) return;
 		if (settings.musicDisabled) {
 			musicVolumeNode.gain.value = 0;
 		} else {
