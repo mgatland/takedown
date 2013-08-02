@@ -223,6 +223,7 @@ function CampaignLoader() {
 
         //now initialize the world and call the callback
         var world = new World(createGrid(width, height));
+        world.level = level;
         world.groundType = groundType;
         world.healAmount = healAmount;
         world.setBriefing(briefing);

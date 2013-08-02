@@ -18,6 +18,15 @@ var dir = {
 
 var messageTextDelay = 50;
 
+var track = function (action, label, number) {
+	console.log("_trackEvent: " + action + ", " + label + ", " + number);
+	try {
+		_gaq.push(['_trackEvent',"takedown_ingame",action, label, number]);;
+	} catch (e) {
+
+	}
+}
+
 var hideElement = function (el) {
 	el.style.display = "none";
 }
@@ -1247,6 +1256,7 @@ var World = function(map) {
 	}
 
 	this.loseMission = function (timeDelay) {
+		track("TD_lose", null, this.level);
 		forceLose = true;
 		this.endMission(timeDelay);
 	}
@@ -1464,6 +1474,9 @@ var World = function(map) {
 };
 
 var start = function () {
+
+
+	track("open_game", null, null);
 	canvas = document.getElementById('gamescreen');
 	ctx = canvas.getContext("2d");
 	canvas.width = screen.width * screen.tileSize;
@@ -1502,6 +1515,7 @@ var start = function () {
 	}
 
 	var loadMission = function () {
+		track("TD_load_mission", null, savedGame.level);
 		world = campaignLoader.loadMission(savedGame.level);
 		world.setFlags(savedGame.flags);
 		world.setNotes(notes, savedGame.notesCollected);
