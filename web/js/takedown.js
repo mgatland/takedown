@@ -753,9 +753,10 @@ shotTypes[4] = {damage: 2, moveSpeed: -1, skin: 2}; // instant hit enemy shot
 
 //player
 var playerType = {health: 10, shootSpeed: 14, moveSpeed: 4, skin: 0, shotType: 0, skill: 99, fightDistMax: 10, fightDistMin: 3, team: 0};
-//player guns:
-// 0 - heatInc: 20, projType: 0, sspeed: 14
-// 1 - heatInc: 35, kick: 15, projType: 2, sspeed: 22
+
+var playerGuns = [];
+playerGuns[0] = {heatIncrease: 20, shotType: 0, shootSpeed: 14, kick: 0};
+playerGuns[1] = {heatIncrease: 35, shotType: 2, shootSpeed: 22, kick: 15};
 
 var enemyTypes = [];
 enemyTypes[1] = {health:  4, shootSpeed: 40, moveSpeed: 8, skin: 1, shotType: 1, skill: 50, fightDistMax: 7, fightDistMin: 2, team: 1 }; //grunt
@@ -856,14 +857,24 @@ Person.prototype.fire = function (mode, world) {
 		this.shot = 10;
 		if (this.isLocalPlayer) world.audio.play(world.audio.overheat);
 	} else {
-		//mode is ignored
-		var shot = world.createShot(this.type.shotType, this.pos, this.face, this.team, this.index, this.targetIndex);
-		if (shot !== null) {
-			//set up shot stealth, special
+		//we have different weapons
+		if (this.guns) {
+			var gun = this.guns[mode];
+			var shot = world.createShot(gun.shotType, this.pos, this.face, this.team, this.index, this.targetIndex);
+			this.heat += gun.heatIncrease;
+			this.shot = gun.shootSpeed;
+			world.audio.play(world.audio.shot, gun.shotType);
+			if (gun.kick) {
+				this.moved = Math.max(this.moved, gun.kick);
+			}
+		} else {
+			//ignore mode, we only have one fire mode
+			var shot = world.createShot(this.type.shotType, this.pos, this.face, this.team, this.index, this.targetIndex);
+			this.heat += 0; //only people with guns can overheat
+			this.shot = this.type.shootSpeed;
 			world.audio.play(world.audio.shot, this.type.shotType);
 		}
-		this.heat += heatOnFiring;
-		this.shot = this.type.shootSpeed;
+
 		if (this.moved < gunKick) {
 			this.moved = gunKick;
 		}
@@ -1295,6 +1306,7 @@ var World = function(map) {
 
 	this.createPlayer = function (pos, face) {
 		this.p = new Person(pos, face, new PlayerAI(), playerType);
+		this.p.guns = playerGuns;
 		this.p.isLocalPlayer = true;
 		this.p.index = this.enemies.length;
 		this.enemies.push(this.p);
