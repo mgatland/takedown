@@ -32,7 +32,7 @@ var hideElement = function (el) {
 }
 
 var showElement = function (el) {
-	el.style.display = null;
+	el.style.display = "";
 }
 
 dir.random = function () {
