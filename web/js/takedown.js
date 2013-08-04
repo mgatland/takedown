@@ -1256,7 +1256,7 @@ var World = function(map) {
 	}
 
 	this.loseMission = function (timeDelay) {
-		track("TD_lose", null, this.level);
+		track("TD_lose", this.level, null);
 		forceLose = true;
 		this.endMission(timeDelay);
 	}
@@ -1515,7 +1515,7 @@ var start = function () {
 	}
 
 	var loadMission = function () {
-		track("TD_load_mission", null, savedGame.level);
+		track("TD_load_mission", savedGame.level, null);
 		world = campaignLoader.loadMission(savedGame.level);
 		world.setFlags(savedGame.flags);
 		world.setNotes(notes, savedGame.notesCollected);
