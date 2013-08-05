@@ -21,7 +21,7 @@ var messageTextDelay = 50;
 var track = function (action, label, number) {
 	console.log("_trackEvent: " + action + ", " + label + ", " + number);
 	try {
-		_gaq.push(['_trackEvent',"takedown_ingame",action, label, number]);;
+		_gaq.push(['_trackEvent',"takedown_ingame", action, ""+label, number]);;
 	} catch (e) {
 
 	}
