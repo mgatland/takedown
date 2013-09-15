@@ -1310,6 +1310,7 @@ var World = function(map) {
 		e.index = this.enemies.length;
 		e.goalDie = goalDie;
 		e.tag = tag;
+		e.moved = e.type.moveSpeed;
 		//states are "standing", "waiting" and "seeking"
 		//ignore "standing" and "waiting", but "seeking" makes them aware of everyone
 		if (state === "seeking") {
