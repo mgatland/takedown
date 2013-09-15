@@ -781,7 +781,7 @@ enemyTypes[7] = {health: 10, shootSpeed: 30, moveSpeed: 8, skin: 4, shotType: 0,
 enemyTypes[9] = {health: 12, shootSpeed: 20, moveSpeed: 4, skin: 5, shotType: 2, skill: 85, fightDistMax: 10, fightDistMin: 3, team: 1}; //elite commando
 enemyTypes[11] = {health: 4, shootSpeed: 30, moveSpeed: 8, skin: 6, shotType: 4, skill: 65, fightDistMax: 20, fightDistMin: 4, team: 1}; //sniper
 //teammate
-enemyTypes[13] = {health: 10, shootSpeed: 30, moveSpeed: 8, skin: 8, shotType: 0, skill: 100, fightDistMax: 9, fightDistMin: 2, team: 0};
+enemyTypes[13] = {health: 10, shootSpeed: 16, moveSpeed: 5, skin: 8, shotType: 0, skill: 100, fightDistMax: 9, fightDistMin: 2, team: 0};
 
 var Person = function (pos, face, ai, type) {
 	this.type = type;

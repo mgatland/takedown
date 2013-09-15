@@ -619,7 +619,7 @@ dec,16,31,16,0
 "    55    4 *   12    1  "
 "  * 55 3                 "
 "      * *    *     * *   "
-"            277777  1    "
+"              2     1    "
 " *1          *     * *   "
 "  4    *                 "
 " * *                     "
@@ -628,16 +628,16 @@ dec,16,31,16,0
 10,0,3
 [enemy]
 0,14,14,13,seeking,0,friend
-1,11,10,1,seeking,1,enemy
-2,12,10,1,seeking,1,enemy
-3,13,9,1,seeking,1,enemy
-4,14,10,1,seeking,1,enemy
-5,11,11,1,seeking,1,enemy
-6,12,12,1,seeking,1,enemy
-7,13,11,1,seeking,1,enemy
-8,14,12,1,seeking,1,enemy
-9,15,12,1,seeking,1,enemy
-10,16,11,1,seeking,1,enemy
+1,11,10,1,seeking,3,enemy
+2,12,10,1,seeking,3,enemy
+3,13,9,1,seeking,3,enemy
+4,14,10,1,seeking,3,enemy
+5,11,11,1,seeking,3,enemy
+6,12,12,1,seeking,3,enemy
+7,13,11,1,seeking,3,enemy
+8,14,12,1,seeking,3,enemy
+9,15,12,1,seeking,3,enemy
+10,16,11,1,seeking,3,enemy
 []
 [trigger]
 0,0,and,newlev,0,0,0,true,0,0,0,text,"Rescue Peacekeeper 2","","",flag_setval,27,1,0
