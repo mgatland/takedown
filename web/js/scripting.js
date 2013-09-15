@@ -164,8 +164,9 @@ var Scripting = function () {
 			case "e_patrolto":
 				var enemyIndex = toInt(action.val[0]);
 				var keySquare = world.getKeySquare(action.val[1]);
-				//the third argument, the state to enter when we arrive, is ignored.
-				world.enemies[enemyIndex].ai.patrolTo(keySquare.pos);
+				var nextAction = action.val[2];
+				//NextState can be 'seek', or empy\anything else to do nothing.
+				world.enemies[enemyIndex].ai.patrolTo(keySquare.pos, nextAction);
 				break;
 			case "speech":
 				var speaker = toInt(action.val[0]); //unused

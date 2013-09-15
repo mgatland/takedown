@@ -325,6 +325,7 @@ If line of sight is lost, any combat state transitions to Pursuing
 var Waiting = function () {
 
 	var patrolPos = null;
+	var patrolEndAction = "";
 
 	this.name = "Waiting";
 	this.update = function (ai, owner, world, target) {
@@ -337,6 +338,10 @@ var Waiting = function () {
 	this.move = function (ai, owner, world, target) {
 		if (patrolPos && patrolPos.equals(owner.pos)) {
 			patrolPos = null;
+			if (patrolEndAction === 'seek') {
+				ai.makeAllAware();
+			}
+			patrolEndAction = '';
 		}
 		if (patrolPos === null) {
 			return dir.NONE;
@@ -345,8 +350,9 @@ var Waiting = function () {
 	}
 
 	//only for Waiting state
-	this.patrolTo = function (pos) {
+	this.patrolTo = function (pos, endAction) {
 		patrolPos = pos;
+		patrolEndAction = endAction;
 	}
 }
 
@@ -517,9 +523,9 @@ var AI = function () {
 	}
 
 	//called by scripting
-	this.patrolTo = function (pos) {
+	this.patrolTo = function (pos, endAction) {
 		if (state.patrolTo) {
-			state.patrolTo(pos);
+			state.patrolTo(pos, endAction);
 		}
 	}
 
